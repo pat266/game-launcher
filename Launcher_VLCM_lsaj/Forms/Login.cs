@@ -17,109 +17,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             InitializeComponent();
         }
 
-        private void Login_Load(object sender, EventArgs e)
+        /**
+         * Form method: 
+         * Load up the captcha
+         */
+        private void Load_Initial_Captcha(object sender, EventArgs e)
         {
             // load captcha
             load_captcha();
-        }
-
-        /**
-         * 
-         */
-        private void load_captcha()
-        {
-            // get the captcha based on the cookies
-            byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
-            if (captcha_data == null)
-                return;
-
-            // put the captcha in picture box control in the login form
-            try
-            {
-                using (MemoryStream memory_stream = new MemoryStream(captcha_data))
-                {
-                    pictureBox_captcha.Image = Image.FromStream(memory_stream);
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message), "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /**
-         * KeyEventHandler of the login window
-         */
-        private void Login_KeyDown(object sender, KeyEventArgs e)
-        {
-            // treat hitting enter the same as clicking ok button
-            switch (e.KeyCode)
-            {
-                case Keys.Enter:
-                    button_ok_Click(sender, e);
-                    return;
-            }
-        }
-
-        /**
-         * EventHandler of the the login window
-         */
-        private void button_ok_Click(object sender, EventArgs e)
-        {
-            // basic check of login info
-            if (!check_input_data())
-                return;
-            
-            login();
-        }
-
-        /**
-         * Helper method:
-         * perform basic check on the input data in the login window
-         */
-        private bool check_input_data()
-        {
-            if (textBox_username.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_username.Focus();
-                return false;
-            }
-
-            if (textBox_password.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_password.Focus();
-                return false;
-            }
-            if (textBox_server.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_server.Focus();
-                return false;
-            }
-            int server;
-            if (!int.TryParse(textBox_server.Text, out server))
-            {
-                MessageBox.Show("Server is invalid! Server has to be a number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
-            }
-            if (server <= 0)
-            {
-                MessageBox.Show("Server is invalid! Server has to be a positive number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
-            }
-            if (textBox_captcha.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_captcha.Focus();
-                return false;
-            }
-            return true;
         }
 
         /**
@@ -168,7 +73,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // create the appropriate data format to login
             byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
                 textBox_username.Text, md5_encrypt(textBox_password.Text), textBox_captcha.Text));
-            
+
             // send login request
             byte[] response_data_for_login =
                 Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj",
@@ -188,12 +93,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 load_captcha();
                 return;
             }
-            
+
             // send request to access the game
             byte[] response_data_for_game = Web_Request.Web_Request.send_request(
                 string.Format("http://www.niua.com/playGame/code/lsaj{0}/", textBox_server.Text), "GET", null,
                 Program.cookies);
-            
+
             if (response_data_for_game == null)
                 return;
 
@@ -214,6 +119,108 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             // close the login window
             Close();
+        }
+
+        /**
+         * Helper method:
+         * Retrieve the captcha image from the server and display it in the form.
+         */
+        private void load_captcha()
+        {
+            // get the captcha based on the cookies
+            byte[] captcha_data =
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
+            if (captcha_data == null)
+                return;
+
+            // put the captcha in picture box control in the login form
+            try
+            {
+                using (MemoryStream memory_stream = new MemoryStream(captcha_data))
+                {
+                    pictureBox_captcha.Image = Image.FromStream(memory_stream);
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message), "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /**
+         * Main method:
+         * KeyEventHandler of the login window
+         */
+        private void Login_KeyDown(object sender, KeyEventArgs e)
+        {
+            // treat hitting enter the same as clicking ok button
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    button_ok_Click(sender, e);
+                    return;
+            }
+        }
+
+        /**
+         * Main method:
+         * EventHandler of the the login window
+         */
+        private void button_ok_Click(object sender, EventArgs e)
+        {
+            // basic check of login info
+            if (!check_input_data())
+                return;
+            
+            login();
+        }
+
+        /**
+         * Helper method:
+         * Perform basic check on the input data in the login window
+         */
+        private bool check_input_data()
+        {
+            if (textBox_username.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_username.Focus();
+                return false;
+            }
+
+            if (textBox_password.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_password.Focus();
+                return false;
+            }
+            if (textBox_server.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_server.Focus();
+                return false;
+            }
+            int server;
+            if (!int.TryParse(textBox_server.Text, out server))
+            {
+                MessageBox.Show("Server is invalid! Server has to be a number.", "Server Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
+            if (server <= 0)
+            {
+                MessageBox.Show("Server is invalid! Server has to be a positive number.", "Server Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
+            if (textBox_captcha.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_captcha.Focus();
+                return false;
+            }
+            return true;
         }
 
         /**
