@@ -91,8 +91,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // check if login is successful
             if (!Encoding.UTF8.GetString(response_data_for_login).Contains("欢迎您登录！"))
             {
-                MessageBox.Show("Login information or captcha is incorrect!", "Login Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Login information or captcha is incorrect!",
+                                "Login Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 // reload captcha
                 load_captcha();
                 return;
@@ -120,8 +122,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // basic check to see if we can load the game
             if (Program.flash_movie == "" || Program.flash_vars == "")
             {
-                MessageBox.Show("Cannot get data to load game!", "Flash Info Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Cannot get data to load game!",
+                                "Flash Info Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return;
             }
             // close the login window
@@ -153,8 +157,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             catch (Exception exception)
             {
-                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message), "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message),
+                                "Captcha Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
         }
 
@@ -214,14 +220,26 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             int server;
             if (!int.TryParse(textBox_server.Text, out server))
             {
-                MessageBox.Show("Server is invalid! Server has to be a number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Server is invalid! Server has to be a number.",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return false;
             }
             if (server <= 0)
             {
-                MessageBox.Show("Server is invalid! Server has to be a positive number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Server is invalid! Server has to be a positive number.",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return false;
+            }
+            if (server > max_server)
+            {
+                MessageBox.Show("Server is invalid! Server has to be less than or equal to " + max_server + ".",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return false;
             }
             if (textBox_captcha.Text == "")
@@ -305,7 +323,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             byte[] html = Web_Request.Web_Request.send_request("http://www.niua.com/server/code/lsaj/",
                                                                 "GET",
                                                                 null,
-                                                                Program.cookies);
+                                                                null);
             if (html == null)
                 return 0;
             // convert the html to string
