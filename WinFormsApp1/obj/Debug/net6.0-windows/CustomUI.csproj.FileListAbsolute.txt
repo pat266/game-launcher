@@ -1,0 +1,14 @@
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\bin\Debug\net6.0-windows\CustomUI.deps.json
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\bin\Debug\net6.0-windows\CustomUI.dll
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\bin\Debug\net6.0-windows\CustomUI.pdb
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.csproj.AssemblyReference.cache
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\WinFormsApp1.Form1.resources
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.csproj.GenerateResource.cache
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.AssemblyInfoInputs.cache
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.AssemblyInfo.cs
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.csproj.CoreCompileInputs.cache
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.dll
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\refint\CustomUI.dll
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\CustomUI.pdb
+C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\WinFormsApp1\obj\Debug\net6.0-windows\ref\CustomUI.dll

@@ -358,10 +358,5 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             string server = temp.Groups[1].ToString();
             return int.Parse(server);
         }
-
-        private void combo_server_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
