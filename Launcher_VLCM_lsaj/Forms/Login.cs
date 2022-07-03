@@ -19,7 +19,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // load up the login window
             InitializeComponent();
             // add load server to be loaded before the game window is loaded
-            this.Load += new EventHandler(this.Load_Server);
+            // this.Load += new EventHandler(this.Load_Server);
         }
 
         /**
@@ -38,16 +38,19 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void Load_Server(object sender, EventArgs e)
         {
-            // retrieve the max number of server
-            max_server = get_max_server();
-            Console.WriteLine("The current max server is: " + max_server);
-            
-            // load the available server in the ComboBox
-            combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+            if (max_server == 0)
+            {
+                // retrieve the max number of server
+                max_server = get_max_server();
+                Console.WriteLine("The current max server is: " + max_server);
 
-            combo_server.DisplayMember = "Server";
-            combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-            combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
+                // load the available server in the ComboBox
+                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+
+                combo_server.DisplayMember = "Server";
+                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
+            }
         }
 
         /**
@@ -57,7 +60,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             string post_data =
                 string.Format(
                     "username={0}&password={1}&server={2}&captcha={3}&submit=Login",
-                    textBox_username.Text, textBox_password.Text, textBox_server.Text, textBox_captcha.Text);
+                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
             byte[] login_data =
                 Web_Request.Web_Request.send_request("http://www.niua.com/login.php", "POST", post_data, Program.cookies);
             if (login_data == null)
@@ -122,7 +125,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // send request to access the game
             byte[] response_data_for_game =
                 Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
-                                                                    textBox_server.Text),
+                                                                    combo_server.Text),
                                                      "GET",
                                                      null,
                                                      Program.cookies);
@@ -230,14 +233,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 textBox_password.Focus();
                 return false;
             }
-            if (textBox_server.Text == "")
+            if (combo_server.Text == "")
             {
                 SystemSounds.Beep.Play();
-                textBox_server.Focus();
+                combo_server.Focus();
                 return false;
             }
             int server;
-            if (!int.TryParse(textBox_server.Text, out server))
+            if (!int.TryParse(combo_server.Text, out server))
             {
                 MessageBox.Show("Server is invalid! Server has to be a number.",
                                 "Server Error",
@@ -356,5 +359,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             return int.Parse(server);
         }
 
+        private void combo_server_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

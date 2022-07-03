@@ -33,7 +33,6 @@
             this.label_password = new System.Windows.Forms.Label();
             this.textBox_password = new System.Windows.Forms.TextBox();
             this.label_server = new System.Windows.Forms.Label();
-            this.textBox_server = new System.Windows.Forms.TextBox();
             this.label_captcha = new System.Windows.Forms.Label();
             this.textBox_captcha = new System.Windows.Forms.TextBox();
             this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
@@ -92,17 +91,6 @@
             this.label_server.TabIndex = 4;
             this.label_server.Text = "Server:";
             // 
-            // textBox_server
-            // 
-            this.textBox_server.BackColor = System.Drawing.Color.White;
-            this.textBox_server.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox_server.ForeColor = System.Drawing.Color.Black;
-            this.textBox_server.Location = new System.Drawing.Point(84, 65);
-            this.textBox_server.Name = "textBox_server";
-            this.textBox_server.Size = new System.Drawing.Size(183, 22);
-            this.textBox_server.TabIndex = 5;
-            this.textBox_server.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            // 
             // label_captcha
             // 
             this.label_captcha.AutoSize = true;
@@ -146,24 +134,24 @@
             // 
             // combo_server
             // 
-            this.combo_server.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.combo_server.ForeColor = System.Drawing.SystemColors.WindowText;
             this.combo_server.FormattingEnabled = true;
-            this.combo_server.Location = new System.Drawing.Point(288, 65);
+            this.combo_server.Location = new System.Drawing.Point(84, 65);
             this.combo_server.Name = "combo_server";
-            this.combo_server.Size = new System.Drawing.Size(121, 21);
+            this.combo_server.Size = new System.Drawing.Size(183, 21);
             this.combo_server.TabIndex = 10;
+            this.combo_server.Click += new System.EventHandler(this.Load_Server);
             // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(433, 169);
+            this.ClientSize = new System.Drawing.Size(292, 159);
             this.Controls.Add(this.combo_server);
             this.Controls.Add(this.button_ok);
             this.Controls.Add(this.pictureBox_captcha);
             this.Controls.Add(this.textBox_captcha);
-            this.Controls.Add(this.textBox_server);
             this.Controls.Add(this.label_captcha);
             this.Controls.Add(this.label_server);
             this.Controls.Add(this.textBox_password);
@@ -194,7 +182,6 @@
         private System.Windows.Forms.Label label_password;
         private System.Windows.Forms.TextBox textBox_password;
         private System.Windows.Forms.Label label_server;
-        private System.Windows.Forms.TextBox textBox_server;
         private System.Windows.Forms.Label label_captcha;
         private System.Windows.Forms.TextBox textBox_captcha;
         private System.Windows.Forms.PictureBox pictureBox_captcha;
