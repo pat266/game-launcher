@@ -11,10 +11,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
+        int max_server;
         public Login()
         {
             // load up the login window
             InitializeComponent();
+            // retrieve the max number of server
+            max_server = get_max_server();
+            Console.WriteLine("The current max server is: " + max_server);
         }
 
         /**
@@ -95,9 +99,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
 
             // send request to access the game
-            byte[] response_data_for_game = Web_Request.Web_Request.send_request(
-                string.Format("http://www.niua.com/playGame/code/lsaj{0}/", textBox_server.Text), "GET", null,
-                Program.cookies);
+            byte[] response_data_for_game =
+                Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
+                                                                    textBox_server.Text),
+                                                     "GET",
+                                                     null,
+                                                     Program.cookies);
 
             if (response_data_for_game == null)
                 return;
@@ -129,7 +136,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // get the captcha based on the cookies
             byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
+                                                    "GET",
+                                                    null,
+                                                    Program.cookies);
             if (captcha_data == null)
                 return;
 
@@ -283,6 +293,30 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             result = Regex.Replace(result, "&$", "");
             return result;
+        }
+
+        /**
+         * Helper method:
+         * Get the maximum server number
+         */
+        public int get_max_server()
+        {
+            // send a get request to the link to get the HTML page
+            byte[] html = Web_Request.Web_Request.send_request("http://www.niua.com/server/code/lsaj/",
+                                                                "GET",
+                                                                null,
+                                                                Program.cookies);
+            if (html == null)
+                return 0;
+            // convert the html to string
+            string html_string = Encoding.UTF8.GetString(html);
+            // a regex to find the maximum server number
+            Regex regex = new Regex("var qServer = {\"([0-9]{0,9})\":\\[");
+            // temp value to hold the extracted values (3 parts)
+            var temp = regex.Match(html_string);
+            // retrieve the maximum server number from the second part of the temp value
+            string server = temp.Groups[1].ToString();
+            return int.Parse(server);
         }
     }
 }
