@@ -108,6 +108,9 @@
     <Compile Include="CustomControls\CustomButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CustomControls\DatePicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CustomControls\MenuColorTable.cs" />
     <Compile Include="CustomControls\ToggleButton.cs">
       <SubType>Component</SubType>
@@ -158,6 +161,8 @@
     <Content Include="dll\AxInterop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Interop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Web_Request.dll" />
+    <None Include="Resources\calendarWhite.png" />
+    <None Include="Resources\calendarDark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -38,7 +38,7 @@
             this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
             this.button_ok = new System.Windows.Forms.Button();
             this.combo_server = new System.Windows.Forms.ComboBox();
-            this.customButton1 = new Launcher_VLCM_niua_lsaj.CustomControls.CustomButton();
+            this.datePicker1 = new Launcher_VLCM_niua_lsaj.CustomControls.DatePicker();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).BeginInit();
             this.SuspendLayout();
             // 
@@ -143,23 +143,18 @@
             this.combo_server.TabIndex = 10;
             this.combo_server.Click += new System.EventHandler(this.Load_Server);
             // 
-            // customButton1
+            // datePicker1
             // 
-            this.customButton1.BackColor = System.Drawing.Color.MediumSlateBlue;
-            this.customButton1.BackgroundColor = System.Drawing.Color.MediumSlateBlue;
-            this.customButton1.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.customButton1.BorderRadius = 0;
-            this.customButton1.BorderSize = 0;
-            this.customButton1.FlatAppearance.BorderSize = 0;
-            this.customButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.customButton1.ForeColor = System.Drawing.Color.White;
-            this.customButton1.Location = new System.Drawing.Point(115, 190);
-            this.customButton1.Name = "customButton1";
-            this.customButton1.Size = new System.Drawing.Size(150, 40);
-            this.customButton1.TabIndex = 11;
-            this.customButton1.Text = "customButton1";
-            this.customButton1.TextColor = System.Drawing.Color.White;
-            this.customButton1.UseVisualStyleBackColor = false;
+            this.datePicker1.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.datePicker1.BorderSize = 0;
+            this.datePicker1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
+            this.datePicker1.Location = new System.Drawing.Point(84, 160);
+            this.datePicker1.MinimumSize = new System.Drawing.Size(0, 35);
+            this.datePicker1.Name = "datePicker1";
+            this.datePicker1.Size = new System.Drawing.Size(200, 35);
+            this.datePicker1.SkinColor = System.Drawing.Color.MediumSlateBlue;
+            this.datePicker1.TabIndex = 11;
+            this.datePicker1.TextColor = System.Drawing.Color.White;
             // 
             // Login
             // 
@@ -167,7 +162,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(416, 258);
-            this.Controls.Add(this.customButton1);
+            this.Controls.Add(this.datePicker1);
             this.Controls.Add(this.combo_server);
             this.Controls.Add(this.button_ok);
             this.Controls.Add(this.pictureBox_captcha);
@@ -207,6 +202,6 @@
         private System.Windows.Forms.PictureBox pictureBox_captcha;
         private System.Windows.Forms.Button button_ok;
         private System.Windows.Forms.ComboBox combo_server;
-        private CustomControls.CustomButton customButton1;
+        private CustomControls.DatePicker datePicker1;
     }
 }
