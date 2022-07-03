@@ -6,15 +6,20 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
+        int max_server;
         public Login()
         {
             // load up the login window
             InitializeComponent();
+            // add load server to be loaded before the game window is loaded
+            // this.Load += new EventHandler(this.Load_Server);
         }
 
         /**
@@ -28,13 +33,34 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
+         * Form method: 
+         * Load up the values of server for the ComboBox in Login form.
+         */
+        private void Load_Server(object sender, EventArgs e)
+        {
+            if (max_server == 0)
+            {
+                // retrieve the max number of server
+                max_server = get_max_server();
+                Console.WriteLine("The current max server is: " + max_server);
+
+                // load the available server in the ComboBox
+                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+
+                combo_server.DisplayMember = "Server";
+                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
+            }
+        }
+
+        /**
         private void login()
         {
             // lấy dữ liệu đăng nhập từ web
             string post_data =
                 string.Format(
                     "username={0}&password={1}&server={2}&captcha={3}&submit=Login",
-                    textBox_username.Text, textBox_password.Text, textBox_server.Text, textBox_captcha.Text);
+                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
             byte[] login_data =
                 Web_Request.Web_Request.send_request("http://www.niua.com/login.php", "POST", post_data, Program.cookies);
             if (login_data == null)
@@ -87,17 +113,22 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // check if login is successful
             if (!Encoding.UTF8.GetString(response_data_for_login).Contains("欢迎您登录！"))
             {
-                MessageBox.Show("Login information or captcha is incorrect!", "Login Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Login information or captcha is incorrect!",
+                                "Login Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 // reload captcha
                 load_captcha();
                 return;
             }
 
             // send request to access the game
-            byte[] response_data_for_game = Web_Request.Web_Request.send_request(
-                string.Format("http://www.niua.com/playGame/code/lsaj{0}/", textBox_server.Text), "GET", null,
-                Program.cookies);
+            byte[] response_data_for_game =
+                Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
+                                                                    combo_server.Text),
+                                                     "GET",
+                                                     null,
+                                                     Program.cookies);
 
             if (response_data_for_game == null)
                 return;
@@ -113,8 +144,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // basic check to see if we can load the game
             if (Program.flash_movie == "" || Program.flash_vars == "")
             {
-                MessageBox.Show("Cannot get data to load game!", "Flash Info Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Cannot get data to load game!",
+                                "Flash Info Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return;
             }
             // close the login window
@@ -129,7 +162,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // get the captcha based on the cookies
             byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
+                                                    "GET",
+                                                    null,
+                                                    Program.cookies);
             if (captcha_data == null)
                 return;
 
@@ -143,8 +179,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             catch (Exception exception)
             {
-                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message), "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message),
+                                "Captcha Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
         }
 
@@ -195,23 +233,35 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 textBox_password.Focus();
                 return false;
             }
-            if (textBox_server.Text == "")
+            if (combo_server.Text == "")
             {
                 SystemSounds.Beep.Play();
-                textBox_server.Focus();
+                combo_server.Focus();
                 return false;
             }
             int server;
-            if (!int.TryParse(textBox_server.Text, out server))
+            if (!int.TryParse(combo_server.Text, out server))
             {
-                MessageBox.Show("Server is invalid! Server has to be a number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Server is invalid! Server has to be a number.",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return false;
             }
             if (server <= 0)
             {
-                MessageBox.Show("Server is invalid! Server has to be a positive number.", "Server Error", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show("Server is invalid! Server has to be a positive number.",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return false;
+            }
+            if (server > max_server)
+            {
+                MessageBox.Show("Server is invalid! Server has to be less than or equal to " + max_server + ".",
+                                "Server Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
                 return false;
             }
             if (textBox_captcha.Text == "")
@@ -283,6 +333,35 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             result = Regex.Replace(result, "&$", "");
             return result;
+        }
+
+        /**
+         * Helper method:
+         * Get the maximum server number
+         */
+        public int get_max_server()
+        {
+            // send a get request to the link to get the HTML page
+            byte[] html = Web_Request.Web_Request.send_request("http://www.niua.com/server/code/lsaj/",
+                                                                "GET",
+                                                                null,
+                                                                null);
+            if (html == null)
+                return 0;
+            // convert the html to string
+            string html_string = Encoding.UTF8.GetString(html);
+            // a regex to find the maximum server number
+            Regex regex = new Regex("var qServer = {\"([0-9]{0,9})\":\\[");
+            // temp value to hold the extracted values (3 parts)
+            var temp = regex.Match(html_string);
+            // retrieve the maximum server number from the second part of the temp value
+            string server = temp.Groups[1].ToString();
+            return int.Parse(server);
+        }
+
+        private void combo_server_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
