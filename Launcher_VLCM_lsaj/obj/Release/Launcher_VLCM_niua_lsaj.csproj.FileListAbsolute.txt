@@ -1,0 +1,9 @@
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\bin\Release\Launcher_VLCM_niua_lsaj.exe
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\bin\Release\AxInterop.ShockwaveFlashObjects.dll
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\bin\Release\Web_Request.dll
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\bin\Release\Interop.ShockwaveFlashObjects.dll
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\obj\Release\Launcher_VLCM_niua_lsaj.Forms.Game.resources
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\obj\Release\Launcher_VLCM_niua_lsaj.Forms.Login.resources
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\obj\Release\Launcher_VLCM_niua_lsaj.Properties.Resources.resources
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\obj\Release\Launcher_VLCM_niua_lsaj.csproj.GenerateResource.Cache
+C:\Users\admin\Desktop\Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj\obj\Release\Launcher_VLCM_niua_lsaj.exe
