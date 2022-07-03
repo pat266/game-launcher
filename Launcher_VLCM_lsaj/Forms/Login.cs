@@ -13,97 +13,18 @@ namespace Launcher_VLCM_niua_lsaj.Forms
     {
         public Login()
         {
+            // load up the login window
             InitializeComponent();
         }
 
-        private void Login_Load(object sender, EventArgs e)
+        /**
+         * Form method: 
+         * Load up the captcha
+         */
+        private void Load_Initial_Captcha(object sender, EventArgs e)
         {
-            load_captcha(); // load mã xác nhận
-        }
-
-        private void load_captcha()
-        {
-            // lấy dữ liệu mã xác nhận từ web
-            byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
-            if (captcha_data == null)
-                return;
-
-            // đưa dữ liệu mã xác nhận vào picture box control trên form đăng nhập
-            try
-            {
-                using (MemoryStream memory_stream = new MemoryStream(captcha_data))
-                {
-                    pictureBox_captcha.Image = Image.FromStream(memory_stream);
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(string.Format("Có lỗi xảy ra khi lấy mã xác nhận!\n{0}", exception.Message), "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void Login_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Enter:
-                    button_ok_Click(sender, e);
-                    return;
-            }
-        }
-
-        private void button_ok_Click(object sender, EventArgs e)
-        {
-            // kiểm tra thông tin nhập vào có hợp lệ hay không
-            if (!check_input_data())
-                return;
-
-            login(); // đăng nhập
-        }
-
-        private bool check_input_data()
-        {
-            if (textBox_username.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_username.Focus();
-                return false;
-            }
-
-            if (textBox_password.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_password.Focus();
-                return false;
-            }
-            if (textBox_server.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_server.Focus();
-                return false;
-            }
-            int server;
-            if (!int.TryParse(textBox_server.Text, out server))
-            {
-                MessageBox.Show("Server không hợp lệ! Server phải là một số.", "Lỗi", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
-            }
-            if (server <= 0)
-            {
-                MessageBox.Show("Server không hợp lệ! Server phải là một số dương.", "Lỗi", MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
-            }
-            if (textBox_captcha.Text == "")
-            {
-                SystemSounds.Beep.Play();
-                textBox_captcha.Focus();
-                return false;
-            }
-            return true;
+            // load captcha
+            load_captcha();
         }
 
         /**
@@ -139,16 +60,21 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
         }
         */
+
+        /**
+         * Main method:
+         * Utilize the input data and login to the server
+         */
         private void login()
         {
             Program.flash_movie = "";
             Program.flash_vars = "";
 
-            // tạo dữ liệu đăng nhập
+            // create the appropriate data format to login
             byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
                 textBox_username.Text, md5_encrypt(textBox_password.Text), textBox_captcha.Text));
-            
-            // gửi yêu cầu đăng nhập và lấy dữ liệu phản hồi
+
+            // send login request
             byte[] response_data_for_login =
                 Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj",
                                                     "POST",
@@ -156,44 +82,152 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                                     Program.cookies);
             if (response_data_for_login == null)
                 return;
-            Console.WriteLine(Encoding.UTF8.GetString(response_data_for_login));
+            // Console.WriteLine(Encoding.UTF8.GetString(response_data_for_login));
 
-            // kiểm tra yêu cầu đăng nhập có thành công hay không
+            // check if login is successful
             if (!Encoding.UTF8.GetString(response_data_for_login).Contains("欢迎您登录！"))
             {
-                MessageBox.Show("Thông tin đăng nhập hoặc mã xác nhận không chính xác!", "Lỗi", MessageBoxButtons.OK,
+                MessageBox.Show("Login information or captcha is incorrect!", "Login Error", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
-                load_captcha(); // load lại mã xác nhận
+                // reload captcha
+                load_captcha();
                 return;
             }
-            
-            // gửi yêu cầu vào game và lấy dữ liệu phản hồi
+
+            // send request to access the game
             byte[] response_data_for_game = Web_Request.Web_Request.send_request(
                 string.Format("http://www.niua.com/playGame/code/lsaj{0}/", textBox_server.Text), "GET", null,
                 Program.cookies);
-            if (response_data_for_game == null)
-            {
-                return;
-            }
 
-            // lấy dữ liệu cần để load game
+            if (response_data_for_game == null)
+                return;
+
+            // get the data to load game
             string game_data = Encoding.UTF8.GetString(response_data_for_game);
+            // find the SWF object to load to flash
             Program.flash_movie = find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            // find the parameters (variables) to load to flash
             Program.flash_vars = find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
             Program.flash_vars = parse_to_query_string(Program.flash_vars);
 
-            // kiểm tra dữ liệu cần để load game có lấy được hay không
+            // basic check to see if we can load the game
             if (Program.flash_movie == "" || Program.flash_vars == "")
             {
-                MessageBox.Show("Không lấy được dữ liệu cần để load game!", "Lỗi", MessageBoxButtons.OK,
+                MessageBox.Show("Cannot get data to load game!", "Flash Info Error", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
-
-            Close(); // đóng form đăng nhập
+            // close the login window
+            Close();
         }
 
-        private string md5_encrypt(string text) // hàm mã hoá chuỗi sang MD5
+        /**
+         * Helper method:
+         * Retrieve the captcha image from the server and display it in the form.
+         */
+        private void load_captcha()
+        {
+            // get the captcha based on the cookies
+            byte[] captcha_data =
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
+            if (captcha_data == null)
+                return;
+
+            // put the captcha in picture box control in the login form
+            try
+            {
+                using (MemoryStream memory_stream = new MemoryStream(captcha_data))
+                {
+                    pictureBox_captcha.Image = Image.FromStream(memory_stream);
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message), "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /**
+         * Main method:
+         * KeyEventHandler of the login window
+         */
+        private void Login_KeyDown(object sender, KeyEventArgs e)
+        {
+            // treat hitting enter the same as clicking ok button
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    button_ok_Click(sender, e);
+                    return;
+            }
+        }
+
+        /**
+         * Main method:
+         * EventHandler of the the login window
+         */
+        private void button_ok_Click(object sender, EventArgs e)
+        {
+            // basic check of login info
+            if (!check_input_data())
+                return;
+            
+            login();
+        }
+
+        /**
+         * Helper method:
+         * Perform basic check on the input data in the login window
+         */
+        private bool check_input_data()
+        {
+            if (textBox_username.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_username.Focus();
+                return false;
+            }
+
+            if (textBox_password.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_password.Focus();
+                return false;
+            }
+            if (textBox_server.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_server.Focus();
+                return false;
+            }
+            int server;
+            if (!int.TryParse(textBox_server.Text, out server))
+            {
+                MessageBox.Show("Server is invalid! Server has to be a number.", "Server Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
+            if (server <= 0)
+            {
+                MessageBox.Show("Server is invalid! Server has to be a positive number.", "Server Error", MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
+            }
+            if (textBox_captcha.Text == "")
+            {
+                SystemSounds.Beep.Play();
+                textBox_captcha.Focus();
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Helper method:
+         * Encrypt the password using MD5 since the server does not accept plain text password.
+         */
+        private string md5_encrypt(string text)
         {
             using (MD5 md5 = MD5.Create())
             {
@@ -208,18 +242,30 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
         }
 
+        /**
+         * Helper method:
+         * Find the string given a pattern and a string.
+         */
         public string find_string(string input, string pattern) // hàm tìm kiếm chuỗi và trả về kết quả
         {
             Match match = Regex.Match(input, pattern);
             return match.Success ? match.Value : "";
         }
 
-        public string remove_white_space(string text) // hàm xoá tất cả khoảng trắng trong chuỗi
+        /**
+         * Helper method:
+         * Replace all of the white spaces in a string.
+         */
+        public string remove_white_space(string text)
         {
             return Regex.Replace(text, "\\s", "");
         }
 
-        public string parse_to_query_string(string text) // hàm chuyển dữ liệu sang query string
+        /**
+         * Helper method:
+         * Clean the input string to make it ready to be used in the query string.
+         */
+        public string parse_to_query_string(string text)
         {
             string result = "";
             string[] text_split = Regex.Split(text, "\\n");
@@ -227,9 +273,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             {
                 text_split[i] = remove_white_space(text_split[i]);
                 if (text_split[i] == "")
-                {
                     continue;
-                }
+                
                 text_split[i] = Regex.Replace(text_split[i], ",$", "");
                 string[] text_split_split = Regex.Split(text_split[i], "(?<=^[^:]*?):");
                 text_split_split[1] = Regex.Replace(text_split_split[1], "^\"", "");

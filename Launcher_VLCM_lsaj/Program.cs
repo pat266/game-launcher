@@ -7,15 +7,18 @@ namespace Launcher_VLCM_niua_lsaj
 {
     static class Program
     {
-        private static Login login { get; set; } // form đăng nhập
+        // login window
+        private static Login login { get; set; }
 
-        private static Game game { get; set; } // form game
+        // game window
+        private static Game game { get; set; }
 
-        public static CookieContainer cookies { get; set; } // dữ liệu đăng nhập
+        // cookies of the session
+        public static CookieContainer cookies { get; set; }
 
-        public static string flash_movie { get; set; } // dữ liệu cần để load game
-
-        public static string flash_vars { get; set; } // dữ liệu cần để load game
+        // needed info to load into the game (set in Login.cs)
+        public static string flash_movie { get; set; }
+        public static string flash_vars { get; set; }
 
         [STAThread]
         static void Main()
@@ -27,12 +30,14 @@ namespace Launcher_VLCM_niua_lsaj
             cookies = new CookieContainer();
             flash_movie = "";
             flash_vars = "";
-            login.ShowDialog(); // hiện form đăng nhập để nhập thông tin
+            // show login form
+            login.ShowDialog();
 
-            // kiểm tra kết quả trả về (dữ liệu cần để laod game) của form đăng nhập
+            // check if the flash info is not empty to load game
             if (flash_movie != "" && flash_vars != "")
             {
-                Application.Run(game); // hiện form game để load game
+                // dispaly window and load game
+                Application.Run(game);
             }
         }
     }
