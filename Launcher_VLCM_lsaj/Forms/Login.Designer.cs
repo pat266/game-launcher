@@ -38,6 +38,7 @@
             this.textBox_captcha = new System.Windows.Forms.TextBox();
             this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
             this.button_ok = new System.Windows.Forms.Button();
+            this.combo_server = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).BeginInit();
             this.SuspendLayout();
             // 
@@ -46,9 +47,9 @@
             this.label_username.AutoSize = true;
             this.label_username.Location = new System.Drawing.Point(3, 9);
             this.label_username.Name = "label_username";
-            this.label_username.Size = new System.Drawing.Size(60, 13);
+            this.label_username.Size = new System.Drawing.Size(61, 13);
             this.label_username.TabIndex = 0;
-            this.label_username.Text = "Tài khoản:";
+            this.label_username.Text = "Username:";
             // 
             // textBox_username
             // 
@@ -68,7 +69,7 @@
             this.label_password.Name = "label_password";
             this.label_password.Size = new System.Drawing.Size(59, 13);
             this.label_password.TabIndex = 2;
-            this.label_password.Text = "Mật khẩu:";
+            this.label_password.Text = "Password:";
             // 
             // textBox_password
             // 
@@ -107,9 +108,9 @@
             this.label_captcha.AutoSize = true;
             this.label_captcha.Location = new System.Drawing.Point(3, 96);
             this.label_captcha.Name = "label_captcha";
-            this.label_captcha.Size = new System.Drawing.Size(75, 13);
+            this.label_captcha.Size = new System.Drawing.Size(52, 13);
             this.label_captcha.TabIndex = 6;
-            this.label_captcha.Text = "Mã xác nhận:";
+            this.label_captcha.Text = "Captcha:";
             // 
             // textBox_captcha
             // 
@@ -137,18 +138,28 @@
             // 
             this.button_ok.Location = new System.Drawing.Point(115, 122);
             this.button_ok.Name = "button_ok";
-            this.button_ok.Size = new System.Drawing.Size(45, 23);
+            this.button_ok.Size = new System.Drawing.Size(72, 23);
             this.button_ok.TabIndex = 9;
-            this.button_ok.Text = "OK";
+            this.button_ok.Text = "Submit";
             this.button_ok.UseVisualStyleBackColor = true;
             this.button_ok.Click += new System.EventHandler(this.button_ok_Click);
+            // 
+            // combo_server
+            // 
+            this.combo_server.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.combo_server.FormattingEnabled = true;
+            this.combo_server.Location = new System.Drawing.Point(288, 65);
+            this.combo_server.Name = "combo_server";
+            this.combo_server.Size = new System.Drawing.Size(121, 21);
+            this.combo_server.TabIndex = 10;
             // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(274, 151);
+            this.ClientSize = new System.Drawing.Size(433, 169);
+            this.Controls.Add(this.combo_server);
             this.Controls.Add(this.button_ok);
             this.Controls.Add(this.pictureBox_captcha);
             this.Controls.Add(this.textBox_captcha);
@@ -167,12 +178,13 @@
             this.MaximizeBox = false;
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Đăng nhập";
+            this.Text = "Login - LSAJ";
             this.Load += new System.EventHandler(this.Load_Initial_Captcha);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Login_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -187,5 +199,6 @@
         private System.Windows.Forms.TextBox textBox_captcha;
         private System.Windows.Forms.PictureBox pictureBox_captcha;
         private System.Windows.Forms.Button button_ok;
+        private System.Windows.Forms.ComboBox combo_server;
     }
 }

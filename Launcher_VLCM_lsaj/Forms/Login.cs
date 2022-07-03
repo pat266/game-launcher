@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -16,9 +18,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // load up the login window
             InitializeComponent();
-            // retrieve the max number of server
-            max_server = get_max_server();
-            Console.WriteLine("The current max server is: " + max_server);
+            // add load server to be loaded before the game window is loaded
+            this.Load += new EventHandler(this.Load_Server);
         }
 
         /**
@@ -29,6 +30,24 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // load captcha
             load_captcha();
+        }
+
+        /**
+         * Form method: 
+         * Load up the values of server for the ComboBox in Login form.
+         */
+        private void Load_Server(object sender, EventArgs e)
+        {
+            // retrieve the max number of server
+            max_server = get_max_server();
+            Console.WriteLine("The current max server is: " + max_server);
+            
+            // load the available server in the ComboBox
+            combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+
+            combo_server.DisplayMember = "Server";
+            combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+            combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
         }
 
         /**
@@ -336,5 +355,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             string server = temp.Groups[1].ToString();
             return int.Parse(server);
         }
+
     }
 }
