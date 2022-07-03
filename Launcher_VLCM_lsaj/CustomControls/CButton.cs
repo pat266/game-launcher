@@ -15,7 +15,7 @@ using System.ComponentModel;
 
 namespace Launcher_VLCM_niua_lsaj.CustomControls
 {
-    public class CustomButton : Button
+    public class CButton : Button
     {
         //Fields
         private int borderSize = 0;
@@ -71,7 +71,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         }
         
         //Constructor
-        public CustomButton()
+        public CButton()
         {
             this.FlatStyle = FlatStyle.Flat;
             this.FlatAppearance.BorderSize = 0;

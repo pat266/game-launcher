@@ -105,13 +105,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomControls\CustomButton.cs">
+    <Compile Include="CustomControls\CButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="CustomControls\DatePicker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CustomControls\MenuColorTable.cs" />
+    <Compile Include="CustomControls\CRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CustomControls\ToggleButton.cs">
       <SubType>Component</SubType>
     </Compile>
