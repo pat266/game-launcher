@@ -217,6 +217,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Helper method:
          * Perform basic check on the input data in the login window
+         * TODO: https://www.codeproject.com/Questions/5061322/Set-focus-on-textbox-combobox-in-winforms-if-it-is
          */
         private bool check_input_data()
         {

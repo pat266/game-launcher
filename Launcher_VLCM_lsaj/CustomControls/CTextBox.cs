@@ -87,7 +87,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
             }
         }
 
-        /**
+        ///**
         [Category("Custom UI")]
         public bool PasswordChar
         {
@@ -98,14 +98,15 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
                 if (!isPlaceholder)
                     textBox1.UseSystemPasswordChar = value;
             }
-        } */
+        } //*/
 
+        /**
         [Category("Custom UI")]
         public bool PasswordChar
         {
             get { return textBox1.UseSystemPasswordChar; }
             set { textBox1.UseSystemPasswordChar = value; }
-        }
+        } */
 
         [Category("Custom UI")]
         public bool Multiline

@@ -110,6 +110,9 @@
     <Compile Include="CustomControls\CButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CustomControls\CComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="CustomControls\CDatePicker.cs">
       <SubType>Component</SubType>
     </Compile>

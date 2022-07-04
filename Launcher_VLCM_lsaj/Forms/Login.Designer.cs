@@ -38,6 +38,8 @@
             this.button_ok = new System.Windows.Forms.Button();
             this.combo_server = new System.Windows.Forms.ComboBox();
             this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
+            this.cTextBox1 = new Launcher_VLCM_niua_lsaj.CustomControls.CTextBox();
+            this.cComboBox1 = new Launcher_VLCM_niua_lsaj.CustomControls.CComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).BeginInit();
             this.SuspendLayout();
             // 
@@ -142,12 +144,55 @@
             this.pictureBox_captcha.TabIndex = 8;
             this.pictureBox_captcha.TabStop = false;
             // 
+            // cTextBox1
+            // 
+            this.cTextBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.cTextBox1.BorderColor = System.Drawing.Color.MediumSlateBlue;
+            this.cTextBox1.BorderFocusColor = System.Drawing.Color.HotPink;
+            this.cTextBox1.BorderRadius = 0;
+            this.cTextBox1.BorderSize = 2;
+            this.cTextBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cTextBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.cTextBox1.Location = new System.Drawing.Point(67, 164);
+            this.cTextBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.cTextBox1.Multiline = false;
+            this.cTextBox1.Name = "cTextBox1";
+            this.cTextBox1.Padding = new System.Windows.Forms.Padding(10, 7, 10, 7);
+            this.cTextBox1.PasswordChar = false;
+            this.cTextBox1.PlaceholderColor = System.Drawing.Color.DarkGray;
+            this.cTextBox1.PlaceholderText = "Enter Your name here";
+            this.cTextBox1.Size = new System.Drawing.Size(250, 31);
+            this.cTextBox1.TabIndex = 12;
+            this.cTextBox1.Texts = "";
+            this.cTextBox1.UnderlinedStyle = false;
+            // 
+            // cComboBox1
+            // 
+            this.cComboBox1.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.cComboBox1.BorderColor = System.Drawing.Color.MediumSlateBlue;
+            this.cComboBox1.BorderSize = 1;
+            this.cComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+            this.cComboBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.cComboBox1.ForeColor = System.Drawing.Color.DimGray;
+            this.cComboBox1.IconColor = System.Drawing.Color.MediumSlateBlue;
+            this.cComboBox1.ListBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(228)))), ((int)(((byte)(245)))));
+            this.cComboBox1.ListTextColor = System.Drawing.Color.DimGray;
+            this.cComboBox1.Location = new System.Drawing.Point(84, 216);
+            this.cComboBox1.MinimumSize = new System.Drawing.Size(200, 30);
+            this.cComboBox1.Name = "cComboBox1";
+            this.cComboBox1.Padding = new System.Windows.Forms.Padding(1);
+            this.cComboBox1.Size = new System.Drawing.Size(200, 30);
+            this.cComboBox1.TabIndex = 13;
+            this.cComboBox1.Texts = "";
+            // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(416, 258);
+            this.Controls.Add(this.cComboBox1);
+            this.Controls.Add(this.cTextBox1);
             this.Controls.Add(this.combo_server);
             this.Controls.Add(this.button_ok);
             this.Controls.Add(this.pictureBox_captcha);
@@ -187,5 +232,7 @@
         private System.Windows.Forms.PictureBox pictureBox_captcha;
         private System.Windows.Forms.Button button_ok;
         private System.Windows.Forms.ComboBox combo_server;
+        private CustomControls.CTextBox cTextBox1;
+        private CustomControls.CComboBox cComboBox1;
     }
 }
