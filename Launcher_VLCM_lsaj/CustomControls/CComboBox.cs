@@ -23,6 +23,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         private Color listTextColor = Color.DimGray;
         private Color borderColor = Color.MediumSlateBlue;
         private int borderSize = 1;
+        private int borderRadius = 0;
 
         //Items
         private ComboBox cmbList;
@@ -36,6 +37,9 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         #region -> Constructor
         public CComboBox()
         {
+            // get the OnPaint event to be called
+            SetStyle(ControlStyles.UserPaint, true);
+            
             cmbList = new ComboBox();
             lblText = new Label();
             btnIcon = new Button();
@@ -80,7 +84,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
             this.Padding = new Padding(borderSize);//Border Size
             this.Font = new Font(this.Font.Name, 10F);
             base.BackColor = borderColor; //Border Color
-            this.Load += new System.EventHandler(this.RJComboBox_Load);
+            this.Load += new System.EventHandler(this.ComboBox_Load);
             this.ResumeLayout();
             AdjustComboBoxDimensions();
         }
@@ -157,6 +161,20 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         }
 
         [Category("Custom UI - Appearance")]
+        public int BorderRadius
+        {
+            get { return borderRadius; }
+            set
+            {
+                if (value >= 0)
+                {
+                    borderRadius = value;
+                    this.Invalidate();//Redraw control
+                }
+            }
+        }
+
+        [Category("Custom UI - Appearance")]
         public override Color ForeColor
         {
             get { return base.ForeColor; }
@@ -197,6 +215,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
                     cmbList.DropDownStyle = value;
             }
         }
+        
         #endregion
 
         #region -> Data properties
@@ -383,9 +402,10 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
             if (DesignMode)
                 AdjustComboBoxDimensions();
         }
+     
         #endregion
 
-        private void RJComboBox_Load(object sender, EventArgs e)
+        private void ComboBox_Load(object sender, EventArgs e)
         {
             AdjustComboBoxDimensions();
         }
