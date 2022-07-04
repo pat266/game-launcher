@@ -35,9 +35,9 @@
             this.label_server = new System.Windows.Forms.Label();
             this.label_captcha = new System.Windows.Forms.Label();
             this.textBox_captcha = new System.Windows.Forms.TextBox();
-            this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
             this.button_ok = new System.Windows.Forms.Button();
             this.combo_server = new System.Windows.Forms.ComboBox();
+            this.pictureBox_captcha = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).BeginInit();
             this.SuspendLayout();
             // 
@@ -111,17 +111,6 @@
             this.textBox_captcha.TabIndex = 7;
             this.textBox_captcha.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // pictureBox_captcha
-            // 
-            this.pictureBox_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox_captcha.ImageLocation = "";
-            this.pictureBox_captcha.Location = new System.Drawing.Point(217, 94);
-            this.pictureBox_captcha.Name = "pictureBox_captcha";
-            this.pictureBox_captcha.Size = new System.Drawing.Size(50, 22);
-            this.pictureBox_captcha.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox_captcha.TabIndex = 8;
-            this.pictureBox_captcha.TabStop = false;
-            // 
             // button_ok
             // 
             this.button_ok.Location = new System.Drawing.Point(115, 122);
@@ -141,6 +130,17 @@
             this.combo_server.Size = new System.Drawing.Size(183, 21);
             this.combo_server.TabIndex = 10;
             this.combo_server.Click += new System.EventHandler(this.Load_Server);
+            // 
+            // pictureBox_captcha
+            // 
+            this.pictureBox_captcha.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBox_captcha.ImageLocation = "";
+            this.pictureBox_captcha.Location = new System.Drawing.Point(217, 94);
+            this.pictureBox_captcha.Name = "pictureBox_captcha";
+            this.pictureBox_captcha.Size = new System.Drawing.Size(50, 22);
+            this.pictureBox_captcha.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox_captcha.TabIndex = 8;
+            this.pictureBox_captcha.TabStop = false;
             // 
             // Login
             // 

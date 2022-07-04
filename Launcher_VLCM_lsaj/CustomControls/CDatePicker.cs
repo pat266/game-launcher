@@ -14,7 +14,7 @@ using System.Drawing.Drawing2D;
 
 namespace Launcher_VLCM_niua_lsaj.CustomControls
 {
-    public class DatePicker : DateTimePicker
+    public class CDatePicker : DateTimePicker
     {
         //Fields
         //-> Appearance
@@ -75,7 +75,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         }
 
         //Constructor
-        public DatePicker()
+        public CDatePicker()
         {
             this.SetStyle(ControlStyles.UserPaint, true);
             this.MinimumSize = new Size(0, 35);

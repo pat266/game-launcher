@@ -15,7 +15,7 @@ using System.ComponentModel;
 
 namespace CustomUI.CustomControls
 {
-    public class ToggleButton : CheckBox
+    public class CToggleButton : CheckBox
     {
         //Fields
         private Color onBackColor = Color.MediumSlateBlue;
@@ -89,7 +89,7 @@ namespace CustomUI.CustomControls
         }
 
         // Constructor
-        public ToggleButton()
+        public CToggleButton()
         {
             // default size
             this.MinimumSize = new Size(45, 22);
