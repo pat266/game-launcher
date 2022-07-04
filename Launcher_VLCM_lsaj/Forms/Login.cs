@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Linq;
+using System.Threading;
 using System.Collections.Generic;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
@@ -20,16 +21,39 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             InitializeComponent();
             // add load server to be loaded before the game window is loaded
             // this.Load += new EventHandler(this.Load_Server);
+            Console.WriteLine("Start a separate thread to retrieve the server list");
+            // dedicate a separate thread to load the server
+            var thread1 = new Thread(new ThreadStart(Load_Server));
+            thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread1.Start();
+            thread1.Join();
+
+            // dedicate another thread to load captcha
+            var thread2 = new Thread(new ThreadStart(load_captcha));
+            thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread2.Start();
+            // thread2.Join();
         }
 
         /**
-         * Form method: 
-         * Load up the captcha
+         * Helper method: 
+         * Load up the values of server for the ComboBox in Login form.
          */
-        private void Load_Initial_Captcha(object sender, EventArgs e)
+        private void Load_Server()
         {
-            // load captcha
-            load_captcha();
+            if (max_server == 0)
+            {
+                // retrieve the max number of server
+                max_server = get_max_server();
+                Console.WriteLine("The current max server is: " + max_server);
+
+                // load the available server in the ComboBox
+                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+
+                combo_server.DisplayMember = "Server";
+                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
+            }
         }
 
         /**

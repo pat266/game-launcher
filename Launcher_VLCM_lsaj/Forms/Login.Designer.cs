@@ -189,7 +189,6 @@
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login - LSAJ";
-            this.Load += new System.EventHandler(this.Load_Initial_Captcha);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Login_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).EndInit();
             this.ResumeLayout(false);
