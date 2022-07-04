@@ -217,6 +217,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Helper method:
          * Perform basic check on the input data in the login window
+         * TODO: https://www.codeproject.com/Questions/5061322/Set-focus-on-textbox-combobox-in-winforms-if-it-is
          */
         private bool check_input_data()
         {
@@ -357,11 +358,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // retrieve the maximum server number from the second part of the temp value
             string server = temp.Groups[1].ToString();
             return int.Parse(server);
-        }
-
-        private void combo_server_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
