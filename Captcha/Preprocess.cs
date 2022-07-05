@@ -49,6 +49,9 @@ namespace Preprocess
 
     public static class Preprocess
     {
+        public static int m_SauvolaWidth = 100;
+        public static double m_SauvolaFactor = 0.3;
+
         /// <summary>
         /// 在二值化数组中寻找与给定坐标点连通的区域，并用涂上灰色
         /// </summary>
@@ -638,10 +641,10 @@ namespace Preprocess
         public static Byte[,] Sauvola(Byte[,] gray_image)
         {
             //以当前像素点为中心的邻域的宽度
-            int w = CaptchaSolver.m_SauvolaWidth;
+            int w = Preprocess.m_SauvolaWidth;
 
             //使用者自定义的修正系数
-            double k = CaptchaSolver.m_SauvolaFactor;
+            double k = Preprocess.m_SauvolaFactor;
 
             //邻域边界距离中心点的距离
             int whalf = w >> 1;

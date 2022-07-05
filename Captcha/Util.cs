@@ -15,11 +15,33 @@ using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
+using System.Net;
 
 namespace Captcha
 {
-    internal class Util
+    public class Util
     {
+        /**
+         * Helper method:
+         * Retrieve the captcha image from the server and display it in the form.
+         */
+        public static Image get_random_captcha(CookieContainer cookieContainer)
+        {
+            // get the captcha based on the cookies
+            byte[] captcha_data =
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
+                                                    "GET",
+                                                    null,
+                                                    cookieContainer);
+            if (captcha_data == null)
+                return null;
+
+            // put the captcha in picture box control in the login form
+            using (MemoryStream memory_stream = new MemoryStream(captcha_data))
+            {
+                return Image.FromStream(memory_stream);
+            }
+        }
         /**
          * Helper method:
          * Replace all of the white spaces in a string and retrieve only the first 4 numerical values.
@@ -32,6 +54,29 @@ namespace Captcha
             if (text.Length > 4)
                 text = text.Substring(0, 4);
             return text;
+        }
+
+        /**
+         * Helper method:
+         * Remove extensions from the filename.
+         */
+        public static string removeExtensions(string filename)
+        {
+            filename = Path.GetFileNameWithoutExtension(filename);
+            /**
+            int index = filename.LastIndexOf('.');
+            if (index > 0)
+                filename = filename.Substring(0, index);
+            **/
+            return filename;
+        }
+
+        /**
+         * Calculate percentage given 2 numbers
+         */
+        public static double percentage(int num1, int num2)
+        {
+            return (double)num1 / (double)num2 * 100;
         }
 
         //Convert Bitmap to BitmapImage
@@ -56,30 +101,70 @@ namespace Captcha
             return bitmapImage;
         }
 
-        /**
-         * An old method that uses AForge.NET to clean the image.
-         * NOT EFFECTIVE!!
+        /** 
+         * New method to process the image:
+         * Ultilize Sauvola binarization to process colored image to gray image.
          */
-        private static Bitmap cleanImage(Image img)
+        public static Bitmap SauvolaBinarization(Bitmap bitmap)
         {
-            // img.Save(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\Captcha\1.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-            Bitmap bmp = new Bitmap(img);
-            bmp = bmp.Clone(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-            Erosion erosion = new Erosion();
-            Dilatation dilatation = new Dilatation();
-            Invert inverter = new Invert();
-            ColorFiltering cor = new ColorFiltering();
-            cor.Blue = new AForge.IntRange(200, 255);
-            cor.Red = new AForge.IntRange(200, 255);
-            cor.Green = new AForge.IntRange(200, 255);
-            Opening open = new Opening();
-            BlobsFiltering bc = new BlobsFiltering() { MinHeight = 10 };
-            Closing close = new Closing();
-            GaussianSharpen gs = new GaussianSharpen();
-            ContrastCorrection cc = new ContrastCorrection();
-            FiltersSequence seq = new FiltersSequence(gs, inverter, open, inverter, bc, inverter, open, cc, cor, bc, inverter);
-            var filteredImg = seq.Apply(bmp);
-            return (Bitmap)filteredImg;
+            Byte[,] BinaryArray = new Byte[bitmap.Height, bitmap.Width];
+
+            Byte[,] grayArraySrc = Preprocess.Preprocess.ToGrayArray(bitmap);
+            BinaryArray = Preprocess.Preprocess.Sauvola(grayArraySrc);
+
+            Bitmap GrayBmp = Preprocess.Preprocess.BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return GrayBmp;
+        }
+
+        /** 
+         * New method to process the image:
+         * Ultilize Otsu binarization to process colored image to gray image.
+         */
+        public static Bitmap OtsuBinarization(Bitmap bitmap)
+        {
+            Byte[,] BinaryArray = new Byte[bitmap.Height, bitmap.Width];
+
+            int threshold;
+            BinaryArray = Preprocess.Preprocess.ToBinaryArray(bitmap, Preprocess.Preprocess.BinarizationMethods.Otsu, out threshold);
+
+            Bitmap GrayBmp = Preprocess.Preprocess.BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return GrayBmp;
+        }
+
+        /** 
+         * New method to process the image:
+         * Ultilize Iterative binarization to process colored image to gray image.
+         */
+        public static Bitmap IterativeBinarization(Bitmap bitmap)
+        {
+            Byte[,] BinaryArray = new Byte[bitmap.Height, bitmap.Width];
+
+            int threshold;
+            BinaryArray = Preprocess.Preprocess.ToBinaryArray(bitmap, Preprocess.Preprocess.BinarizationMethods.Iterative, out threshold);
+
+            Bitmap GrayBmp = Preprocess.Preprocess.BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return GrayBmp;
+        }
+
+        /** 
+         * New method to process the image:
+         * Ultilize Zhang-Suen skelenton binarization to process colored image to gray image.
+         */
+        public static Bitmap SkeletonBinarization(Bitmap bitmap)
+        {
+            Byte[,] BinaryArray = new Byte[bitmap.Height, bitmap.Width];
+
+            Byte[,] grayArraySrc = Preprocess.Preprocess.ToGrayArray(bitmap);
+            BinaryArray = Preprocess.Preprocess.ToGrayArray(bitmap);
+            BinaryArray = Preprocess.Preprocess.Sauvola(BinaryArray);
+            BinaryArray = Preprocess.Preprocess.ThinPicture(BinaryArray);
+
+            Bitmap GrayBmp = Preprocess.Preprocess.BinaryArrayToBinaryBitmap(BinaryArray);
+
+            return GrayBmp;
         }
 
         /// <summary>

@@ -200,7 +200,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void solve_captcha()
         {
             // process the image
-            Image filteredImg = captchaSolver.SelectionChangedMethod(0, pictureBox_captcha.Image);
+            Image filteredImg = captchaSolver.SelectionProcessImage(1, pictureBox_captcha.Image);
             // get the result
             textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) filteredImg);
         }
