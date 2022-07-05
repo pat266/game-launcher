@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using System.IO;
 using System.Drawing;
-using AForge.Imaging.Filters;
 using Tesseract;
 using System.Text.RegularExpressions;
 
@@ -40,10 +39,9 @@ namespace Captcha
             // if it is wrong.
             generate_sample_captchas(100);
 
-            // check the result of the image processing
+            // check the result of the image processing (only run this after manual check)
             check_correctness();
 
-            
         }
 
         /**
@@ -120,6 +118,9 @@ namespace Captcha
 
                 // get the image
                 Bitmap image = new Bitmap(file.FullName);
+
+                // test the effect of resizing the image (not effective)
+                // image = Util.ResizeImage(image, (int) (image.Width * 1.2), (int) (image.Height * 1.2));
 
                 // check original (without image processing) correct
                 if (original_correct(image, answer))

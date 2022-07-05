@@ -4,7 +4,7 @@ using System.Drawing;
 using Tesseract;
 
 /**
- * Code taken from https://foxlearn.com/windows-forms/recaptcha-using-tesseract-ocr-in-csharp-373.html
+ * Utilizing Tesseract-OCR and custom image processing methods to attempt to solve the captcha.
  */
 
 namespace Captcha
