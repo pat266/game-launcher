@@ -7,6 +7,8 @@ Attempt to solve captcha required to login automatically.
 * Pre-processing: Can be found in `Captcha.Util.cs`.
     * Attempt to convert colored captchas into black & white captchas
     * Multiple methods, some of the methods were found [here](https://github.com/livezingy/CaptchaProcess/tree/master/CaptchaProcess/CaptchaProcess)
+    * Original Image:<br> ![Alt text](./sampleImages/before-5585.png)
+    * Processed Image:<br> ![Alt text](./sampleImages/after-5485.png)
 * Text extractor: Can be found in `Captcha.CaptchaSolver.cs`
     * Utilizes Tesseract-OCR 3.02 to "read" the numeric values from the image
     * Although there is higher version (5.0+), it uses LSTM model
@@ -21,7 +23,7 @@ Attempt to solve captcha required to login automatically.
         * Thirdly, run the `check_correctness()`, and it will output the result (similar to below).
 
 ## Results
-Normal process:<br>
+Normal process:
 ```
 Total number of captchas: 100 captchas
 Without image processing: 66% correct
@@ -37,11 +39,11 @@ Combination of without image processing and Sauvola: 69% correct
 Enlarges the images by x2
 ```
 Total number of captchas: 100 captchas
-Without image processing: number of correct: 7, percent: 7%
-Primitive Gray Bitmap 1: number of correct: 11, percent: 11%
-Primitive Gray Bitmap 2: number of correct: 9, percent: 9%
-Sauvola binarization: number of correct: 6, percent: 6%
-Otsu binarization: number of correct: 9, percent: 9%
-Iterative binarization: number of correct: 10, percent: 10%
-Zhang-Suen skelenton: number of correct: 47, percent: 47%
+Without image processing: 7% correct
+Primitive Gray Bitmap 1: 10% correct
+Primitive Gray Bitmap 2: 8% correct
+Sauvola binarization: 6% correct
+Otsu binarization: 7% correct
+Iterative binarization: 8% correct
+Zhang-Suen skelenton: 46% correct
 ```
