@@ -1,47 +1,63 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Media;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Linq;
-using System.Collections.Generic;
+using System.Threading;
+
+using Captcha;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
         int max_server;
+
+        CaptchaSolver captchaSolver;
+        
         public Login()
         {
+            // load up the captcha solver
+            captchaSolver = new CaptchaSolver();
+
+            ///**
             // load up the login window
             InitializeComponent();
+
             // add load server to be loaded before the game window is loaded
             // this.Load += new EventHandler(this.Load_Server);
+            Console.WriteLine("Start a separate thread to retrieve the server list");
+            // dedicate a separate thread to load the server
+            var thread1 = new Thread(new ThreadStart(Load_Server));
+            thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread1.Start(); // starts thread
+            thread1.Join(); // wait for thread to finish
+
+            // dedicate another thread to load captcha
+            var thread2 = new Thread(new ThreadStart(load_captcha));
+            thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread2.Start(); // starts thread
+            thread2.Join(); // wait for thread to finish
+
+            // dedicate another thread to solve captcha
+            var thread3 = new Thread(new ThreadStart(solve_captcha));
+            thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread3.Start(); // starts thread
+            // thread3.Join(); // wait for thread to finish
+
         }
 
         /**
-         * Form method: 
-         * Load up the captcha
-         */
-        private void Load_Initial_Captcha(object sender, EventArgs e)
-        {
-            // load captcha
-            load_captcha();
-        }
-
-        /**
-         * Form method: 
+         * Helper method: 
          * Load up the values of server for the ComboBox in Login form.
          */
-        private void Load_Server(object sender, EventArgs e)
+        private void Load_Server()
         {
             if (max_server == 0)
             {
                 // retrieve the max number of server
-                max_server = get_max_server();
+                max_server = Login_Helper.get_max_server();
                 Console.WriteLine("The current max server is: " + max_server);
 
                 // load the available server in the ComboBox
@@ -54,40 +70,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
-        private void login()
-        {
-            // lấy dữ liệu đăng nhập từ web
-            string post_data =
-                string.Format(
-                    "username={0}&password={1}&server={2}&captcha={3}&submit=Login",
-                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
-            byte[] login_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/login.php", "POST", post_data, Program.cookies);
-            if (login_data == null)
-            {
-                return;
-            }
-
-            // đọc dữ liệu đăng nhập từ web
-            string login_data_string = Encoding.UTF8.GetString(login_data);
-            if (login_data_string.Contains("<title>Login</title>"))
-            {
-                // nếu đăng nhập thất bại
-                load_captcha(); // load mã xác nhận mới
-                MessageBox.Show("Đăng nhập thất bại!\nMã xác nhận không hợp lệ hoặc đã hết hạn.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (login_data_string.Contains("<title>Home</title>"))
-            {
-                // nếu đăng nhập thành công
-                Program.cookies = Web_Request.Web_Request.get_cookies(); // lấy cookies
-                Program.username = textBox_username.Text; //
-            }
-        }
-        */
-
-        /**
          * Main method:
          * Utilize the input data and login to the server
          */
@@ -98,7 +80,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // create the appropriate data format to login
             byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
-                textBox_username.Text, md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+                textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
 
             // send login request
             byte[] response_data_for_login =
@@ -119,6 +101,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 MessageBoxIcon.Error);
                 // reload captcha
                 load_captcha();
+                // solve it again
+                solve_captcha();
                 return;
             }
 
@@ -136,10 +120,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // get the data to load game
             string game_data = Encoding.UTF8.GetString(response_data_for_game);
             // find the SWF object to load to flash
-            Program.flash_movie = find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            Program.flash_movie = Login_Helper.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
             // find the parameters (variables) to load to flash
-            Program.flash_vars = find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
-            Program.flash_vars = parse_to_query_string(Program.flash_vars);
+            Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
 
             // basic check to see if we can load the game
             if (Program.flash_movie == "" || Program.flash_vars == "")
@@ -155,35 +139,38 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
-         * Helper method:
+         * Main method:
          * Retrieve the captcha image from the server and display it in the form.
          */
         private void load_captcha()
         {
-            // get the captcha based on the cookies
-            byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
-                                                    "GET",
-                                                    null,
-                                                    Program.cookies);
-            if (captcha_data == null)
-                return;
-
             // put the captcha in picture box control in the login form
             try
             {
-                using (MemoryStream memory_stream = new MemoryStream(captcha_data))
-                {
-                    pictureBox_captcha.Image = Image.FromStream(memory_stream);
-                }
+                // set the captcha image
+                pictureBox_captcha.Image = Login_Helper.get_random_captcha(Program.cookies);
+                // solve captcha automatically after image is loaded
+                solve_captcha();
             }
             catch (Exception exception)
             {
-                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message),
+                MessageBox.Show(string.Format("There is an error getting captcha~!\n{0}", exception.Message),
                                 "Captcha Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
+        }
+    
+        /**
+         * Helper method:
+         * Solve the captcha and put the result in the text box.
+         */
+        private void solve_captcha()
+        {
+            // process the image using Sauvola method
+            Image filteredImg = captchaSolver.SelectionProcessImage(0, pictureBox_captcha.Image);
+            // get the result
+            textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) filteredImg);
         }
 
         /**
@@ -274,90 +261,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             return true;
         }
 
-        /**
-         * Helper method:
-         * Encrypt the password using MD5 since the server does not accept plain text password.
-         */
-        private string md5_encrypt(string text)
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] data = Encoding.UTF8.GetBytes(text);
-                byte[] result = md5.ComputeHash(data);
-                StringBuilder string_builder = new StringBuilder();
-                foreach (byte b in result)
-                {
-                    string_builder.Append(b.ToString("X2"));
-                }
-                return string_builder.ToString().ToLower();
-            }
-        }
+        
+        
 
-        /**
-         * Helper method:
-         * Find the string given a pattern and a string.
-         */
-        public string find_string(string input, string pattern) // hàm tìm kiếm chuỗi và trả về kết quả
-        {
-            Match match = Regex.Match(input, pattern);
-            return match.Success ? match.Value : "";
-        }
-
-        /**
-         * Helper method:
-         * Replace all of the white spaces in a string.
-         */
-        public string remove_white_space(string text)
-        {
-            return Regex.Replace(text, "\\s", "");
-        }
-
-        /**
-         * Helper method:
-         * Clean the input string to make it ready to be used in the query string.
-         */
-        public string parse_to_query_string(string text)
-        {
-            string result = "";
-            string[] text_split = Regex.Split(text, "\\n");
-            for (int i = 0; i < text_split.Length; i++)
-            {
-                text_split[i] = remove_white_space(text_split[i]);
-                if (text_split[i] == "")
-                    continue;
-                
-                text_split[i] = Regex.Replace(text_split[i], ",$", "");
-                string[] text_split_split = Regex.Split(text_split[i], "(?<=^[^:]*?):");
-                text_split_split[1] = Regex.Replace(text_split_split[1], "^\"", "");
-                text_split_split[1] = Regex.Replace(text_split_split[1], "\"$", "");
-                result += string.Format("{0}={1}&", text_split_split[0], text_split_split[1]);
-            }
-            result = Regex.Replace(result, "&$", "");
-            return result;
-        }
-
-        /**
-         * Helper method:
-         * Get the maximum server number
-         */
-        public int get_max_server()
-        {
-            // send a get request to the link to get the HTML page
-            byte[] html = Web_Request.Web_Request.send_request("http://www.niua.com/server/code/lsaj/",
-                                                                "GET",
-                                                                null,
-                                                                null);
-            if (html == null)
-                return 0;
-            // convert the html to string
-            string html_string = Encoding.UTF8.GetString(html);
-            // a regex to find the maximum server number
-            Regex regex = new Regex("var qServer = {\"([0-9]{0,9})\":\\[");
-            // temp value to hold the extracted values (3 parts)
-            var temp = regex.Match(html_string);
-            // retrieve the maximum server number from the second part of the temp value
-            string server = temp.Groups[1].ToString();
-            return int.Parse(server);
-        }
     }
 }

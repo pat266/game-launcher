@@ -3,6 +3,8 @@ using System.Net;
 using System.Windows.Forms;
 using Launcher_VLCM_niua_lsaj.Forms;
 
+using Captcha;
+
 namespace Launcher_VLCM_niua_lsaj
 {
     static class Program
@@ -39,6 +41,7 @@ namespace Launcher_VLCM_niua_lsaj
                 // dispaly window and load game
                 Application.Run(game);
             }
+            
         }
     }
 }

@@ -130,7 +130,6 @@
             this.combo_server.Name = "combo_server";
             this.combo_server.Size = new System.Drawing.Size(183, 21);
             this.combo_server.TabIndex = 10;
-            this.combo_server.Click += new System.EventHandler(this.Load_Server);
             // 
             // pictureBox_captcha
             // 
@@ -189,7 +188,6 @@
             this.Name = "Login";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Login - LSAJ";
-            this.Load += new System.EventHandler(this.Load_Initial_Captcha);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Login_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_captcha)).EndInit();
             this.ResumeLayout(false);
