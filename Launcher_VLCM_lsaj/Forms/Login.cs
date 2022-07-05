@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Media;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Linq;
 using System.Threading;
-using System.Collections.Generic;
-
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-
-using System.Runtime.InteropServices;
 
 using Captcha;
 

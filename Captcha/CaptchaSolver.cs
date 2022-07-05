@@ -22,7 +22,7 @@ namespace Captcha
             engine.SetVariable("tessedit_unrej_any_wd", true);
         }
         /**
-         * Main method: clean the image using AForge.NET and
+         * Main method: clean the image using custom preprocessing and
          * retrieve text using Tesseract.
          */
         public string solveCaptcha(Bitmap bitmap)

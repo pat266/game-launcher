@@ -1,21 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.IO;
 using System.Drawing;
-using Tesseract;
-using System.Text.RegularExpressions;
-
-using System.Runtime.InteropServices;
-
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Windows.Media.Imaging;
-using System.Net;
-using System.Web.Hosting;
 
 /**
  * A class to generate 100 captchas, then utilize different image

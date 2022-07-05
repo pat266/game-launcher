@@ -1,4 +1,5 @@
 ﻿/* --------------------------------------------------------
+ * Taken from https://github.com/livezingy/CaptchaProcess/tree/master/CaptchaProcess/CaptchaProcess
  * 作者：livezingy
  * 
  * 博客：http://www.livezingy.com
