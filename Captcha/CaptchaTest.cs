@@ -93,7 +93,7 @@ namespace Captcha
             FileInfo[] Files = d.GetFiles("*.png");
 
             // keep track of the total number of captchas and the number of correct captchas for each pre-process method
-            int total = 0, original = 0, sauvola = 0, otsu = 0, iterative = 0, skeleton = 0, grayBitmap1 = 0, grayBitmap2 = 0;
+            int total = 0, original = 0, sauvola = 0, otsu = 0, iterative = 0, skeleton = 0, grayBitmap1 = 0, grayBitmap2 = 0, combination = 0;
             
             // for each file, check the correctness
             foreach (FileInfo file in Files)
@@ -106,60 +106,73 @@ namespace Captcha
                 Bitmap image = new Bitmap(file.FullName);
 
                 // test the effect of resizing the image (not effective)
-                // image = Util.ResizeImage(image, (int) (image.Width * 1.2), (int) (image.Height * 1.2));
+                // image = Util.ResizeImage(image, (int) (image.Width * 2), (int) (image.Height * 2));
 
+                // deep clone the image
+                Bitmap[] bitmaps = new Bitmap[8];
+                for (int i = 0; i < bitmaps.Length; i++)
+                {
+                    bitmaps[i] = Util.Clone(image);
+                }
                 // check original (without image processing) correct
-                if (original_correct(image, answer))
+                if (original_correct(bitmaps[0], answer))
                 {
                     original++;
                 }
-                
-                // check sauvola correct
-                if (sauvola_correct(image, answer))
+
+                // check sauvola correct                
+                if (sauvola_correct(bitmaps[1], answer))
                 {
                     sauvola++;
                 }
 
-                // check otsu correct
-                if (otsu_correct(image, answer))
+                // check otsu correct              
+                if (otsu_correct(bitmaps[2], answer))
                 {
                     otsu++;
                 }
 
                 // check iterative correct
-                if (iterative_correct(image, answer))
+                if (iterative_correct(bitmaps[3], answer))
                 {
                     iterative++;
                 }
 
                 // check skeleton correct
-                if (skeleton_correct(image, answer))
+                if (skeleton_correct(bitmaps[4], answer))
                 {
                     skeleton++;
                 }
 
                 // check grayBitmap1 correct
-                if (gray_bitmap1_correct(image, answer))
+                if (gray_bitmap1_correct(bitmaps[5], answer))
                 {
                     grayBitmap1++;
                 }
 
                 // check grayBitmap2 correct
-                if (gray_bitmap2_correct(image, answer))
+                if (gray_bitmap2_correct(bitmaps[6], answer))
                 {
                     grayBitmap2++;
+                }
+
+                // check combination correct
+                if (combination_correct(bitmaps[7], answer))
+                {
+                    combination++;
                 }
             }
             
             // print out the result
             Console.WriteLine("Total number of captchas: {0} captchas", total);
-            Console.WriteLine("Without image processing: number of correct: {0}, percent: {1}%", original, Util.percentage(original, total));
-            Console.WriteLine("Primitive Gray Bitmap 1: number of correct: {0}, percent: {1}%", grayBitmap1, Util.percentage(grayBitmap1, total));
-            Console.WriteLine("Primitive Gray Bitmap 2: number of correct: {0}, percent: {1}%", grayBitmap2, Util.percentage(grayBitmap2, total));
-            Console.WriteLine("Sauvola binarization: number of correct: {0}, percent: {1}%", sauvola, Util.percentage(sauvola, total));
-            Console.WriteLine("Otsu binarization: number of correct: {0}, percent: {1}%", otsu, Util.percentage(otsu, total));
-            Console.WriteLine("Iterative binarization: number of correct: {0}, percent: {1}%", iterative, Util.percentage(iterative, total));
-            Console.WriteLine("Zhang-Suen skelenton: number of correct: {0}, percent: {1}%", skeleton, Util.percentage(skeleton, total));
+            Console.WriteLine("Without image processing: {0}% correct", Util.percentage(original, total));
+            Console.WriteLine("Primitive Gray Bitmap 1: {0}% correct", Util.percentage(grayBitmap1, total));
+            Console.WriteLine("Primitive Gray Bitmap 2: {0}% correct", Util.percentage(grayBitmap2, total));
+            Console.WriteLine("Sauvola binarization: {0}% correct", Util.percentage(sauvola, total));
+            Console.WriteLine("Otsu binarization: {0}% correct", Util.percentage(otsu, total));
+            Console.WriteLine("Iterative binarization: {0}% correct", Util.percentage(iterative, total));
+            Console.WriteLine("Zhang-Suen skelenton: {0}% correct", Util.percentage(skeleton, total));
+            Console.WriteLine("Combination of without image processing and Sauvola: {0}% correct", Util.percentage(combination, total));
 
         }
 
@@ -236,6 +249,23 @@ namespace Captcha
         {
             Bitmap grayBitmap2 = Util.ToGrayBitmap2(randomCaptcha);
             string result = captchaSolver.solveCaptcha(grayBitmap2);
+            return value.Equals(result);
+        }
+
+        /**
+         * Method to determine if the image process helps to determine the correct answer
+         * When no mask returns no answer, attempt to use Sauvola Binarization to get it
+         */
+        private static Boolean combination_correct(Bitmap randomCaptcha, string value)
+        {
+            // attempt to solve it without masking
+            string result = captchaSolver.solveCaptcha(randomCaptcha);
+            if (result.Length < 4)
+            {
+                // attempt to solve it with masking
+                result = captchaSolver.solveCaptcha(Util.SauvolaBinarization(randomCaptcha));
+            }
+
             return value.Equals(result);
         }
     }

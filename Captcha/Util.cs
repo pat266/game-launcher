@@ -15,6 +15,8 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Windows.Media.Imaging;
 using System.Net;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Captcha
 {
@@ -41,7 +43,39 @@ namespace Captcha
                 return Image.FromStream(memory_stream);
             }
         }
-        
+
+        /**
+         * Helper method:
+         * Make a deep copy.
+         */
+        public static Bitmap bitmap_deep_copy(Bitmap b)
+        {
+            return b.Clone(new Rectangle(0, 0, b.Width, b.Height), b.PixelFormat);
+        }
+
+        public static T Clone<T>(T source)
+        {
+            if (!typeof(T).IsSerializable)
+            {
+                throw new ArgumentException("The type must be serializable.", "source");
+            }
+
+            // Don't serialize a null object, simply return the default for that object
+            if (Object.ReferenceEquals(source, null))
+            {
+                return default(T);
+            }
+
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new MemoryStream();
+            using (stream)
+            {
+                formatter.Serialize(stream, source);
+                stream.Seek(0, SeekOrigin.Begin);
+                return (T)formatter.Deserialize(stream);
+            }
+        }
+
         /**
          * Helper method:
          * Replace all of the white spaces in a string and retrieve only the first 4 numerical values.
