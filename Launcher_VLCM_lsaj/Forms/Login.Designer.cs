@@ -130,7 +130,6 @@
             this.combo_server.Name = "combo_server";
             this.combo_server.Size = new System.Drawing.Size(183, 21);
             this.combo_server.TabIndex = 10;
-            this.combo_server.Click += new System.EventHandler(this.Load_Server);
             // 
             // pictureBox_captcha
             // 

@@ -10,29 +10,63 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+
+using System.Runtime.InteropServices;
+
+using Captcha;
+
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
         int max_server;
+
+        CaptchaSolver captchaSolver;
         public Login()
         {
+            // load up the captcha solver
+            captchaSolver = new CaptchaSolver();
+
+            ///**
             // load up the login window
             InitializeComponent();
+
             // add load server to be loaded before the game window is loaded
             // this.Load += new EventHandler(this.Load_Server);
             Console.WriteLine("Start a separate thread to retrieve the server list");
             // dedicate a separate thread to load the server
             var thread1 = new Thread(new ThreadStart(Load_Server));
             thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread1.Start();
-            thread1.Join();
+            thread1.Start(); // starts thread
+            thread1.Join(); // wait for thread to finish
 
             // dedicate another thread to load captcha
             var thread2 = new Thread(new ThreadStart(load_captcha));
             thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread2.Start();
-            // thread2.Join();
+            thread2.Start(); // starts thread
+            thread2.Join(); // wait for thread to finish
+
+            // dedicate another thread to solve captcha
+            var thread3 = new Thread(new ThreadStart(solve_captcha));
+            thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread3.Start(); // starts thread
+            // thread3.Join(); // wait for thread to finish
+
+            
+
+            // generate 100 captcha images to test
+            // dedicate another thread to solve captcha
+            // var thread4 = new Thread(() => generate_captcha(100));
+            // thread4.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            // thread4.Start(); // starts thread
+            // thread4.Join(); // wait for thread to finish
+            // generate_captcha(100);
+            // generate_captcha(1);
+            //generate_captcha(2);
+
+            //**/
         }
 
         /**
@@ -55,61 +89,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
             }
         }
-
-        /**
-         * Form method: 
-         * Load up the values of server for the ComboBox in Login form.
-         */
-        private void Load_Server(object sender, EventArgs e)
-        {
-            if (max_server == 0)
-            {
-                // retrieve the max number of server
-                max_server = get_max_server();
-                Console.WriteLine("The current max server is: " + max_server);
-
-                // load the available server in the ComboBox
-                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
-
-                combo_server.DisplayMember = "Server";
-                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
-            }
-        }
-
-        /**
-        private void login()
-        {
-            // lấy dữ liệu đăng nhập từ web
-            string post_data =
-                string.Format(
-                    "username={0}&password={1}&server={2}&captcha={3}&submit=Login",
-                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
-            byte[] login_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/login.php", "POST", post_data, Program.cookies);
-            if (login_data == null)
-            {
-                return;
-            }
-
-            // đọc dữ liệu đăng nhập từ web
-            string login_data_string = Encoding.UTF8.GetString(login_data);
-            if (login_data_string.Contains("<title>Login</title>"))
-            {
-                // nếu đăng nhập thất bại
-                load_captcha(); // load mã xác nhận mới
-                MessageBox.Show("Đăng nhập thất bại!\nMã xác nhận không hợp lệ hoặc đã hết hạn.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (login_data_string.Contains("<title>Home</title>"))
-            {
-                // nếu đăng nhập thành công
-                Program.cookies = Web_Request.Web_Request.get_cookies(); // lấy cookies
-                Program.username = textBox_username.Text; //
-            }
-        }
-        */
 
         /**
          * Main method:
@@ -143,6 +122,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 MessageBoxIcon.Error);
                 // reload captcha
                 load_captcha();
+                // solve it again
+                solve_captcha();
                 return;
             }
 
@@ -200,14 +181,28 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 {
                     pictureBox_captcha.Image = Image.FromStream(memory_stream);
                 }
+                // solve captcha automatically after image is loaded
+                solve_captcha();
             }
             catch (Exception exception)
             {
-                MessageBox.Show(string.Format("There is an error getting captcha!\n{0}", exception.Message),
+                MessageBox.Show(string.Format("There is an error getting captcha~!\n{0}", exception.Message),
                                 "Captcha Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
+        }
+    
+        /**
+         * Helper method:
+         * Solve the captcha and put the result in the text box.
+         */
+        private void solve_captcha()
+        {
+            // process the image
+            Image filteredImg = captchaSolver.SelectionChangedMethod(0, pictureBox_captcha.Image);
+            // get the result
+            textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) filteredImg);
         }
 
         /**
@@ -324,6 +319,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         public string find_string(string input, string pattern) // hàm tìm kiếm chuỗi và trả về kết quả
         {
             Match match = Regex.Match(input, pattern);
+            
             return match.Success ? match.Value : "";
         }
 
@@ -383,5 +379,102 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             string server = temp.Groups[1].ToString();
             return int.Parse(server);
         }
+
+        /**
+         * Helper method:
+         * Retrieve the captcha image from the server (without cookies).
+         */
+        private void generate_captcha(int number)
+        {
+            for (int i = 0; i < number; i++)
+            {
+                // get the captcha based on the cookies
+                byte[] captcha_data =
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
+                                                    "GET",
+                                                    null,
+                                                    null);
+                if (captcha_data == null)
+                    continue;
+
+                Image retImg;
+                // put the captcha in picture box control in the login form
+                try
+                {
+                    using (MemoryStream memory_stream = new MemoryStream(captcha_data))
+                    {
+                        retImg = Image.FromStream(memory_stream);
+                                               
+                        // resize the image by 300%
+                        retImg = ResizeImage(retImg, retImg.Width * 2, retImg.Height * 2);
+
+                        // convert the image to black and white
+                        // SetPixelColor((Bitmap) retImg);
+                        // retImg = ToGrayBitmap((Bitmap) retImg);
+                        // retImg = MainHub.processImage((Bitmap) retImg);
+
+                        
+                        // get the result of the captcha as name
+                        string name = captchaSolver.solveCaptcha((Bitmap) retImg);
+                        Console.WriteLine(name);
+                        
+                        // save the captcha to a file
+                        string imagesDirectory = Path.Combine(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\Captcha", "sampleImages", name);
+                        imagesDirectory += ".png";
+                        Console.WriteLine(imagesDirectory);
+
+                        // save the image to a file
+                        retImg.Save(imagesDirectory);
+                        /****/
+                    }
+
+                }
+                catch (Exception exception)
+                {
+                    MessageBox.Show(string.Format("There is an error getting captcha in generate_captcha()!\n{0}", exception.Message),
+                                    "Captcha Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                    continue;
+                }
+            }
+            
+        }
+
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// https://stackoverflow.com/questions/1922040/how-to-resize-an-image-c-sharp
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        private Bitmap ResizeImage(Image image, int width, int height)
+        {
+            var destRect = new Rectangle(0, 0, width, height);
+            var destImage = new Bitmap(width, height);
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
+        
+
     }
 }
