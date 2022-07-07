@@ -18,8 +18,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // mute the site?!
             Game.SetVolume(0);
 
-            // set the minimum size
-            this.MinimumSize = new Size(1920, 1080);
+            
 
             InitializeComponent();
             
@@ -30,10 +29,21 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // set the necessary information to flash control of form game
             axShockwaveFlash.Movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
 
-            // load full screen
-            this.TopMost = true;
+            // set it so that the application is resizable
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.SizeGripStyle = SizeGripStyle.Auto;
+
+            // set the intial size
+            this.Size = new Size(1024, 768);
+            
+            // center the application
+            this.CenterToScreen();
+            
             // this.FormBorderStyle = FormBorderStyle.None;
-            this.WindowState = FormWindowState.Maximized;
+            
+            // this.WindowState = FormWindowState.Maximized;
+            
+            
         }
 
         /// <summary>
@@ -60,15 +70,5 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             waveOutSetVolume(IntPtr.Zero, NewVolumeAllChannels);
         }
 
-        protected override void WndProc(ref Message m)
-        {
-            switch (m.Msg)
-            {
-                case 0x84:
-                    m.Result = new IntPtr(0x2);
-                    return;
-            }
-            base.WndProc(ref m);
-        }
     }
 }

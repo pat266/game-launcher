@@ -119,5 +119,18 @@ namespace Launcher_VLCM_niua_lsaj
             string server = temp.Groups[1].ToString();
             return int.Parse(server);
         }
+
+        public static string getBetween(string strSource, string strStart, string strEnd)
+        {
+            if (strSource.Contains(strStart) && strSource.Contains(strEnd))
+            {
+                int Start, End;
+                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
+                End = strSource.IndexOf(strEnd, Start);
+                return strSource.Substring(Start, End - Start);
+            }
+
+            return "";
+        }
     }
 }
