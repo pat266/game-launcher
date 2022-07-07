@@ -52,8 +52,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // load_captcha();
             solve_captcha();
-            
-            
+
+            // set the reveal button to transparent
+            reveal.TabStop = false;
+            reveal.FlatStyle = FlatStyle.Flat;
+            reveal.FlatAppearance.BorderSize = 0;
+            reveal.FlatAppearance.BorderColor = Color.FromArgb(0, 255, 255, 255); //transparent
 
             // TODO: remove
             textBox_username.Text = "samdeptrai26@gmail.com";
