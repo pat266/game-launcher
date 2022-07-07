@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.IO;
 using System.Drawing;
-using Tesseract;
 using System.Text.RegularExpressions;
 
 using System.Runtime.InteropServices;
@@ -17,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace Captcha
 {

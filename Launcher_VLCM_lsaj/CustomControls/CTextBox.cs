@@ -151,7 +151,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
         }
 
         [Category("Custom UI")]
-        public string Texts
+        public override string Text
         {
             get
             {

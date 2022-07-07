@@ -28,7 +28,8 @@ namespace Captcha
         public string solveCaptcha(Bitmap bitmap)
         {
             string res = string.Empty;
-            using (var page = engine.Process(bitmap, PageSegMode.SingleLine))
+            
+            using (var page = engine.Process(bitmap, PageSegMode.SingleWord))
                 res = page.GetText();
             // Console.WriteLine("This is the result: ");
             return Util.cleanResult(res);

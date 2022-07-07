@@ -10,11 +10,9 @@ Attempt to solve captcha required to login automatically.
     * Original Image:<br> ![Alt text](./sampleImages/before-5585.png)
     * Processed Image:<br> ![Alt text](./sampleImages/after-5485.png)
 * Text extractor: Can be found in `Captcha.CaptchaSolver.cs`
-    * Utilizes Tesseract-OCR 3.02 to "read" the numeric values from the image
-    * Although there is higher version (5.0+), it uses LSTM model
-        * Cons: Data is too big - 500MB - and is slower so I did not use it.
-        * Pros: its accuracy would definitely be improved.
-        * Explanation: we do not care about accuracy when it is above 70% since we could try again. No need to get 100% accuracy.
+    * Utilizes Tesseract-OCR 4.01 to "read" the numeric values from the image
+        * Utilizes LSTM model. The overall size is much lighter.
+    * Can be trained on the captcha for better performance better.
 * How I test: Can be found in `Captcha.CaptchaTest.cs`
     * Description: Compare each pre-processing methods (including no method) against each other to see which one would make the text extractor (Tesseract) the most accurate.
     * Here are the steps below:

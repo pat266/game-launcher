@@ -60,6 +60,7 @@
             this.Load += new System.EventHandler(this.Game_Load);
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).EndInit();
             this.ResumeLayout(false);
+
         }
 
         #endregion
