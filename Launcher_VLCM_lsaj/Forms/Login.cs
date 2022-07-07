@@ -15,7 +15,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         int max_server;
 
         CaptchaSolver captchaSolver;
-        
+
+        private static Bitmap revealImg = new Bitmap(Properties.Resources.reveal);
+        private static Bitmap hideImg = new Bitmap(Properties.Resources.hide);
+
         public Login()
         {
             // load up the captcha solver
@@ -25,14 +28,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // load up the login window
             InitializeComponent();
 
-            // add load server to be loaded before the game window is loaded
-            // this.Load += new EventHandler(this.Load_Server);
             Console.WriteLine("Start a separate thread to retrieve the server list");
             // dedicate a separate thread to load the server
             var thread1 = new Thread(new ThreadStart(Load_Server));
             thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread1.Start(); // starts thread
-            thread1.Join(); // wait for thread to finish
+            thread1.Join(); // wait for thread to finish           
 
             // dedicate another thread to load captcha
             var thread2 = new Thread(new ThreadStart(load_captcha));
@@ -46,27 +47,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             thread3.Start(); // starts thread
             // thread3.Join(); // wait for thread to finish
 
-        }
+           
 
-        /**
-         * Helper method: 
-         * Load up the values of server for the ComboBox in Login form.
-         */
-        private void Load_Server()
-        {
-            if (max_server == 0)
-            {
-                // retrieve the max number of server
-                max_server = Login_Helper.get_max_server();
-                Console.WriteLine("The current max server is: " + max_server);
-
-                // load the available server in the ComboBox
-                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
-
-                combo_server.DisplayMember = "Server";
-                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
-            }
         }
 
         /**
@@ -99,6 +81,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 "Login Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
+                Console.WriteLine("The username is {0}, password is {1}, server is {2}, captcha is {3}",
+                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
                 // reload captcha
                 load_captcha();
                 // solve it again
@@ -139,6 +123,32 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
+         * Helper method: 
+         * Load up the values of server for the ComboBox in Login form.
+         */
+        private void Load_Server()
+        {
+            if (max_server == 0)
+            {
+                // retrieve the max number of server
+                max_server = Login_Helper.get_max_server();
+
+                combo_server.Text = max_server.ToString();
+
+                /**
+                Console.WriteLine("The current max server is: " + max_server);
+
+                // load the available server in the ComboBox
+                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
+
+                combo_server.DisplayMember = "Server";
+                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
+                **/
+            }
+        }
+
+        /**
          * Main method:
          * Retrieve the captcha image from the server and display it in the form.
          */
@@ -148,7 +158,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             try
             {
                 // set the captcha image
-                pictureBox_captcha.Image = Login_Helper.get_random_captcha(Program.cookies);
+                Image captcha = Login_Helper.get_random_captcha(Program.cookies);
+                pictureBox_captcha.Image = captcha;
                 // solve captcha automatically after image is loaded
                 solve_captcha();
             }
@@ -167,10 +178,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void solve_captcha()
         {
-            // process the image using Sauvola method
-            Image filteredImg = captchaSolver.SelectionProcessImage(0, pictureBox_captcha.Image);
+            // Apply simple gray bitmap filter
+            pictureBox_captcha.Image = Util.ToGrayBitmap((Bitmap)pictureBox_captcha.Image);
+
             // get the result
-            textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) filteredImg);
+            textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) pictureBox_captcha.Image);
+
         }
 
         /**
@@ -234,6 +247,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 "Server Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
+                combo_server.Focus();
                 return false;
             }
             if (server <= 0)
@@ -242,6 +256,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 "Server Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
+                combo_server.Focus();
                 return false;
             }
             if (server > max_server)
@@ -250,6 +265,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 "Server Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
+                combo_server.Focus();
                 return false;
             }
             if (textBox_captcha.Text == "")
@@ -261,8 +277,29 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             return true;
         }
 
-        
-        
+        private void pictureBox_captcha_Click(object sender, EventArgs e)
+        {
+            load_captcha();
+            solve_captcha();
+        }
 
+        /**
+         * Reveal password or cover it up
+         */
+        private void reveal_Click(object sender, EventArgs e)
+        {
+            if (textBox_password.PasswordChar)
+            {
+                textBox_password.PasswordChar = false;
+                reveal.Image = Login.hideImg;
+            }
+
+            else
+            {
+                textBox_password.PasswordChar = true;
+                reveal.Image = Login.revealImg;
+            }
+                
+        }
     }
 }
