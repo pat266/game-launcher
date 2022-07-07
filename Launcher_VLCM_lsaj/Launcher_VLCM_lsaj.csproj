@@ -180,6 +180,11 @@
     <Content Include="dll\AxInterop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Interop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Web_Request.dll" />
+    <None Include="Resources\close.png" />
+    <None Include="Resources\minimize.png" />
+    <None Include="Resources\maximize.png" />
+    <None Include="Resources\mute.png" />
+    <None Include="Resources\unmute.png" />
     <None Include="Resources\hide.jpg" />
     <None Include="Resources\reveal.jpg" />
     <None Include="Resources\calendarWhite.png" />
