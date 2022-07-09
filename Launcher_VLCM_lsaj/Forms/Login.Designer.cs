@@ -84,12 +84,15 @@
             // 
             // reveal
             // 
+            this.reveal.BackColor = System.Drawing.Color.Transparent;
+            this.reveal.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.reveal.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.reveal.Image = global::Launcher_VLCM_niua_lsaj.Properties.Resources.reveal;
             this.reveal.Location = new System.Drawing.Point(266, 55);
             this.reveal.Name = "reveal";
             this.reveal.Size = new System.Drawing.Size(30, 25);
             this.reveal.TabIndex = 19;
-            this.reveal.UseVisualStyleBackColor = true;
+            this.reveal.UseVisualStyleBackColor = false;
             this.reveal.Click += new System.EventHandler(this.reveal_Click);
             // 
             // pictureBox_captcha

@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading;
 
 using Captcha;
+using DotNetEnv;
+using System.Threading.Tasks;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -19,14 +21,22 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private static Bitmap revealImg = new Bitmap(Properties.Resources.reveal);
         private static Bitmap hideImg = new Bitmap(Properties.Resources.hide);
 
+        public static string success_login = "欢迎您登录！"; // success login
+
         public Login()
         {
+            // track form loading time
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            
             // load up the captcha solver
             captchaSolver = new CaptchaSolver();
 
-            ///**
+            // /**
             // load up the login window
             InitializeComponent();
+            // prettify reveal password button
+            Prettify_Reveal_Button();
 
             Console.WriteLine("Start a separate thread to retrieve the server list");
             // dedicate a separate thread to load the server
@@ -41,85 +51,87 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             thread2.Start(); // starts thread
             thread2.Join(); // wait for thread to finish
 
-            // dedicate another thread to solve captcha
-            var thread3 = new Thread(new ThreadStart(solve_captcha));
+            solve_captcha();
+            
+            // dedicate another thread to load login credentials
+            var thread3 = new Thread(new ThreadStart(Load_Credentials));
             thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread3.Start(); // starts thread
-            // thread3.Join(); // wait for thread to finish
+            thread3.Join(); // wait for thread to finish
+            // **/
 
-           
+            watch.Stop();
 
+            Console.WriteLine($"Loading Time: {watch.ElapsedMilliseconds / 1000.0} s");
         }
 
         /**
-         * Main method:
-         * Utilize the input data and login to the server
-         */
-        private void login()
+        public Login()
         {
-            Program.flash_movie = "";
-            Program.flash_vars = "";
+            // track form loading time
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+            
+            // load up the captcha solver
+            captchaSolver = new CaptchaSolver();
 
-            // create the appropriate data format to login
-            byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
-                textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+            // load up the login window
+            InitializeComponent();
+            // prettify reveal password button
+            Prettify_Reveal_Button();
 
-            // send login request
-            byte[] response_data_for_login =
-                Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj",
-                                                    "POST",
-                                                    login_data,
-                                                    Program.cookies);
-            if (response_data_for_login == null)
-                return;
-            // Console.WriteLine(Encoding.UTF8.GetString(response_data_for_login));
+            Console.WriteLine("Start a separate thread to retrieve the server list");
+            // dedicate a separate thread to load the server
+            var thread1 = new Thread(new ThreadStart(Load_Server));
+            thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread1.Start(); // starts thread
+            thread1.Join(); // wait for thread to finish           
 
-            // check if login is successful
-            if (!Encoding.UTF8.GetString(response_data_for_login).Contains("欢迎您登录！"))
-            {
-                MessageBox.Show("Login information or captcha is incorrect!",
-                                "Login Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                Console.WriteLine("The username is {0}, password is {1}, server is {2}, captcha is {3}",
-                    textBox_username.Text, textBox_password.Text, combo_server.Text, textBox_captcha.Text);
-                // reload captcha
-                load_captcha();
-                // solve it again
-                solve_captcha();
-                return;
-            }
+            // dedicate another thread to load captcha
+            var thread2 = new Thread(new ThreadStart(load_captcha));
+            thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread2.Start(); // starts thread
+            thread2.Join(); // wait for thread to finish
 
-            // send request to access the game
-            byte[] response_data_for_game =
-                Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
-                                                                    combo_server.Text),
-                                                     "GET",
-                                                     null,
-                                                     Program.cookies);
+            solve_captcha();
+            
+            // dedicate another thread to load login credentials
+            var thread3 = new Thread(new ThreadStart(Load_Credentials));
+            thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+            thread3.Start(); // starts thread
+            thread3.Join(); // wait for thread to finish
+            
 
-            if (response_data_for_game == null)
-                return;
+            watch.Stop();
 
-            // get the data to load game
-            string game_data = Encoding.UTF8.GetString(response_data_for_game);
-            // find the SWF object to load to flash
-            Program.flash_movie = Login_Helper.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
-            // find the parameters (variables) to load to flash
-            Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
-            Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
+            Console.WriteLine($"Loading Time: {watch.ElapsedMilliseconds / 1000.0} s");
+        }
+        **/
 
-            // basic check to see if we can load the game
-            if (Program.flash_movie == "" || Program.flash_vars == "")
-            {
-                MessageBox.Show("Cannot get data to load game!",
-                                "Flash Info Error",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                return;
-            }
-            // close the login window
-            Close();
+        /**
+         * Helper method: 
+         * Make the reveal password button prettier.
+         */
+        private void Prettify_Reveal_Button()
+        {
+            // set the reveal button to transparent
+            reveal.TabStop = false;
+            reveal.FlatStyle = FlatStyle.Flat;
+            reveal.FlatAppearance.BorderSize = 0;
+            reveal.FlatAppearance.BorderColor = Color.FromArgb(0, 255, 255, 255); //transparent
+        }
+
+        /**
+         * Helper method: 
+         * Load up the credentials from the .env file.
+         */
+        private void Load_Credentials()
+        {
+            // load the login values from the .env file
+            Env.Load("../../.env");
+
+            textBox_username.Text = Environment.GetEnvironmentVariable("USERNAME");
+            textBox_password.Text = Environment.GetEnvironmentVariable("PASSWORD");
         }
 
         /**
@@ -133,18 +145,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 // retrieve the max number of server
                 max_server = Login_Helper.get_max_server();
 
-                combo_server.Text = max_server.ToString();
-
-                /**
-                Console.WriteLine("The current max server is: " + max_server);
-
-                // load the available server in the ComboBox
-                combo_server.DataSource = Enumerable.Range(1, max_server).Reverse().ToList();
-
-                combo_server.DisplayMember = "Server";
-                combo_server.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                combo_server.AutoCompleteSource = AutoCompleteSource.ListItems;
-                **/
+                if (combo_server.Text == "")
+                    combo_server.Text = max_server.ToString();
             }
         }
 
@@ -183,6 +185,20 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // get the result
             textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) pictureBox_captcha.Image);
+
+        }
+
+        /**
+         * Helper method:
+         * Solve the captcha and put the result in the text box asynchronously.
+         */
+        private async Task solve_captcha_async()
+        {
+            // Apply simple gray bitmap filter
+            pictureBox_captcha.Image = Util.ToGrayBitmap((Bitmap)pictureBox_captcha.Image);
+
+            // get the result
+            textBox_captcha.Text = await Task.Run(() => captchaSolver.solveCaptcha((Bitmap)pictureBox_captcha.Image));
 
         }
 
@@ -275,6 +291,96 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 return false;
             }
             return true;
+        }
+
+        /**
+         * Main method:
+         * Utilize the input data and login to the server
+         */
+        private void login()
+        {
+            // attempt to login 5 times
+            for (int i = 0; i < 5; i++)
+            {
+                Program.flash_movie = "";
+                Program.flash_vars = "";
+
+                // create the appropriate data format to login
+                byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
+                    textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+                Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
+
+                // send login request
+                byte[] response_data_for_login =
+                    Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj",
+                                                        "POST",
+                                                        login_data,
+                                                        Program.cookies);
+                if (response_data_for_login == null)
+                    return;
+                
+                // check if login is successful
+                if (!Encoding.UTF8.GetString(response_data_for_login).Contains(success_login))
+                {
+                    // if it still fails after 5 times, show error message and return
+                    if (i >= 4)
+                    {
+                        MessageBox.Show("Login information or captcha is incorrect!",
+                                    "Login Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                        // reload captcha
+                        load_captcha();
+                        // solve it again
+                        solve_captcha();
+                        return;
+                    }
+                    else
+                    {
+                        // if it fails, reload captcha and solve it again
+                        load_captcha();
+                        solve_captcha();
+                    }
+                    
+                }
+                else // if the login is successful
+                {
+                    // break out of the login attempt
+                    break;
+                }
+            }
+            
+            
+            // send request to access the game
+            byte[] response_data_for_game =
+                Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
+                                                                    combo_server.Text),
+                                                     "GET",
+                                                     null,
+                                                     Program.cookies);
+
+            if (response_data_for_game == null)
+                return;
+
+            // get the data to load game
+            string game_data = Encoding.UTF8.GetString(response_data_for_game);
+            // find the SWF object to load to flash
+            Program.flash_movie = Login_Helper.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            // find the parameters (variables) to load to flash
+            Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
+
+            // basic check to see if we can load the game
+            if (Program.flash_movie == "" || Program.flash_vars == "")
+            {
+                MessageBox.Show("Cannot get data to load game!",
+                                "Flash Info Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+            // close the login window
+            Close();
         }
 
         private void pictureBox_captcha_Click(object sender, EventArgs e)
