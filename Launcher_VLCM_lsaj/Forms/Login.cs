@@ -40,24 +40,15 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             Console.WriteLine("Start a separate thread to retrieve the server list");
             // dedicate a separate thread to load the server
-            var thread1 = new Thread(new ThreadStart(Load_Server));
-            thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread1.Start(); // starts thread
-            thread1.Join(); // wait for thread to finish           
+            Load_Server_Async();
 
             // dedicate another thread to load captcha
-            var thread2 = new Thread(new ThreadStart(load_captcha));
-            thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread2.Start(); // starts thread
-            thread2.Join(); // wait for thread to finish
+            Load_Captcha_Async();
 
-            solve_captcha();
-            
             // dedicate another thread to load login credentials
             var thread3 = new Thread(new ThreadStart(Load_Credentials));
             thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
             thread3.Start(); // starts thread
-            thread3.Join(); // wait for thread to finish
             // **/
 
             watch.Stop();
@@ -151,10 +142,26 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
+         * Helper method: 
+         * Load up the values of server for the ComboBox in Login form.
+         */
+        private async Task Load_Server_Async()
+        {
+            if (max_server == 0)
+            {
+                // retrieve the max number of server
+                max_server = await Task.Run(() => Login_Helper.get_max_server());
+
+                if (combo_server.Text == "")
+                    combo_server.Text = max_server.ToString();
+            }
+        }
+
+        /**
          * Main method:
          * Retrieve the captcha image from the server and display it in the form.
          */
-        private void load_captcha()
+        private void Load_Captcha()
         {
             // put the captcha in picture box control in the login form
             try
@@ -163,7 +170,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 Image captcha = Login_Helper.get_random_captcha(Program.cookies);
                 pictureBox_captcha.Image = captcha;
                 // solve captcha automatically after image is loaded
-                solve_captcha();
+                Solve_Captcha();
             }
             catch (Exception exception)
             {
@@ -173,32 +180,42 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                 MessageBoxIcon.Error);
             }
         }
-    
+
+        /**
+         * Main method:
+         * Retrieve the captcha image from the server and display it in the form.
+         */
+        private async Task Load_Captcha_Async()
+        {
+            // put the captcha in picture box control in the login form
+            try
+            {
+                // set the captcha image
+                Image captcha = await Task.Run(() => Login_Helper.get_random_captcha(Program.cookies));
+                pictureBox_captcha.Image = captcha;
+                // solve captcha automatically after image is loaded
+                Solve_Captcha();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(string.Format("There is an error getting captcha~!\n{0}", exception.Message),
+                                "Captcha Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+        }
+
         /**
          * Helper method:
          * Solve the captcha and put the result in the text box.
          */
-        private void solve_captcha()
+        private void Solve_Captcha()
         {
             // Apply simple gray bitmap filter
             pictureBox_captcha.Image = Util.ToGrayBitmap((Bitmap)pictureBox_captcha.Image);
 
             // get the result
             textBox_captcha.Text = captchaSolver.solveCaptcha((Bitmap) pictureBox_captcha.Image);
-
-        }
-
-        /**
-         * Helper method:
-         * Solve the captcha and put the result in the text box asynchronously.
-         */
-        private async Task solve_captcha_async()
-        {
-            // Apply simple gray bitmap filter
-            pictureBox_captcha.Image = Util.ToGrayBitmap((Bitmap)pictureBox_captcha.Image);
-
-            // get the result
-            textBox_captcha.Text = await Task.Run(() => captchaSolver.solveCaptcha((Bitmap)pictureBox_captcha.Image));
 
         }
 
@@ -233,10 +250,18 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Helper method:
          * Perform basic check on the input data in the login window
-         * TODO: https://www.codeproject.com/Questions/5061322/Set-focus-on-textbox-combobox-in-winforms-if-it-is
          */
         private bool check_input_data()
         {
+            // if the application has not finished loading
+            if (combo_server.Text == "" && textBox_captcha.Text == "" && pictureBox_captcha.Image == null)
+            {
+                MessageBox.Show("Please wait until the application finishes loading.",
+                                "Loading Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return false;
+            }
             if (textBox_username.Text == "")
             {
                 SystemSounds.Beep.Play();
@@ -330,16 +355,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
                         // reload captcha
-                        load_captcha();
-                        // solve it again
-                        solve_captcha();
+                        Load_Captcha();
                         return;
                     }
                     else
                     {
                         // if it fails, reload captcha and solve it again
-                        load_captcha();
-                        solve_captcha();
+                        Load_Captcha();
                     }
                     
                 }
@@ -385,8 +407,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private void pictureBox_captcha_Click(object sender, EventArgs e)
         {
-            load_captcha();
-            solve_captcha();
+            // the load captcha method will reload the captcha (already call the solve method)
+            Load_Captcha();
         }
 
         /**
