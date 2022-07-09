@@ -18,5 +18,9 @@ I created this application to login with a click of button.
 
 ## Some Stats
 ### **Average time taken to load up the form** (load server, get captcha, solve captcha, login credentials)
-* load server (thread); get captcha (thread); solve captcha (none); login credentials (thread): 3-4 seconds
-* load server (); get captcha (); solve captcha (); login credentials ():  seconds
+* load server (thread); get captcha (thread); solve captcha (none); login credentials (thread): 2.9 - 4 seconds
+* load server (thread); get captcha (thread); solve captcha (async); login credentials (thread): 3.4 - 3.8 seconds
+* load server (async); get captcha (thread); solve captcha (async); login credentials (thread): 1.1 - 1.7 seconds
+* load server (async); get captcha (thread); solve captcha (none); login credentials (thread): 1.1 - 1.5 seconds
+* load server (async); get captcha (async); solve captcha (async); login credentials (none): 0.4 - 0.6 seconds
+* load server (async); get captcha (async); solve captcha (async); login credentials (thread): ~0.3 seconds **<= best**
