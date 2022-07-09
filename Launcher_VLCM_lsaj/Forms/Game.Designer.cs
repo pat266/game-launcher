@@ -64,19 +64,27 @@
             this.FormBorder.Name = "FormBorder";
             this.FormBorder.Size = new System.Drawing.Size(784, 30);
             this.FormBorder.TabIndex = 1;
+            this.FormBorder.DoubleClick += new System.EventHandler(this.FormBorder_DoubleClick);
+            this.FormBorder.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseDown);
+            this.FormBorder.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseMove);
+            this.FormBorder.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseUp);
             // 
             // nameLabel
             // 
+            this.nameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.nameLabel.AutoSize = true;
-            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
             this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.nameLabel.Location = new System.Drawing.Point(30, 0);
+            this.nameLabel.Location = new System.Drawing.Point(36, 5);
             this.nameLabel.Name = "nameLabel";
             this.nameLabel.Size = new System.Drawing.Size(205, 21);
             this.nameLabel.TabIndex = 1;
             this.nameLabel.Text = "Launcher - lsaj.niua.com";
             this.nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.nameLabel.DoubleClick += new System.EventHandler(this.nameLabel_DoubleClick);
+            this.nameLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseDown);
+            this.nameLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseMove);
+            this.nameLabel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseUp);
             // 
             // minimize
             // 
@@ -169,7 +177,7 @@
             this.DoubleBuffered = true;
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.ForeColor = System.Drawing.Color.Black;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.KeyPreview = true;
             this.Name = "Game";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
