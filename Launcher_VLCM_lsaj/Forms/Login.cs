@@ -14,7 +14,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
-        int max_server;
+        int max_server = Int32.MaxValue;
 
         CaptchaSolver captchaSolver;
 
@@ -57,49 +57,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         /**
-        public Login()
-        {
-            // track form loading time
-            var watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-            
-            // load up the captcha solver
-            captchaSolver = new CaptchaSolver();
-
-            // load up the login window
-            InitializeComponent();
-            // prettify reveal password button
-            Prettify_Reveal_Button();
-
-            Console.WriteLine("Start a separate thread to retrieve the server list");
-            // dedicate a separate thread to load the server
-            var thread1 = new Thread(new ThreadStart(Load_Server));
-            thread1.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread1.Start(); // starts thread
-            thread1.Join(); // wait for thread to finish           
-
-            // dedicate another thread to load captcha
-            var thread2 = new Thread(new ThreadStart(load_captcha));
-            thread2.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread2.Start(); // starts thread
-            thread2.Join(); // wait for thread to finish
-
-            solve_captcha();
-            
-            // dedicate another thread to load login credentials
-            var thread3 = new Thread(new ThreadStart(Load_Credentials));
-            thread3.SetApartmentState(ApartmentState.STA); //Set the thread to STA
-            thread3.Start(); // starts thread
-            thread3.Join(); // wait for thread to finish
-            
-
-            watch.Stop();
-
-            Console.WriteLine($"Loading Time: {watch.ElapsedMilliseconds / 1000.0} s");
-        }
-        **/
-
-        /**
          * Helper method: 
          * Make the reveal password button prettier.
          */
@@ -129,25 +86,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          * Helper method: 
          * Load up the values of server for the ComboBox in Login form.
          */
-        private void Load_Server()
-        {
-            if (max_server == 0)
-            {
-                // retrieve the max number of server
-                max_server = Login_Helper.get_max_server();
-
-                if (combo_server.Text == "")
-                    combo_server.Text = max_server.ToString();
-            }
-        }
-
-        /**
-         * Helper method: 
-         * Load up the values of server for the ComboBox in Login form.
-         */
         private async Task Load_Server_Async()
         {
-            if (max_server == 0)
+            if (max_server == Int32.MaxValue)
             {
                 // retrieve the max number of server
                 max_server = await Task.Run(() => Login_Helper.get_max_server());
@@ -238,15 +179,15 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          * Main method:
          * EventHandler of the the login window
          */
-        private void button_ok_Click(object sender, EventArgs e)
+        private async void button_ok_Click(object sender, EventArgs e)
         {
             // basic check of login info
             if (!check_input_data())
                 return;
             
-            login();
+            await Login_Async();
         }
-
+        
         /**
          * Helper method:
          * Perform basic check on the input data in the login window
@@ -254,7 +195,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private bool check_input_data()
         {
             // if the application has not finished loading
-            if (combo_server.Text == "" && textBox_captcha.Text == "" && pictureBox_captcha.Image == null)
+            if (textBox_captcha.Text == "" && pictureBox_captcha.Image == null)
             {
                 MessageBox.Show("Please wait until the application finishes loading.",
                                 "Loading Error",
@@ -380,6 +321,93 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                                      "GET",
                                                      null,
                                                      Program.cookies);
+
+            if (response_data_for_game == null)
+                return;
+
+            // get the data to load game
+            string game_data = Encoding.UTF8.GetString(response_data_for_game);
+            // find the SWF object to load to flash
+            Program.flash_movie = Login_Helper.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            // find the parameters (variables) to load to flash
+            Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
+
+            // basic check to see if we can load the game
+            if (Program.flash_movie == "" || Program.flash_vars == "")
+            {
+                MessageBox.Show("Cannot get data to load game!",
+                                "Flash Info Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+            // close the login window
+            Close();
+        }
+
+        /**
+         * Main method:
+         * Utilize the input data and login to the server
+         */
+        private async Task Login_Async()
+        {
+            // attempt to login 5 times
+            for (int i = 0; i < 5; i++)
+            {
+                Program.flash_movie = "";
+                Program.flash_vars = "";
+
+                // create the appropriate data format to login
+                byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
+                    textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+                Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
+
+                // send login request
+                byte[] response_data_for_login = await Task.Run(() =>
+                    Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj",
+                                                        "POST",
+                                                        login_data,
+                                                        Program.cookies));
+                if (response_data_for_login == null)
+                    return;
+
+                // check if login is successful
+                if (!Encoding.UTF8.GetString(response_data_for_login).Contains(success_login))
+                {
+                    // if it still fails after 5 times, show error message and return
+                    if (i >= 4)
+                    {
+                        MessageBox.Show("Login information or captcha is incorrect!",
+                                    "Login Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                        // reload captcha
+                        Load_Captcha();
+                        return;
+                    }
+                    else
+                    {
+                        // if it fails, reload captcha and solve it again
+                        Load_Captcha();
+                    }
+
+                }
+                else // if the login is successful
+                {
+                    // break out of the login attempt
+                    break;
+                }
+            }
+
+
+            // send request to access the game
+            byte[] response_data_for_game = await Task.Run(() =>
+                Web_Request.Web_Request.send_request(string.Format("http://www.niua.com/playGame/code/lsaj{0}/",
+                                                                    combo_server.Text),
+                                                     "GET",
+                                                     null,
+                                                     Program.cookies));
 
             if (response_data_for_game == null)
                 return;
