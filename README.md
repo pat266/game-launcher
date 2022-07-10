@@ -24,3 +24,14 @@ I created this application to login with a click of button.
 * load server (async); get captcha (thread); solve captcha (none); login credentials (thread): 1.1 - 1.5 seconds
 * load server (async); get captcha (async); solve captcha (async); login credentials (none): 0.4 - 0.6 seconds
 * load server (async); get captcha (async); solve captcha (async); login credentials (thread): ~0.3 seconds **<= best**
+
+## Current Images
+* Gif of the current application:<br><br>
+![](./images/sampleVid.gif)
+
+* Some sample images:
+    * Loaded login screen:<br><br>
+    ![](./images/login.png)
+
+    * Loading game screen:<br><br>
+    ![](./images/loading_game.png)
