@@ -27,7 +27,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             InitializeComponent();
 
-            this.SetStyle(ControlStyles.ResizeRedraw, true); // this is to avoid visual artifacts
+            this.SetStyle(ControlStyles.ResizeRedraw, true);    
 
             // mute the game
             Mute_Game();
@@ -306,5 +306,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
         #endregion
 
+        private void axShockwaveFlash_Enter(object sender, EventArgs e)
+        {
+
+        }
     }
 }
