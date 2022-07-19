@@ -40,10 +40,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             Console.WriteLine("Start a separate thread to retrieve the server list");
             // dedicate a separate thread to load the server
-            Load_Server_Async();
+            _ = Load_Server_Async();
 
             // dedicate another thread to load captcha
-            Load_Captcha_Async();
+            _ = Load_Captcha_Async();
 
             // dedicate another thread to load login credentials
             var thread3 = new Thread(new ThreadStart(Load_Credentials));
@@ -361,7 +361,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 // create the appropriate data format to login
                 byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
                     textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
-                Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
+                // Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
 
                 // send login request
                 byte[] response_data_for_login = await Task.Run(() =>

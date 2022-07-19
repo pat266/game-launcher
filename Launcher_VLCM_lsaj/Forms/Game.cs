@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -18,7 +19,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         // make the winform draggable
         private bool _Moving = false;
+        private bool _FullSreen = false;
+        private bool _AfterFullSreen = false;
         private Point _Offset;
+
 
         /**
          * Constructor
@@ -47,7 +51,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             
             Adjust_Gameform();
 
-            Adjust_FormBorder();    
+            Adjust_FormBorder();
+
+            // axShockwaveFlash.s
+            
         }
 
         #region "Basic Visual Changes"
@@ -201,6 +208,11 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void FormBorder_MouseDown(object sender, MouseEventArgs e)
         {
             _Moving = true;
+            if (this.WindowState == FormWindowState.Maximized)
+            {
+                _FullSreen = true;
+                _Moving = false;
+            }
             _Offset = new Point(e.X, e.Y);
         }
 
@@ -209,13 +221,23 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void FormBorder_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_Moving)
+            if (_FullSreen)
             {
-                // change the state of the form when we want to move it
-                if (this.WindowState == FormWindowState.Maximized)
-                {
-                    this.WindowState = FormWindowState.Normal;
-                }
+                this.WindowState = FormWindowState.Normal;
+                this.Location = new Point(_Offset.X - (this.Width / 2), _Offset.Y);
+                _FullSreen = false;
+                _AfterFullSreen = true;
+                // _Moving = true;
+            }
+            else if (_AfterFullSreen)
+            {
+                Point newlocation = this.Location;
+                newlocation.X += e.X - (this.Width / 2);
+                newlocation.Y += e.Y;
+                this.Location = newlocation;
+            }
+            else if (_Moving)
+            {
                 Point newlocation = this.Location;
                 newlocation.X += e.X - _Offset.X;
                 newlocation.Y += e.Y - _Offset.Y;
@@ -228,10 +250,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void FormBorder_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_Moving)
-            {
-                _Moving = false;
-            }
+            _FullSreen = false;
+            _Moving = false;
+            _AfterFullSreen = false;
         }
 
         /**
@@ -240,21 +261,29 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void nameLabel_MouseDown(object sender, MouseEventArgs e)
         {
             _Moving = true;
+            if (this.WindowState == FormWindowState.Maximized)
+            {
+                _FullSreen = true;
+                _Moving = false;
+            }
             _Offset = new Point(e.X, e.Y);
         }
-
+        
         /**
          * Allow to drag the form from the text label
          */
         private void nameLabel_MouseMove(object sender, MouseEventArgs e)
         {
-            if (_Moving)
+            if (_FullSreen)
             {
-                // change the state of the form when we want to move it
-                if (this.WindowState == FormWindowState.Maximized)
-                {
-                    this.WindowState = FormWindowState.Normal;
-                }
+                this.WindowState = FormWindowState.Normal;
+                this.Location = new Point(e.X + this.Location.X, e.Y + this.Location.Y);
+                _FullSreen = false;
+                _Offset = new Point(e.X, e.Y);
+                _Moving = true;
+            }
+            else if (_Moving)
+            {
                 Point newlocation = this.Location;
                 newlocation.X += e.X - _Offset.X;
                 newlocation.Y += e.Y - _Offset.Y;
@@ -267,10 +296,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void nameLabel_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_Moving)
-            {
-                _Moving = false;
-            }
+            _FullSreen = false;
+            _Moving = false;
+            _AfterFullSreen = false;
         }
         #endregion
 
@@ -304,11 +332,16 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 this.WindowState = FormWindowState.Maximized;
             }
         }
+
+        /**
+         * Set the maximum size of the FlashObject
+         */
+        private void Game_Resize(object sender, EventArgs e)
+        {
+            axShockwaveFlash.MaximumSize = new Size(this.Width, this.Height - FormBorder.Height);
+        }
         #endregion
 
-        private void axShockwaveFlash_Enter(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }
