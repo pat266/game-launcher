@@ -25,6 +25,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         public Login()
         {
+            this.Icon = Properties.Resources.app_icon;
             // track form loading time
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();

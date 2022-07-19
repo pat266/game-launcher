@@ -4,6 +4,10 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Deployment.Application;
+using System.IO;
+using Microsoft.Win32;
+using System.Reflection;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -31,7 +35,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             InitializeComponent();
 
-            this.SetStyle(ControlStyles.ResizeRedraw, true);    
+            SetAddRemoveProgramsIcon();
+            this.SetStyle(ControlStyles.ResizeRedraw, true); // avoid visual artifacts
+            this.Icon = Properties.Resources.app_icon;
 
             // mute the game
             Mute_Game();
@@ -342,6 +348,44 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
         #endregion
 
-        
+        #region "Icon"
+        /**
+         * Modify the registry to change the icon in 'Add or Remove Programs'
+         */
+        private static void SetAddRemoveProgramsIcon()
+        {
+            //only run if deployed
+            if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed
+                 && ApplicationDeployment.CurrentDeployment.IsFirstRun)
+            {
+                try
+                {
+                    Assembly code = Assembly.GetExecutingAssembly();
+                    AssemblyDescriptionAttribute asdescription =
+                        (AssemblyDescriptionAttribute)Attribute.GetCustomAttribute(code, typeof(AssemblyDescriptionAttribute));
+                    // string assemblyDescription = asdescription.Description;
+
+
+                    RegistryKey myUninstallKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
+                    string[] mySubKeyNames = myUninstallKey.GetSubKeyNames();
+                    for (int i = 0; i < mySubKeyNames.Length; i++)
+                    {
+                        RegistryKey myKey = myUninstallKey.OpenSubKey(mySubKeyNames[i], true);
+                        object myValue = myKey.GetValue("DisplayName");
+                        if (myValue != null && myValue.ToString() == "admin")
+                        {
+                            myKey.SetValue("DisplayIcon", Properties.Resources.app_icon);
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message.ToString());
+                }
+            }
+        }
+
+        #endregion
     }
 }

@@ -3,7 +3,9 @@ using System.Net;
 using System.Windows.Forms;
 using Launcher_VLCM_niua_lsaj.Forms;
 
-using Captcha;
+using Microsoft.Win32;
+using System.Deployment.Application;
+using System.IO;
 
 namespace Launcher_VLCM_niua_lsaj
 {
