@@ -23,7 +23,7 @@ namespace OcrLiteLib
 
         ~DbNet()
         {
-            dbNet.Dispose();
+            // dbNet.Dispose();
         }
 
         public void InitModel(string path, int numThread)

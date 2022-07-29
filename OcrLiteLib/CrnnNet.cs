@@ -24,7 +24,7 @@ namespace OcrLiteLib
 
         ~CrnnNet()
         {
-            crnnNet.Dispose();
+            // crnnNet.Dispose();
         }
 
         public void InitModel(string path, string keysPath, int numThread)

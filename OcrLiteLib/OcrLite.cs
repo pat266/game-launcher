@@ -21,7 +21,7 @@ namespace OcrLiteLib
     {
         public bool isPartImg { get; set; }
         public bool isDebugImg { get; set; }
-        private string dbNetPath, angleNetPath, crnnNetPath, keysPath;
+        // private string dbNetPath, angleNetPath, crnnNetPath, keysPath;
         private DbNet dbNet;
         private AngleNet angleNet;
         private CrnnNet crnnNet;
@@ -243,12 +243,15 @@ namespace OcrLiteLib
                 // List<string> resultList = result.Translation.Split(separator.ToCharArray()).ToList();
                 translatedText.AddRange(resultList);
             }
-
-            // change the value of TranslatedText in TextBlocks
-            for (int i = 0; i < translatedText.Count; i++)
+            if (translatedText.Count > 0 && ocrResult.TextBlocks.Count > 0)
             {
-                ocrResult.TextBlocks[i].TranslatedText = translatedText[i];
+                // change the value of TranslatedText in TextBlocks
+                for (int i = 0; i < translatedText.Count; i++)
+                {
+                    ocrResult.TextBlocks[i].TranslatedText = translatedText[i];
+                }
             }
+            
         }
     }
 }
