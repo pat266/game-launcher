@@ -8,6 +8,9 @@ using System.Deployment.Application;
 using System.IO;
 using Microsoft.Win32;
 using System.Reflection;
+using OcrLiteLib;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -26,7 +29,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private bool _FullSreen = false;
         private bool _AfterFullSreen = false;
         private Point _Offset;
-
+        private OcrLite ocrEngine;
 
         /**
          * Constructor
@@ -108,6 +111,11 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             minimize.Image = Properties.Resources.minimize;
             minimize.MinimumSize = new Size(30, 30);
             minimize.MaximumSize = new Size(30, 30);
+
+            // minimize
+            translationButton.Image = Properties.Resources.translation;
+            translationButton.MinimumSize = new Size(30, 30);
+            translationButton.MaximumSize = new Size(30, 30);
         }
         #endregion
 
@@ -204,6 +212,24 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void minimize_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
+        }
+
+        private async void translationButton_Click(object sender, EventArgs e)
+        {
+            var img = SnippingTool.Snip();
+            Bitmap bitmap = new Bitmap(img);
+            bitmap.ToImage<Bgr, byte>();
+            this.WindowState = FormWindowState.Normal;
+
+            Thread thread = new Thread(new ThreadStart(StartLoadingForm));
+            thread.Start();
+            Thread.Sleep(5000);
+            thread.Abort();
+        }
+
+        private void StartLoadingForm()
+        {
+            Application.Run(new LoadingScreen());
         }
         #endregion
 
@@ -387,5 +413,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         }
 
         #endregion
+
+        
     }
 }

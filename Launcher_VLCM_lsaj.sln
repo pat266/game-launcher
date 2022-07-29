@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Launcher_VLCM_lsaj", "Launc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Captcha", "Captcha\Captcha.csproj", "{5A8CA2DB-D059-4948-898C-48D5DFF0B16A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrLiteLib", "OcrLiteLib\OcrLiteLib.csproj", "{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{5A8CA2DB-D059-4948-898C-48D5DFF0B16A}.Release|x64.Build.0 = Release|Any CPU
 		{5A8CA2DB-D059-4948-898C-48D5DFF0B16A}.Release|x86.ActiveCfg = Release|Any CPU
 		{5A8CA2DB-D059-4948-898C-48D5DFF0B16A}.Release|x86.Build.0 = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|x64.Build.0 = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|x64.ActiveCfg = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|x64.Build.0 = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A1647DA-83CD-4F9D-9FFA-F663BB55FF6A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
