@@ -153,6 +153,16 @@ namespace Launcher_VLCM_niua_lsaj.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap translation {
+            get {
+                object obj = ResourceManager.GetObject("translation", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap unmute {
             get {
                 object obj = ResourceManager.GetObject("unmute", resourceCulture);

@@ -32,6 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
             this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
             this.FormBorder = new System.Windows.Forms.Panel();
+            this.translationButton = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.minimize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.maximize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.exit = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
@@ -58,6 +59,7 @@
             // FormBorder
             // 
             this.FormBorder.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.FormBorder.Controls.Add(this.translationButton);
             this.FormBorder.Controls.Add(this.minimize);
             this.FormBorder.Controls.Add(this.maximize);
             this.FormBorder.Controls.Add(this.exit);
@@ -74,6 +76,26 @@
             this.FormBorder.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseDown);
             this.FormBorder.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseMove);
             this.FormBorder.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseUp);
+            // 
+            // translationButton
+            // 
+            this.translationButton.BackColor = System.Drawing.Color.Transparent;
+            this.translationButton.BackgroundColor = System.Drawing.Color.Transparent;
+            this.translationButton.BorderColor = System.Drawing.Color.Transparent;
+            this.translationButton.BorderRadius = 0;
+            this.translationButton.BorderSize = 0;
+            this.translationButton.Dock = System.Windows.Forms.DockStyle.Left;
+            this.translationButton.FlatAppearance.BorderSize = 0;
+            this.translationButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.translationButton.ForeColor = System.Drawing.Color.Transparent;
+            this.translationButton.Location = new System.Drawing.Point(235, 0);
+            this.translationButton.Name = "translationButton";
+            this.translationButton.Size = new System.Drawing.Size(30, 30);
+            this.translationButton.TabIndex = 6;
+            this.translationButton.TextColor = System.Drawing.Color.Transparent;
+            this.translationButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.translationButton.UseVisualStyleBackColor = false;
+            this.translationButton.Click += new System.EventHandler(this.translationButton_Click);
             // 
             // minimize
             // 
@@ -137,11 +159,11 @@
             // 
             // nameLabel
             // 
-            this.nameLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.nameLabel.AutoSize = true;
+            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
             this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
             this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.nameLabel.Location = new System.Drawing.Point(36, 3);
+            this.nameLabel.Location = new System.Drawing.Point(30, 0);
             this.nameLabel.Name = "nameLabel";
             this.nameLabel.Size = new System.Drawing.Size(205, 21);
             this.nameLabel.TabIndex = 1;
@@ -231,5 +253,6 @@
         private System.Windows.Forms.Label nameLabel;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ImageList imageList1;
+        private CustomControls.CButton translationButton;
     }
 }
