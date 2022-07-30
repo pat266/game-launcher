@@ -43,11 +43,16 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         public Game()
         {
             InitializeComponent();
+            this.ShowInTaskbar = true;
 
             SetAddRemoveProgramsIcon();
             this.SetStyle(ControlStyles.ResizeRedraw, true); // avoid visual artifacts
             this.Icon = Properties.Resources.app_icon;
 
+            // add KeyEvent to the form
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(KeyEvent);
+
+            // initialize the OCR Engine
             ocrEngine = new OcrLite();
 
             // mute the game
@@ -76,58 +81,82 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Adjust_FormBorder();
         }
 
+        /**
+         * Method to handle various methods from pressing down the key
+         */
+        private void KeyEvent(object sender, KeyEventArgs e) //Keyup Event 
+        {
+            // press F8 to open up the translation feature
+            if (e.KeyCode == Keys.F8)
+            {
+                translationButton_Click(null, null);
+            }
+            // press F11 to toggle full screen
+            if (e.KeyCode == Keys.F11)
+            {
+                if (this.WindowState == FormWindowState.Maximized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
+                else
+                {
+                    this.WindowState = FormWindowState.Maximized;
+                }
+            }
+        }
+
         #region "Basic Visual Changes"
         private void Adjust_Gameform()
-        {
-            // set the intial size
-            this.Size = new Size(1024, 768);
+    {
+        // set the intial size
+        this.Size = new Size(1024, 768);
 
-            // center the application
-            this.CenterToScreen();
+        // center the application
+        this.CenterToScreen();
 
-        }
+    }
 
-        /**
-         * Make the custom FormBorder to only be horizontally extendable.
-         */
-        private void Adjust_FormBorder()
-        {
-            // disable title bar 
-            this.ControlBox = false;
-            this.Text = String.Empty;
+    /**
+        * Make the custom FormBorder to only be horizontally extendable.
+        */
+    private void Adjust_FormBorder()
+    {
+        // disable title bar 
+        this.ControlBox = false;
+        this.Text = String.Empty;
             
-            // fixed the form border to only be expandable horizontally
-            FormBorder.MinimumSize = new Size(0, 30);
-            FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
-        }
+        // fixed the form border to only be expandable horizontally
+        FormBorder.MinimumSize = new Size(0, 30);
+        FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
+    }
 
-        /**
-         * Set the image and the size of the three buttons:
-         * exit, maximize, minimize
-         */
-        private void Set_Control_Buttons()
-        {
-            // exit
-            exit.Image = Properties.Resources.close;
-            exit.MinimumSize = new Size(30, 30);
-            exit.MaximumSize = new Size(30, 30);
+    /**
+        * Set the image and the size of the three buttons:
+        * exit, maximize, minimize
+        */
+    private void Set_Control_Buttons()
+    {
+        // exit
+        exit.Image = Properties.Resources.close;
+        exit.MinimumSize = new Size(30, 30);
+        exit.MaximumSize = new Size(30, 30);
 
-            // maximize
-            maximize.Image = Properties.Resources.maximize;
-            maximize.MinimumSize = new Size(30, 30);
-            maximize.MaximumSize = new Size(30, 30);
+        // maximize
+        maximize.Image = Properties.Resources.maximize;
+        maximize.MinimumSize = new Size(30, 30);
+        maximize.MaximumSize = new Size(30, 30);
 
-            // minimize
-            minimize.Image = Properties.Resources.minimize;
-            minimize.MinimumSize = new Size(30, 30);
-            minimize.MaximumSize = new Size(30, 30);
+        // minimize
+        minimize.Image = Properties.Resources.minimize;
+        minimize.MinimumSize = new Size(30, 30);
+        minimize.MaximumSize = new Size(30, 30);
 
-            // minimize
-            translationButton.Image = Properties.Resources.translation;
-            translationButton.MinimumSize = new Size(30, 30);
-            translationButton.MaximumSize = new Size(30, 30);
-        }
-        #endregion
+        // minimize
+        translationButton.Image = Properties.Resources.translation;
+        translationButton.MinimumSize = new Size(30, 30);
+        translationButton.MaximumSize = new Size(30, 30);
+    }
+    #endregion
 
         #region "Application Volume"
         /// <summary>
@@ -226,8 +255,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
+            //this is the screen the current form is on
+            Screen screen = Screen.FromControl(this); 
             // Utilizes snipping tool to capture the part of the screen
-            var img = SnippingTool.Snip();
+            var img = SnippingTool.Snip(screen);
+            // if the SnippingTool is cancelled, break out of the function
+            if (img == null)
+                return;
+            
             Bitmap bitmap = new Bitmap(img);
             bitmap.ToImage<Bgr, byte>();
             this.WindowState = FormWindowState.Normal;
