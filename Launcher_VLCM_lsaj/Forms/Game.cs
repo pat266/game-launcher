@@ -84,12 +84,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Method to handle various methods from pressing down the key
          */
-        private void KeyEvent(object sender, KeyEventArgs e) //Keyup Event 
+        private async void KeyEvent(object sender, KeyEventArgs e) //Keyup Event 
         {
             // press F8 to open up the translation feature
             if (e.KeyCode == Keys.F8)
             {
-                translationButton_Click(null, null);
+                await StartTranslatingProcess();
             }
             // press F11 to toggle full screen
             if (e.KeyCode == Keys.F11)
@@ -255,57 +255,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
-            //this is the screen the current form is on
-            Screen screen = Screen.FromControl(this); 
-            // Utilizes snipping tool to capture the part of the screen
-            var img = SnippingTool.Snip(screen);
-            // if the SnippingTool is cancelled, break out of the function
-            if (img == null)
-                return;
-            
-            Bitmap bitmap = new Bitmap(img);
-            bitmap.ToImage<Bgr, byte>();
-            this.WindowState = FormWindowState.Normal;
-
-            // declare a thread to load Loading Form
-            //Thread loadingFormThread = new Thread(new ThreadStart(StartLoadingForm));
-            //loadingFormThread.Start(); // start the loading form
-
-            LoadingScreen loadingScreen = new LoadingScreen();
-            loadingScreen.Show();
-            loadingScreen.TopMost = true;
-
-            if (translatedImageForm != null)
-            {
-                translatedImageForm.Close();
-                translatedImageForm = null;
-                System.GC.Collect();
-            }
-            translatedImageForm = new TranslatedImage();
-            OcrResult ocrResult = await ProcessText_Onnx(bitmap, bitmap.Width, translateText: true);
-            // show the translated image
-
-            Mat matImg = ocrResult.BoxImg;
-            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());
-
-
-            // loadingFormThread.Abort(); // remove loading form
-            loadingScreen.Close();
-
-            // close the translated image form when the main form is closed
-            this.FormClosing += (s, args) =>
-            {
-                translatedImageForm.Close();
-            };
-
-            translatedImageForm.ShowInTaskbar = false;
-            translatedImageForm.Show(); // show the translated image form
-        }
-
-        private void StartLoadingForm()
-        {
-            
-            Application.Run(new LoadingScreen());
+            await StartTranslatingProcess();
         }
 
         #endregion
@@ -580,6 +530,52 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             System.GC.Collect(); // clean up the memory
             return ocrResult;
         }
+
+        private async Task StartTranslatingProcess()
+        {
+            //this is the screen the current form is on
+            Screen screen = Screen.FromControl(this);
+            // Utilizes snipping tool to capture the part of the screen
+            var img = SnippingTool.Snip(screen);
+            // if the SnippingTool is cancelled, break out of the function
+            if (img == null)
+                return;
+
+            Bitmap bitmap = new Bitmap(img);
+            bitmap.ToImage<Bgr, byte>();
+            this.WindowState = FormWindowState.Normal;
+
+            LoadingScreen loadingScreen = new LoadingScreen();
+            loadingScreen.Show();
+            loadingScreen.TopMost = true;
+
+            if (translatedImageForm != null)
+            {
+                translatedImageForm.Close();
+                translatedImageForm = null;
+                System.GC.Collect();
+            }
+            translatedImageForm = new TranslatedImage();
+            OcrResult ocrResult = await ProcessText_Onnx(bitmap, bitmap.Width, translateText: true);
+            // show the translated image
+
+            Mat matImg = ocrResult.BoxImg;
+            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());
+
+
+            // loadingFormThread.Abort(); // remove loading form
+            loadingScreen.Close();
+
+            // close the translated image form when the main form is closed
+            this.FormClosing += (s, args) =>
+            {
+                translatedImageForm.Close();
+            };
+
+            translatedImageForm.ShowInTaskbar = false;
+            translatedImageForm.Show(); // show the translated image form
+        }
+        
         #endregion
     }
 }
