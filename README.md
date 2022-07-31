@@ -59,3 +59,6 @@ For more information, check out https://github.com/pat266/Image-Translator. This
 
     * Loading game screen:<br><br>
     ![](./images/loading_game.png)
+    
+    * Result of the image translation:<br><br>
+    ![](./test.png)
