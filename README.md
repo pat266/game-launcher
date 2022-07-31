@@ -3,7 +3,7 @@
 ## Purpose:
 My childhood game requires multiple steps to login and load the game. Moreover, their website is very slow and would take ages to load.<br>
 
-I created this application to login with a click of button and able to translate anything in the game with a click of a button instead of using Google Translate Image on my phone.
+I created this application to login and launch the game easily, as well as to translate anything in the game with a click of a button instead of using Google Translate Image on my phone.
 
 ## Features
 ### **Login Window**
