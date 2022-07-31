@@ -3,7 +3,7 @@
 ## Purpose:
 My childhood game requires multiple steps to login and load the game. Moreover, their website is very slow and would take ages to load.<br>
 
-I created this application to login with a click of button.
+I created this application to login with a click of button and able to translate anything in the game with a click of a button instead of using Google Translate Image on my phone.
 
 ## Features
 ### **Login Window**
@@ -28,7 +28,7 @@ I created this application to login with a click of button.
 * 86% accuracy from 100 randomly chosen images
 
 ## Image Translator
-For more information, check out https://github.com/pat266/Image-Translator. This repo shows 
+For more information, check out https://github.com/pat266/Image-Translator. This repo shows different processes which showcase their results (accuracy), computation time, and memory usage
 ### Current process:
 * EmguCV + pre-trained Onnx model
 * Google Translate API (free) to translate it to English
