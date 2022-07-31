@@ -17,13 +17,31 @@ I created this application to login and launch the game easily, as well as to tr
 * Check for the newest server number to validate user input
 * Snipping Tool to capture an area on screen and ultilizes the Image Translator to translate it
 
-### Stats
-#### Image Translator
+## Images
+* Gif of the current application:<br><br>
+![](./images/sampleVid.gif)
+
+* Gif of the image translator:<br><br>
+![](./images/image_translation.gif)
+
+* Some sample images:
+    * Loaded login screen:<br><br>
+    ![](./images/login.png)
+
+    * Loading game screen:<br><br>
+    ![](./images/loading_game.png)
+    
+    * Result of the image translation:<br><br>
+    ![](./test.png)
+
+## Stats
+
+### Image Translator
 * ~0.9 seconds to recognize and extract the text from an image (depending on the size).
 * ~0.2 seconds to bulk translate all of the text
 * 200MB-4GB RAM usage depending on the image size and the number of text on image.
 
-#### Captcha
+### Captcha
 * ~0.3 seconds to solve each captcha.
 * 86% accuracy from 100 randomly chosen images
 
@@ -45,20 +63,3 @@ For more information, check out https://github.com/pat266/Image-Translator. This
 * EmguCV alone (https://www.youtube.com/watch?v=KHes5M7zpGg)
     * Is worse than IronOCR
     * Does not work well to detect text in game. Works best when the background is clear.
-
-## Images
-* Gif of the current application:<br><br>
-![](./images/sampleVid.gif)
-
-* Gif of the image translator:<br><br>
-![](./images/image_translation.gif)
-
-* Some sample images:
-    * Loaded login screen:<br><br>
-    ![](./images/login.png)
-
-    * Loading game screen:<br><br>
-    ![](./images/loading_game.png)
-    
-    * Result of the image translation:<br><br>
-    ![](./test.png)
