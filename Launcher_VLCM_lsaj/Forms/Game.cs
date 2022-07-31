@@ -11,6 +11,8 @@ using System.Reflection;
 using OcrLiteLib;
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Threading.Tasks;
+using GTranslate.Translators;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -29,7 +31,11 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private bool _FullSreen = false;
         private bool _AfterFullSreen = false;
         private Point _Offset;
+        
         private OcrLite ocrEngine;
+        private AggregateTranslator translator;
+
+        private TranslatedImage translatedImageForm;
 
         /**
          * Constructor
@@ -37,17 +43,29 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         public Game()
         {
             InitializeComponent();
+            this.ShowInTaskbar = true;
 
             SetAddRemoveProgramsIcon();
             this.SetStyle(ControlStyles.ResizeRedraw, true); // avoid visual artifacts
             this.Icon = Properties.Resources.app_icon;
+
+            // add KeyEvent to the form
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(KeyEvent);
+
+            // initialize the OCR Engine
+            ocrEngine = new OcrLite();
 
             // mute the game
             Mute_Game();
 
             // set basic buttons
             Set_Control_Buttons();
-            
+
+            // load the Onnx model
+            loadOnnxModel();
+
+            // initialize the Translator
+            translator = new AggregateTranslator();
         }
 
         /**
@@ -61,63 +79,84 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Adjust_Gameform();
 
             Adjust_FormBorder();
+        }
 
-            // axShockwaveFlash.s
-            
+        /**
+         * Method to handle various methods from pressing down the key
+         */
+        private async void KeyEvent(object sender, KeyEventArgs e) //Keyup Event 
+        {
+            // press F8 to open up the translation feature
+            if (e.KeyCode == Keys.F8)
+            {
+                await StartTranslatingProcess();
+            }
+            // press F11 to toggle full screen
+            if (e.KeyCode == Keys.F11)
+            {
+                if (this.WindowState == FormWindowState.Maximized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
+                else
+                {
+                    this.WindowState = FormWindowState.Maximized;
+                }
+            }
         }
 
         #region "Basic Visual Changes"
         private void Adjust_Gameform()
-        {
-            // set the intial size
-            this.Size = new Size(1024, 768);
+    {
+        // set the intial size
+        this.Size = new Size(1024, 768);
 
-            // center the application
-            this.CenterToScreen();
+        // center the application
+        this.CenterToScreen();
 
-        }
+    }
 
-        /**
-         * Make the custom FormBorder to only be horizontally extendable.
-         */
-        private void Adjust_FormBorder()
-        {
-            // disable title bar 
-            this.ControlBox = false;
-            this.Text = String.Empty;
+    /**
+        * Make the custom FormBorder to only be horizontally extendable.
+        */
+    private void Adjust_FormBorder()
+    {
+        // disable title bar 
+        this.ControlBox = false;
+        this.Text = String.Empty;
             
-            // fixed the form border to only be expandable horizontally
-            FormBorder.MinimumSize = new Size(0, 30);
-            FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
-        }
+        // fixed the form border to only be expandable horizontally
+        FormBorder.MinimumSize = new Size(0, 30);
+        FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
+    }
 
-        /**
-         * Set the image and the size of the three buttons:
-         * exit, maximize, minimize
-         */
-        private void Set_Control_Buttons()
-        {
-            // exit
-            exit.Image = Properties.Resources.close;
-            exit.MinimumSize = new Size(30, 30);
-            exit.MaximumSize = new Size(30, 30);
+    /**
+        * Set the image and the size of the three buttons:
+        * exit, maximize, minimize
+        */
+    private void Set_Control_Buttons()
+    {
+        // exit
+        exit.Image = Properties.Resources.close;
+        exit.MinimumSize = new Size(30, 30);
+        exit.MaximumSize = new Size(30, 30);
 
-            // maximize
-            maximize.Image = Properties.Resources.maximize;
-            maximize.MinimumSize = new Size(30, 30);
-            maximize.MaximumSize = new Size(30, 30);
+        // maximize
+        maximize.Image = Properties.Resources.maximize;
+        maximize.MinimumSize = new Size(30, 30);
+        maximize.MaximumSize = new Size(30, 30);
 
-            // minimize
-            minimize.Image = Properties.Resources.minimize;
-            minimize.MinimumSize = new Size(30, 30);
-            minimize.MaximumSize = new Size(30, 30);
+        // minimize
+        minimize.Image = Properties.Resources.minimize;
+        minimize.MinimumSize = new Size(30, 30);
+        minimize.MaximumSize = new Size(30, 30);
 
-            // minimize
-            translationButton.Image = Properties.Resources.translation;
-            translationButton.MinimumSize = new Size(30, 30);
-            translationButton.MaximumSize = new Size(30, 30);
-        }
-        #endregion
+        // minimize
+        translationButton.Image = Properties.Resources.translation;
+        translationButton.MinimumSize = new Size(30, 30);
+        translationButton.MaximumSize = new Size(30, 30);
+    }
+    #endregion
 
         #region "Application Volume"
         /// <summary>
@@ -216,21 +255,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
-            var img = SnippingTool.Snip();
-            Bitmap bitmap = new Bitmap(img);
-            bitmap.ToImage<Bgr, byte>();
-            this.WindowState = FormWindowState.Normal;
-
-            Thread thread = new Thread(new ThreadStart(StartLoadingForm));
-            thread.Start();
-            Thread.Sleep(5000);
-            thread.Abort();
+            await StartTranslatingProcess();
         }
 
-        private void StartLoadingForm()
-        {
-            Application.Run(new LoadingScreen());
-        }
         #endregion
 
         #region "Make Form Draggable"
@@ -414,6 +441,141 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         #endregion
 
+        #region "Translation Methods"
+        /**
+         * Helper Method to load ONNX model
+         */
+        private void loadOnnxModel(
+            string detName = "dbnet.onnx",
+            string clsName = "angle_net.onnx",
+            string recName = "crnn_lite_lstm.onnx",
+            string keysName = "keys.txt",
+            int numThread = 4
+            )
+        {
+
+            string appPath = AppDomain.CurrentDomain.BaseDirectory;
+            string modelsDir = appPath + "models";
+            // modelsTextBox.Text = modelsDir;
+            string detPath = modelsDir + "\\" + detName;
+            string clsPath = modelsDir + "\\" + clsName;
+            string recPath = modelsDir + "\\" + recName;
+            string keysPath = modelsDir + "\\" + keysName;
+            bool isDetExists = File.Exists(detPath);
+            if (!isDetExists)
+            {
+                MessageBox.Show("Model file not found at: " + detPath);
+            }
+            bool isClsExists = File.Exists(clsPath);
+            if (!isClsExists)
+            {
+                MessageBox.Show("Model file not found at: " + clsPath);
+            }
+            bool isRecExists = File.Exists(recPath);
+            if (!isRecExists)
+            {
+                MessageBox.Show("Model file not found at: " + recPath);
+            }
+            bool isKeysExists = File.Exists(keysPath);
+            if (!isKeysExists)
+            {
+                MessageBox.Show("Keys file not found at: " + keysPath);
+            }
+            if (isDetExists && isClsExists && isRecExists && isKeysExists)
+            {
+                if (ocrEngine != null)
+                {
+                    ocrEngine = null;
+                    System.GC.Collect();
+                }
+                ocrEngine = new OcrLite();
+                ocrEngine.InitModels(detPath, clsPath, recPath, keysPath, (int)numThread);
+            }
+            else
+            {
+                MessageBox.Show("Initialization failed, please confirm the model folder and file, and then reinitialize!");
+            }
+            System.GC.Collect();
+        }
+
+        /**
+         * Detect text in the image and draw Bounding Rectangles around it.
+         * Using IronOCR to get both bounding rectangles and Onnx model for extracting text
+         */
+        private async Task<OcrResult> ProcessText_Onnx(
+            Bitmap bitmap,
+            int imgResize,
+            int padding = 50,
+            float boxScoreThresh = 0.618f,
+            float boxThresh = 0.300f,
+            float unClipRatio = 2.0f,
+            bool doAngle = true,
+            bool mostAngle = true,
+            bool extractText = false,
+            bool translateText = false
+            )
+        {
+            if (ocrEngine == null)
+            {
+                MessageBox.Show("OCR Engine is uninitialized, cannot execute!");
+                return null;
+            }
+            Image<Bgr, byte> imageCV = bitmap.ToImage<Bgr, byte>(); //Image Class from Emgu.CV
+            Mat mat = imageCV.Mat;
+
+            OcrResult ocrResult = await Task.Run(() => ocrEngine.Detect(
+                mat, padding, imgResize, boxScoreThresh, boxThresh, unClipRatio,
+                doAngle, mostAngle, extractText, translateText, translator));
+
+            System.GC.Collect(); // clean up the memory
+            return ocrResult;
+        }
+
+        private async Task StartTranslatingProcess()
+        {
+            //this is the screen the current form is on
+            Screen screen = Screen.FromControl(this);
+            // Utilizes snipping tool to capture the part of the screen
+            var img = SnippingTool.Snip(screen);
+            // if the SnippingTool is cancelled, break out of the function
+            if (img == null)
+                return;
+
+            Bitmap bitmap = new Bitmap(img);
+            bitmap.ToImage<Bgr, byte>();
+            this.WindowState = FormWindowState.Normal;
+
+            LoadingScreen loadingScreen = new LoadingScreen();
+            loadingScreen.Show();
+            loadingScreen.TopMost = true;
+
+            if (translatedImageForm != null)
+            {
+                translatedImageForm.Close();
+                translatedImageForm = null;
+                System.GC.Collect();
+            }
+            translatedImageForm = new TranslatedImage();
+            OcrResult ocrResult = await ProcessText_Onnx(bitmap, bitmap.Width, translateText: true);
+            // show the translated image
+
+            Mat matImg = ocrResult.BoxImg;
+            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());
+
+
+            // loadingFormThread.Abort(); // remove loading form
+            loadingScreen.Close();
+
+            // close the translated image form when the main form is closed
+            this.FormClosing += (s, args) =>
+            {
+                translatedImageForm.Close();
+            };
+
+            translatedImageForm.ShowInTaskbar = false;
+            translatedImageForm.Show(); // show the translated image form
+        }
         
+        #endregion
     }
 }

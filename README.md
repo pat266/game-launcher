@@ -7,7 +7,7 @@ I created this application to login with a click of button.
 
 ## Features
 ### **Login Window**
-* Load login credentials from .env file
+* Load login credentials from .env file (will change in the future)
 * Solve Captcha Automatically (86% correct)
 * Check for the newest server number to validate user input
 
@@ -15,37 +15,43 @@ I created this application to login with a click of button.
 * Custom TitleBar
 * Mute/unmute application
 * Check for the newest server number to validate user input
+* Snipping Tool to capture an area on screen and ultilizes the Image Translator to translate it
 
-## Captcha Stats
-### **Average time taken to load up the form** (load server, get captcha, solve captcha, login credentials)
-* load server (thread); get captcha (thread); solve captcha (none); login credentials (thread): 2.9 - 4 seconds
-* load server (thread); get captcha (thread); solve captcha (async); login credentials (thread): 3.4 - 3.8 seconds
-* load server (async); get captcha (thread); solve captcha (async); login credentials (thread): 1.1 - 1.7 seconds
-* load server (async); get captcha (thread); solve captcha (none); login credentials (thread): 1.1 - 1.5 seconds
-* load server (async); get captcha (async); solve captcha (async); login credentials (none): 0.4 - 0.6 seconds
-* load server (async); get captcha (async); solve captcha (async); login credentials (thread): ~0.3 seconds **<= best**
+### Stats
+#### Image Translator
+* ~0.9 seconds to recognize and extract the text from an image (depending on the size).
+* ~0.2 seconds to bulk translate all of the text
+* 200MB-4GB RAM usage depending on the image size and the number of text on image.
+
+#### Captcha
+* ~0.3 seconds to solve each captcha.
+* 86% accuracy from 100 randomly chosen images
 
 ## Image Translator
+For more information, check out https://github.com/pat266/Image-Translator. This repo shows 
 ### Current process:
-* IronOCR-Chinese to detect the Chinese characters
+* EmguCV + pre-trained Onnx model
 * Google Translate API (free) to translate it to English
-* Detecting text block ?! (https://devindeep.com/text-detection-with-c/)
-    * https://devindeep.com/text-detection-with-c/
-    * https://www.youtube.com/watch?v=KHes5M7zpGg
 
-### Some other failed processes
+### Some other failed text extraction processes
 * Capture2Text (extracting text)
     * Inspired by https://github.com/phatjkk/DragonTranslator
     * http://capture2text.sourceforge.net/#text_line_capture
     * `./Capture2Text_CLI.exe -l "Chinese - Simplified" --trim-capture --line-breaks -i "testImg/sample.PNG" -o capture2text_result.txt`
     * The result is not very good. Many Chinese characters were not recognized.
-    * See `ImageTranslator/sample/capture2text_result.txt` for the sample result.
+* IronOCR-Chinese to detect the Chinese characters
+    * Even though it is much better than Tesseract, it was still not able to detect the text on screen at a satisfactory level
+    * It is also slow
+* EmguCV alone (https://www.youtube.com/watch?v=KHes5M7zpGg)
+    * Is worse than IronOCR
+    * Does not work well to detect text in game. Works best when the background is clear.
 
-* 
-
-## Current Images
+## Images
 * Gif of the current application:<br><br>
 ![](./images/sampleVid.gif)
+
+* Gif of the image translator:<br><br>
+![](./images/image_translation.gif)
 
 * Some sample images:
     * Loaded login screen:<br><br>

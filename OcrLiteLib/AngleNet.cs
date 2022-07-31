@@ -23,7 +23,7 @@ namespace OcrLiteLib
 
         ~AngleNet()
         {
-            angleNet.Dispose();
+            // angleNet.Dispose();
         }
 
         public void InitModel(string path, int numThread)

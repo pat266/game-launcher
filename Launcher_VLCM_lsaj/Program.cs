@@ -34,6 +34,7 @@ namespace Launcher_VLCM_niua_lsaj
             cookies = new CookieContainer();
             flash_movie = "";
             flash_vars = "";
+            login.ShowInTaskbar = true;
             // show login form
             login.ShowDialog();
 

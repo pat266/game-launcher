@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Original from: http://stackoverflow.com/a/3124252/122195
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace Launcher_VLCM_niua_lsaj
 {
     public partial class SnippingTool : Form
     {
-        public static Image Snip()
+        public static Image Snip(Screen currentScreen)
         {
-            var rc = Screen.PrimaryScreen.Bounds;
+            var rc = currentScreen.Bounds;
+            // var rc = Screen.PrimaryScreen.Bounds;
             using (Bitmap bmp = new Bitmap(rc.Width, rc.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb))
             {
                 using (Graphics gr = Graphics.FromImage(bmp))
