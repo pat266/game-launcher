@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
-            this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
             this.FormBorder = new System.Windows.Forms.Panel();
             this.translationButton = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.minimize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
@@ -39,22 +38,11 @@
             this.nameLabel = new System.Windows.Forms.Label();
             this.ApplicationSound = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).BeginInit();
             this.FormBorder.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // axShockwaveFlash
-            // 
-            this.axShockwaveFlash.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axShockwaveFlash.Enabled = true;
-            this.axShockwaveFlash.Location = new System.Drawing.Point(0, 30);
-            this.axShockwaveFlash.Margin = new System.Windows.Forms.Padding(0);
-            this.axShockwaveFlash.Name = "axShockwaveFlash";
-            this.axShockwaveFlash.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axShockwaveFlash.OcxState")));
-            this.axShockwaveFlash.Size = new System.Drawing.Size(784, 600);
-            this.axShockwaveFlash.TabIndex = 0;
             // 
             // FormBorder
             // 
@@ -199,15 +187,25 @@
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.FormBorder, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.webBrowser1, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 561);
             this.tableLayoutPanel1.TabIndex = 2;
+            // 
+            // webBrowser1
+            // 
+            this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.webBrowser1.Location = new System.Drawing.Point(3, 33);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser1.Name = "webBrowser1";
+            this.webBrowser1.Size = new System.Drawing.Size(778, 525);
+            this.webBrowser1.TabIndex = 2;
             // 
             // imageList1
             // 
@@ -234,7 +232,6 @@
             this.Text = "Launcher VLCM - lsaj.niua.com";
             this.Load += new System.EventHandler(this.Game_Load);
             this.Resize += new System.EventHandler(this.Game_Resize);
-            ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).EndInit();
             this.FormBorder.ResumeLayout(false);
             this.FormBorder.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -243,8 +240,6 @@
         }
 
         #endregion
-
-        private AxShockwaveFlashObjects.AxShockwaveFlash axShockwaveFlash;
         private System.Windows.Forms.Panel FormBorder;
         private CustomControls.CButton ApplicationSound;
         private CustomControls.CButton minimize;
@@ -254,5 +249,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ImageList imageList1;
         private CustomControls.CButton translationButton;
+        private System.Windows.Forms.WebBrowser webBrowser1;
     }
 }

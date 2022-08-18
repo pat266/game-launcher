@@ -14,6 +14,7 @@ using Emgu.CV.Structure;
 using System.Threading.Tasks;
 using GTranslate.Translators;
 
+
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Game : Form
@@ -73,9 +74,15 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void Game_Load(object sender, EventArgs e)
         {
-            // set the necessary information to flash control of form game
-            axShockwaveFlash.Movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
+            // WebBrowser webBrowser = new WebBrowser();
             
+            // set the necessary information to flash control of form game
+            string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
+            // axShockwaveFlash.Movie = movie;
+            webBrowser1.Navigate(movie);
+            System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\movie.txt", movie);
+
+
             Adjust_Gameform();
 
             Adjust_FormBorder();
@@ -255,7 +262,25 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
-            await StartTranslatingProcess();
+            int OLECMDID_OPTICAL_ZOOM = 63;
+            int OLECMDEXECOPT_DONTPROMPTUSER = 2;
+            object zoom = 200; //The value should be between 10 , 1000
+
+            var browser = webBrowser1.ActiveXInstance as SHDocVw.InternetExplorer;
+            browser.ExecWB(SHDocVw.OLECMDID.OLECMDID_OPTICAL_ZOOM, SHDocVw.OLECMDEXECOPT.OLECMDEXECOPT_DODEFAULT, 200, IntPtr.Zero);
+            /**
+            if (webBrowser1.Document.Body.Style == "zoom:200%")
+            {
+                webBrowser1.Document.Body.Style = "zoom:100%";
+            }
+            else
+            {
+                webBrowser1.Document.Body.Style = "zoom:200%";
+            } */
+
+            MessageBox.Show(webBrowser1.Document.Body.InnerHtml, "Some title", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // await StartTranslatingProcess();
         }
 
         #endregion
@@ -397,7 +422,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void Game_Resize(object sender, EventArgs e)
         {
-            axShockwaveFlash.MaximumSize = new Size(this.Width, this.Height - FormBorder.Height);
+            // axShockwaveFlash.MaximumSize = new Size(this.Width, this.Height - FormBorder.Height);
         }
         #endregion
 
@@ -575,7 +600,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             translatedImageForm.ShowInTaskbar = false;
             translatedImageForm.Show(); // show the translated image form
         }
-        
+
         #endregion
+
+        #region "Web Browser"
+
+        #endregion
+
     }
 }
