@@ -117,8 +117,8 @@ body {
 		weiduan:"0",
 		deptserver:"lsajniua",	
 		chatPort:"443,433",
-		auth:"c2lkPTk3MCZ1aWQ9NDk0NjI3MDkmaXA9MTcyLjEwNy4xOTQuMTUwJnRpbWU9MTY2MDg1NTYxNiZpbmR1bGdlPW4mdG90YWxtb25leT0w",
-		sign:"a5d5cdedcbdafbf4dfa6a91749b9e34f"			
+		auth:"c2lkPTk3MCZ1aWQ9NDk0NjI3MDkmaXA9MTcyLjEwNy4xOTQuMTUwJnRpbWU9MTY2MDg1NTk1NiZpbmR1bGdlPW4mdG90YWxtb25leT0w",
+		sign:"52d5a24f82ac2bc8afcc8453f9e83ed1"			
 		
 	};
 

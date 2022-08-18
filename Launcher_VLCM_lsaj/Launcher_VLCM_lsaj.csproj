@@ -128,10 +128,6 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AxInterop.ShockwaveFlashObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>dll\AxInterop.ShockwaveFlashObjects.dll</HintPath>
-    </Reference>
     <Reference Include="DotNetEnv, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetEnv.2.3.0\lib\netstandard1.3\DotNetEnv.dll</HintPath>
     </Reference>
@@ -427,8 +423,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dll\AxInterop.ShockwaveFlashObjects.dll" />
-    <Content Include="dll\Interop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Web_Request.dll" />
     <None Include="Resources\translation.png" />
     <None Include="Resources\app_icon.ico" />
