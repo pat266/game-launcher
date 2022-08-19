@@ -109,16 +109,16 @@ body {
 		program:"program1112",
 		resversion:"lan_font:1,lan_notice:1,lan_text:1,lan_offset:1,trans:1,sceneMonster:1,goodmodel:9,monstermodel:1,task:1,task_dialog:1,activity:1,npc:1,npc_trans:1,combo:1,skill:1,skilleffect:1,xuewei:1,xuewei_realdragon:1,mountres:1,leadStep:1,achievement:1,instance:1,shouji:1,anqi:1,equipmenplayconfig:1,city:1,tuteng:1,lianti:1,shengWangShop:1,dugujiujian:1,4lingzhen:1,baguazhang:2,ico:1",
 		baseDir:"http://res.aojian.game2.com.cn/eflashdir121227/",
-		affiche:"http://s970.lsaj.niua.com/gamepage/affiche.asp",		
-		loginServer:"s970.lsaj.niua.com",
+		affiche:"http://s971.lsaj.niua.com/gamepage/affiche.asp",		
+		loginServer:"s971.lsaj.niua.com",
 		loginPort:"433,443",
-		chatServer:"s970.lsaj.niua.com",
+		chatServer:"s971.lsaj.niua.com",
 		recharge:"http://pay.niua.com/pay/g/lsaj/s/$s/u/$u/",		
 		weiduan:"0",
 		deptserver:"lsajniua",	
 		chatPort:"443,433",
-		auth:"c2lkPTk3MCZ1aWQ9NDk0NjI3MDkmaXA9MTcyLjEwNy4xOTQuMTUwJnRpbWU9MTY2MDg1NTk1NiZpbmR1bGdlPW4mdG90YWxtb25leT0w",
-		sign:"52d5a24f82ac2bc8afcc8453f9e83ed1"			
+		auth:"c2lkPTk3MSZ1aWQ9NDk0NjI3MDkmaXA9MTcyLjEwNy4xOTQuMTUwJnRpbWU9MTY2MDg4MTQwMyZpbmR1bGdlPW4mdG90YWxtb25leT0w",
+		sign:"a417f46ca577a5a642c555fb82d7ce7f"			
 		
 	};
 

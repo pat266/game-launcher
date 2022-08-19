@@ -13,7 +13,8 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Threading.Tasks;
 using GTranslate.Translators;
-
+using AxShockwaveFlashObjects;
+using System.Xml;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -79,13 +80,43 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // set the necessary information to flash control of form game
             string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
             // axShockwaveFlash.Movie = movie;
-            webBrowser1.Navigate(movie);
+            // axShockwaveFlash.LoadMovie(0, movie);
+            
+            var localSWF = Application.StartupPath + @"\AS3Game.swf";
+            // receive data from AS3
+            axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive); 
+            axShockwaveFlash.LoadMovie(0, localSWF);
+            // sending movie data to AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
+            // MessageBox.Show(pass, "Some title", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\movie.txt", movie);
 
 
             Adjust_Gameform();
 
             Adjust_FormBorder();
+        }
+
+        public void AS3_Receive(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+        {
+            string message = "";
+
+            // message is in xml format so we need to parse it
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(e.request);
+            // get attributes to see which command flash is trying to call
+            XmlAttributeCollection attributes = document.FirstChild.Attributes;
+            String command = attributes.Item(0).InnerText;
+            // get parameters
+            XmlNodeList list = document.GetElementsByTagName("arguments");
+            // Interpret command
+            switch (command)
+            {
+                case "as3ToC#": message = list[0].InnerText; break;
+                case "Some_Other_Command": break;
+            }
+            // MessageBox.Show(message, "Received", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /**
@@ -262,13 +293,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
+            /**
             int OLECMDID_OPTICAL_ZOOM = 63;
             int OLECMDEXECOPT_DONTPROMPTUSER = 2;
             object zoom = 200; //The value should be between 10 , 1000
 
             var browser = webBrowser1.ActiveXInstance as SHDocVw.InternetExplorer;
             browser.ExecWB(SHDocVw.OLECMDID.OLECMDID_OPTICAL_ZOOM, SHDocVw.OLECMDEXECOPT.OLECMDEXECOPT_DODEFAULT, 200, IntPtr.Zero);
-            /**
+            
             if (webBrowser1.Document.Body.Style == "zoom:200%")
             {
                 webBrowser1.Document.Body.Style = "zoom:100%";
@@ -278,7 +310,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 webBrowser1.Document.Body.Style = "zoom:200%";
             } */
 
-            MessageBox.Show(webBrowser1.Document.Body.InnerHtml, "Some title", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // sending movie data to AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + "increase" + "</string></arguments></invoke>");
 
             // await StartTranslatingProcess();
         }
@@ -422,7 +455,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void Game_Resize(object sender, EventArgs e)
         {
-            // axShockwaveFlash.MaximumSize = new Size(this.Width, this.Height - FormBorder.Height);
+            axShockwaveFlash.MaximumSize = new Size(this.Width, this.Height - FormBorder.Height);
         }
         #endregion
 
