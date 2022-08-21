@@ -13,6 +13,8 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Threading.Tasks;
 using GTranslate.Translators;
+using AxShockwaveFlashObjects;
+using System.Xml;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -25,6 +27,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
 
         private bool isMute = false;
+        private ToolTip toolTip;
 
         // make the winform draggable
         private bool _Moving = false;
@@ -34,9 +37,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         
         private OcrLite ocrEngine;
         private AggregateTranslator translator;
-
         private TranslatedImage translatedImageForm;
 
+        // store the information of the zoom level and its information
+        private float[] zoomLevels;
+        private int mapZoomIndex;
+        private int menuZoomIndex;
+        
         /**
          * Constructor
          */
@@ -50,7 +57,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             this.Icon = Properties.Resources.app_icon;
 
             // add KeyEvent to the form
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(KeyEvent);
+            this.KeyUp += new KeyEventHandler(KeyEvent);
+            this.MouseWheel += new MouseEventHandler(MouseScroll);
 
             // initialize the OCR Engine
             ocrEngine = new OcrLite();
@@ -61,11 +69,20 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // set basic buttons
             Set_Control_Buttons();
 
+            // set the tool tip for the buttons
+            toolTip = new ToolTip();
+            SetToolTip();
+
             // load the Onnx model
             loadOnnxModel();
 
             // initialize the Translator
             translator = new AggregateTranslator();
+
+            // initialize the values of the zoom levels
+            zoomLevels = new float[] {0.1f, 0.25f, 0.5f, 1.0f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f};
+            mapZoomIndex = 3;
+            menuZoomIndex = 3;
         }
 
         /**
@@ -73,14 +90,27 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void Game_Load(object sender, EventArgs e)
         {
+            // WebBrowser webBrowser = new WebBrowser();
+            
+
             // set the necessary information to flash control of form game
-            axShockwaveFlash.Movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
+            string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
+            // axShockwaveFlash.Movie = movie;
+            // axShockwaveFlash.LoadMovie(0, movie);
+            
+            
+            var localSWF = Application.StartupPath + @"\AS3Game.swf";
+            // receive data from AS3
+            axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive); 
+            axShockwaveFlash.LoadMovie(0, localSWF);
+            // sending movie data to AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
             
             Adjust_Gameform();
 
             Adjust_FormBorder();
         }
-
+        
         /**
          * Method to handle various methods from pressing down the key
          */
@@ -107,56 +137,66 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         #region "Basic Visual Changes"
         private void Adjust_Gameform()
-    {
-        // set the intial size
-        this.Size = new Size(1024, 768);
+        {
+            // set the intial size
+            this.Size = new Size(1024, 768);
 
-        // center the application
-        this.CenterToScreen();
+            // center the application
+            this.CenterToScreen();
 
-    }
+        }
 
-    /**
-        * Make the custom FormBorder to only be horizontally extendable.
-        */
-    private void Adjust_FormBorder()
-    {
-        // disable title bar 
-        this.ControlBox = false;
-        this.Text = String.Empty;
+        /**
+            * Make the custom FormBorder to only be horizontally extendable.
+            */
+        private void Adjust_FormBorder()
+        {
+            // disable title bar 
+            this.ControlBox = false;
+            this.Text = String.Empty;
             
-        // fixed the form border to only be expandable horizontally
-        FormBorder.MinimumSize = new Size(0, 30);
-        FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
-    }
+            // fixed the form border to only be expandable horizontally
+            FormBorder.MinimumSize = new Size(0, 30);
+            FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
+        }
 
-    /**
-        * Set the image and the size of the three buttons:
-        * exit, maximize, minimize
-        */
-    private void Set_Control_Buttons()
-    {
-        // exit
-        exit.Image = Properties.Resources.close;
-        exit.MinimumSize = new Size(30, 30);
-        exit.MaximumSize = new Size(30, 30);
+        /**
+            * Set the image and the size of the three buttons:
+            * exit, maximize, minimize
+            */
+        private void Set_Control_Buttons()
+        {
+            // exit
+            exit.Image = Properties.Resources.close;
+            exit.MinimumSize = new Size(30, 30);
+            exit.MaximumSize = new Size(30, 30);
 
-        // maximize
-        maximize.Image = Properties.Resources.maximize;
-        maximize.MinimumSize = new Size(30, 30);
-        maximize.MaximumSize = new Size(30, 30);
+            // maximize
+            maximize.Image = Properties.Resources.maximize;
+            maximize.MinimumSize = new Size(30, 30);
+            maximize.MaximumSize = new Size(30, 30);
+            
+            // minimize
+            minimize.Image = Properties.Resources.minimize;
+            minimize.MinimumSize = new Size(30, 30);
+            minimize.MaximumSize = new Size(30, 30);
 
-        // minimize
-        minimize.Image = Properties.Resources.minimize;
-        minimize.MinimumSize = new Size(30, 30);
-        minimize.MaximumSize = new Size(30, 30);
+            // translation
+            translationButton.Image = Properties.Resources.translation;
+            translationButton.MinimumSize = new Size(30, 30);
+            translationButton.MaximumSize = new Size(30, 30);
 
-        // minimize
-        translationButton.Image = Properties.Resources.translation;
-        translationButton.MinimumSize = new Size(30, 30);
-        translationButton.MaximumSize = new Size(30, 30);
-    }
-    #endregion
+            // reset
+            reset.Image = Properties.Resources.reset;
+            reset.MinimumSize = new Size(30, 30);
+            reset.MaximumSize = new Size(30, 30);
+
+            // restart
+            restart.Image = Properties.Resources.restart;
+            restart.MinimumSize = new Size(30, 30);
+            restart.MaximumSize = new Size(30, 30);
+        }
+        #endregion
 
         #region "Application Volume"
         /// <summary>
@@ -258,6 +298,29 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             await StartTranslatingProcess();
         }
 
+        /**
+         * Call the function in AS3 to restart the game
+         */
+        private void restart_Click(object sender, EventArgs e)
+        {
+            // call the function to reset the zoom to default from AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"restartGame\" returntype=\"xml\"><arguments><string>" +
+                "something" + "</string></arguments></invoke>");
+        }
+
+        /**
+         * Set tool tip for the buttons
+         */
+        private void SetToolTip()
+        {
+            toolTip.SetToolTip(ApplicationSound, "Mute/Unmute");
+            toolTip.SetToolTip(translationButton, "Translate Screen");
+            toolTip.SetToolTip(reset, "Reset Zoom Level");
+            toolTip.SetToolTip(restart, "Restart");
+            toolTip.SetToolTip(minimize, "Minimize");
+            toolTip.SetToolTip(maximize, "Maximize");
+            toolTip.SetToolTip(exit, "Close");
+        }
         #endregion
 
         #region "Make Form Draggable"
@@ -575,7 +638,112 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             translatedImageForm.ShowInTaskbar = false;
             translatedImageForm.Show(); // show the translated image form
         }
-        
+
         #endregion
+
+        #region "Zoom In/Out - AS3"
+        /**
+         * A Function to receive data from ActionScript3 loaded SWF file
+         */
+        public void AS3_Receive(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+        {
+            string message = "";
+
+            // message is in xml format so we need to parse it
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(e.request);
+            // get attributes to see which command flash is trying to call
+            XmlAttributeCollection attributes = document.FirstChild.Attributes;
+            String command = attributes.Item(0).InnerText;
+            // get parameters
+            XmlNodeList list = document.GetElementsByTagName("arguments");
+            // Interpret command
+            switch (command)
+            {
+                case "as3ToC#": message = list[0].InnerText; break;
+                case "Some_Other_Command": break;
+            }
+            // MessageBox.Show(message, "Received", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /**
+         * Method to handle various methods from pressing down the key
+         */
+        private void MouseScroll(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                // The user scrolled up.
+                Zoom(true);
+            }
+            else
+            {
+                // The user scrolled down.
+                Zoom(false);
+            }
+
+        }
+
+        /**
+         * A function to call the method in AS3 to zoom in/out the map or menus
+         */
+        private void Zoom(Boolean increase)
+        {
+            if ((Control.ModifierKeys & Keys.Shift) != 0)
+            {
+                // if pressing both control and shift keys, zoom the menus
+                if (increase)
+                {
+                    if (menuZoomIndex < zoomLevels.Length - 1)
+                    {
+                        menuZoomIndex++;
+                    }
+                }
+                else
+                {
+                    if (menuZoomIndex > 0)
+                    {
+                        menuZoomIndex--;
+                    }
+                }
+                // call the function to zoom menus from AS3
+                axShockwaveFlash.CallFunction("<invoke name=\"zoomMenu\" returntype=\"xml\"><arguments><string>" +
+                    zoomLevels[menuZoomIndex].ToString("N2") + "</string></arguments></invoke>");
+            }
+            else if (Control.ModifierKeys == Keys.Control)
+            {
+                // if pressing only control key, zoom the map
+                if (increase)
+                {
+                    if (mapZoomIndex < zoomLevels.Length - 1)
+                    {
+                        mapZoomIndex++;
+                    }
+                }
+                else
+                {
+                    if (mapZoomIndex > 0)
+                    {
+                        mapZoomIndex--;
+                    }
+                }
+                // call the function to zoom map from AS3
+                axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" +
+                    zoomLevels[mapZoomIndex].ToString("N2") + "</string></arguments></invoke>");
+            }
+        }
+
+        /**
+         * Call the function in AS3 to reset both of the zoom levels
+         */
+        private void reset_Click(object sender, EventArgs e)
+        {
+            // call the function to reset the zoom to default from AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"resetZoom\" returntype=\"xml\"><arguments><string>" +
+                "something" + "</string></arguments></invoke>");
+        }
+        #endregion
+
+
     }
 }
