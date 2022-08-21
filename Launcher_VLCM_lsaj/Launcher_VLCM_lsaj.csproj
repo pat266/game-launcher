@@ -426,6 +426,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="dll\Web_Request.dll" />
+    <None Include="Resources\restart.png" />
     <None Include="Resources\reset.png" />
     <None Include="Resources\translation.png" />
     <None Include="Resources\app_icon.ico" />

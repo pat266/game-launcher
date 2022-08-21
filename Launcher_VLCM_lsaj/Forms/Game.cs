@@ -27,6 +27,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private static extern int waveOutSetVolume(IntPtr hwo, uint dwVolume);
 
         private bool isMute = false;
+        private ToolTip toolTip;
 
         // make the winform draggable
         private bool _Moving = false;
@@ -67,6 +68,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // set basic buttons
             Set_Control_Buttons();
+
+            // set the tool tip for the buttons
+            toolTip = new ToolTip();
+            SetToolTip();
 
             // load the Onnx model
             loadOnnxModel();
@@ -132,61 +137,66 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         #region "Basic Visual Changes"
         private void Adjust_Gameform()
-    {
-        // set the intial size
-        this.Size = new Size(1024, 768);
+        {
+            // set the intial size
+            this.Size = new Size(1024, 768);
 
-        // center the application
-        this.CenterToScreen();
+            // center the application
+            this.CenterToScreen();
 
-    }
+        }
 
-    /**
-        * Make the custom FormBorder to only be horizontally extendable.
-        */
-    private void Adjust_FormBorder()
-    {
-        // disable title bar 
-        this.ControlBox = false;
-        this.Text = String.Empty;
+        /**
+            * Make the custom FormBorder to only be horizontally extendable.
+            */
+        private void Adjust_FormBorder()
+        {
+            // disable title bar 
+            this.ControlBox = false;
+            this.Text = String.Empty;
             
-        // fixed the form border to only be expandable horizontally
-        FormBorder.MinimumSize = new Size(0, 30);
-        FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
-    }
+            // fixed the form border to only be expandable horizontally
+            FormBorder.MinimumSize = new Size(0, 30);
+            FormBorder.MaximumSize = new Size(Int32.MaxValue, 30);
+        }
 
-    /**
-        * Set the image and the size of the three buttons:
-        * exit, maximize, minimize
-        */
-    private void Set_Control_Buttons()
-    {
-        // exit
-        exit.Image = Properties.Resources.close;
-        exit.MinimumSize = new Size(30, 30);
-        exit.MaximumSize = new Size(30, 30);
+        /**
+            * Set the image and the size of the three buttons:
+            * exit, maximize, minimize
+            */
+        private void Set_Control_Buttons()
+        {
+            // exit
+            exit.Image = Properties.Resources.close;
+            exit.MinimumSize = new Size(30, 30);
+            exit.MaximumSize = new Size(30, 30);
 
-        // maximize
-        maximize.Image = Properties.Resources.maximize;
-        maximize.MinimumSize = new Size(30, 30);
-        maximize.MaximumSize = new Size(30, 30);
+            // maximize
+            maximize.Image = Properties.Resources.maximize;
+            maximize.MinimumSize = new Size(30, 30);
+            maximize.MaximumSize = new Size(30, 30);
             
-        // minimize
-        minimize.Image = Properties.Resources.minimize;
-        minimize.MinimumSize = new Size(30, 30);
-        minimize.MaximumSize = new Size(30, 30);
+            // minimize
+            minimize.Image = Properties.Resources.minimize;
+            minimize.MinimumSize = new Size(30, 30);
+            minimize.MaximumSize = new Size(30, 30);
 
-        // translation
-        translationButton.Image = Properties.Resources.translation;
-        translationButton.MinimumSize = new Size(30, 30);
-        translationButton.MaximumSize = new Size(30, 30);
+            // translation
+            translationButton.Image = Properties.Resources.translation;
+            translationButton.MinimumSize = new Size(30, 30);
+            translationButton.MaximumSize = new Size(30, 30);
 
-        // reset
-        reset.Image = Properties.Resources.reset;
-        reset.MinimumSize = new Size(30, 30);
-        reset.MaximumSize = new Size(30, 30);
-    }
-    #endregion
+            // reset
+            reset.Image = Properties.Resources.reset;
+            reset.MinimumSize = new Size(30, 30);
+            reset.MaximumSize = new Size(30, 30);
+
+            // restart
+            restart.Image = Properties.Resources.restart;
+            restart.MinimumSize = new Size(30, 30);
+            restart.MaximumSize = new Size(30, 30);
+        }
+        #endregion
 
         #region "Application Volume"
         /// <summary>
@@ -288,6 +298,29 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             await StartTranslatingProcess();
         }
 
+        /**
+         * Call the function in AS3 to restart the game
+         */
+        private void restart_Click(object sender, EventArgs e)
+        {
+            // call the function to reset the zoom to default from AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"restartGame\" returntype=\"xml\"><arguments><string>" +
+                "something" + "</string></arguments></invoke>");
+        }
+
+        /**
+         * Set tool tip for the buttons
+         */
+        private void SetToolTip()
+        {
+            toolTip.SetToolTip(ApplicationSound, "Mute/Unmute");
+            toolTip.SetToolTip(translationButton, "Translate Screen");
+            toolTip.SetToolTip(reset, "Reset Zoom Level");
+            toolTip.SetToolTip(restart, "Restart");
+            toolTip.SetToolTip(minimize, "Minimize");
+            toolTip.SetToolTip(maximize, "Maximize");
+            toolTip.SetToolTip(exit, "Close");
+        }
         #endregion
 
         #region "Make Form Draggable"

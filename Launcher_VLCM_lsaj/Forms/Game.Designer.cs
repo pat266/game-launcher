@@ -32,15 +32,16 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.FormBorder = new System.Windows.Forms.Panel();
+            this.nameLabel = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
+            this.reset = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
+            this.restart = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.translationButton = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.minimize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.maximize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.exit = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
-            this.nameLabel = new System.Windows.Forms.Label();
             this.ApplicationSound = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
-            this.reset = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.FormBorder.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).BeginInit();
@@ -56,6 +57,7 @@
             // 
             this.FormBorder.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.FormBorder.Controls.Add(this.reset);
+            this.FormBorder.Controls.Add(this.restart);
             this.FormBorder.Controls.Add(this.translationButton);
             this.FormBorder.Controls.Add(this.minimize);
             this.FormBorder.Controls.Add(this.maximize);
@@ -73,6 +75,89 @@
             this.FormBorder.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseDown);
             this.FormBorder.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseMove);
             this.FormBorder.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseUp);
+            // 
+            // nameLabel
+            // 
+            this.nameLabel.AutoSize = true;
+            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.nameLabel.Location = new System.Drawing.Point(30, 0);
+            this.nameLabel.Name = "nameLabel";
+            this.nameLabel.Size = new System.Drawing.Size(205, 21);
+            this.nameLabel.TabIndex = 1;
+            this.nameLabel.Text = "Launcher - lsaj.niua.com";
+            this.nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.nameLabel.DoubleClick += new System.EventHandler(this.nameLabel_DoubleClick);
+            this.nameLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseDown);
+            this.nameLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseMove);
+            this.nameLabel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseUp);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.FormBorder, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 561);
+            this.tableLayoutPanel1.TabIndex = 2;
+            // 
+            // axShockwaveFlash
+            // 
+            this.axShockwaveFlash.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.axShockwaveFlash.Enabled = true;
+            this.axShockwaveFlash.Location = new System.Drawing.Point(3, 33);
+            this.axShockwaveFlash.Name = "axShockwaveFlash";
+            this.axShockwaveFlash.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axShockwaveFlash.OcxState")));
+            this.axShockwaveFlash.Size = new System.Drawing.Size(778, 525);
+            this.axShockwaveFlash.TabIndex = 2;
+            // 
+            // reset
+            // 
+            this.reset.BackColor = System.Drawing.Color.Transparent;
+            this.reset.BackgroundColor = System.Drawing.Color.Transparent;
+            this.reset.BorderColor = System.Drawing.Color.Transparent;
+            this.reset.BorderRadius = 0;
+            this.reset.BorderSize = 0;
+            this.reset.Dock = System.Windows.Forms.DockStyle.Left;
+            this.reset.FlatAppearance.BorderSize = 0;
+            this.reset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.reset.ForeColor = System.Drawing.Color.Transparent;
+            this.reset.Location = new System.Drawing.Point(265, 0);
+            this.reset.Name = "reset";
+            this.reset.Size = new System.Drawing.Size(30, 30);
+            this.reset.TabIndex = 8;
+            this.reset.TextColor = System.Drawing.Color.Transparent;
+            this.reset.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.reset.UseVisualStyleBackColor = false;
+            this.reset.Click += new System.EventHandler(this.reset_Click);
+            // 
+            // restart
+            // 
+            this.restart.BackColor = System.Drawing.Color.Transparent;
+            this.restart.BackgroundColor = System.Drawing.Color.Transparent;
+            this.restart.BorderColor = System.Drawing.Color.Transparent;
+            this.restart.BorderRadius = 0;
+            this.restart.BorderSize = 0;
+            this.restart.Dock = System.Windows.Forms.DockStyle.Right;
+            this.restart.FlatAppearance.BorderSize = 0;
+            this.restart.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.restart.ForeColor = System.Drawing.Color.Transparent;
+            this.restart.Location = new System.Drawing.Point(664, 0);
+            this.restart.Name = "restart";
+            this.restart.Size = new System.Drawing.Size(30, 30);
+            this.restart.TabIndex = 7;
+            this.restart.TextColor = System.Drawing.Color.Transparent;
+            this.restart.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.restart.UseVisualStyleBackColor = false;
+            this.restart.Click += new System.EventHandler(this.restart_Click);
             // 
             // translationButton
             // 
@@ -154,23 +239,6 @@
             this.exit.UseVisualStyleBackColor = false;
             this.exit.Click += new System.EventHandler(this.exit_Click);
             // 
-            // nameLabel
-            // 
-            this.nameLabel.AutoSize = true;
-            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.nameLabel.Location = new System.Drawing.Point(30, 0);
-            this.nameLabel.Name = "nameLabel";
-            this.nameLabel.Size = new System.Drawing.Size(205, 21);
-            this.nameLabel.TabIndex = 1;
-            this.nameLabel.Text = "Launcher - lsaj.niua.com";
-            this.nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.nameLabel.DoubleClick += new System.EventHandler(this.nameLabel_DoubleClick);
-            this.nameLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseDown);
-            this.nameLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseMove);
-            this.nameLabel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseUp);
-            // 
             // ApplicationSound
             // 
             this.ApplicationSound.BackColor = System.Drawing.Color.Transparent;
@@ -190,52 +258,6 @@
             this.ApplicationSound.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.ApplicationSound.UseVisualStyleBackColor = false;
             this.ApplicationSound.Click += new System.EventHandler(this.ApplicationSound_Click);
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.FormBorder, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 561);
-            this.tableLayoutPanel1.TabIndex = 2;
-            // 
-            // axShockwaveFlash
-            // 
-            this.axShockwaveFlash.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axShockwaveFlash.Enabled = true;
-            this.axShockwaveFlash.Location = new System.Drawing.Point(3, 33);
-            this.axShockwaveFlash.Name = "axShockwaveFlash";
-            this.axShockwaveFlash.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axShockwaveFlash.OcxState")));
-            this.axShockwaveFlash.Size = new System.Drawing.Size(778, 525);
-            this.axShockwaveFlash.TabIndex = 2;
-            // 
-            // reset
-            // 
-            this.reset.BackColor = System.Drawing.Color.Transparent;
-            this.reset.BackgroundColor = System.Drawing.Color.Transparent;
-            this.reset.BorderColor = System.Drawing.Color.Transparent;
-            this.reset.BorderRadius = 0;
-            this.reset.BorderSize = 0;
-            this.reset.Dock = System.Windows.Forms.DockStyle.Right;
-            this.reset.FlatAppearance.BorderSize = 0;
-            this.reset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.reset.ForeColor = System.Drawing.Color.Transparent;
-            this.reset.Location = new System.Drawing.Point(664, 0);
-            this.reset.Name = "reset";
-            this.reset.Size = new System.Drawing.Size(30, 30);
-            this.reset.TabIndex = 7;
-            this.reset.TextColor = System.Drawing.Color.Transparent;
-            this.reset.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.reset.UseVisualStyleBackColor = false;
-            this.reset.Click += new System.EventHandler(this.reset_Click);
             // 
             // Game
             // 
@@ -275,6 +297,7 @@
         private CustomControls.CButton ApplicationSound;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private AxShockwaveFlashObjects.AxShockwaveFlash axShockwaveFlash;
+        private CustomControls.CButton restart;
         private CustomControls.CButton reset;
     }
 }

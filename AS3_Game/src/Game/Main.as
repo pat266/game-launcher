@@ -37,6 +37,9 @@ package Game
 				zoomMap();
 				zoomMenu();
 				resetZoomDefault();
+				
+				// restart the game
+				restartGame();
 			}
 		}
 		
@@ -48,7 +51,7 @@ package Game
 			{
 				this.movie = text;
 				loader.load(new URLRequest(this.movie));
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded );
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded);
 				
 				return this.movie; // optional, just to test the data
 			});
@@ -60,6 +63,23 @@ package Game
 		 */
 		private function handleLoaded (evt:Event):void {
 			stage.addChild(loader.content);
+		}
+		
+		/**
+		 * A function to add the ExternalInterface to accept call from outside (C#)
+		 * Restart the game
+		 */
+		private function restartGame():void {
+			
+			ExternalInterface.addCallback("restartGame", function(text : String) : String
+			{
+				stage.removeChild(loader.content);
+				loader.unload();
+				loader.load(new URLRequest(this.movie));
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded);
+				
+				return ""; // for testing purpose
+			});
 		}
 		
 		/**
@@ -124,7 +144,7 @@ package Game
 		
 		/**
 		 * A function to add the ExternalInterface to accept call from outside (C#)
-		 * Resizing the menus, leaving only the map intact
+		 * Reset the zoom levels to default
 		 */
 		private function resetZoomDefault():void {
 			
