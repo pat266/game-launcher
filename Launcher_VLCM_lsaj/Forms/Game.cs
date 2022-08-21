@@ -675,9 +675,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                         menuZoomIndex--;
                     }
                 }
-
-
-                MessageBox.Show("Scrolling up", "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
+                // call the function to zoom menus from AS3
+                axShockwaveFlash.CallFunction("<invoke name=\"zoomMenu\" returntype=\"xml\"><arguments><string>" +
+                    zoomLevels[menuZoomIndex].ToString("N2") + "</string></arguments></invoke>");
             }
             else if (Control.ModifierKeys == Keys.Control)
             {
@@ -697,10 +697,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                     }
                 }
                 // call the function to zoom map from AS3
-                string test = axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" +
-                    zoomLevels[mapZoomIndex].ToString("N3") + "</string></arguments></invoke>");
-
-                // MessageBox.Show("Scrolling down", "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
+                axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" +
+                    zoomLevels[mapZoomIndex].ToString("N2") + "</string></arguments></invoke>");
             }
         }
         #endregion

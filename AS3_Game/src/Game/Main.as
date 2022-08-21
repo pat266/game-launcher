@@ -20,10 +20,6 @@ package Game
 		private var loader:Loader;
 		private var movie : String;
 		
-		private var defaultVal : Boolean;
-		private var originalWidth : Number;
-		private var originalHeight : Number;
-		
 		public function Main() 
 		{
 			// allow to load all swf file
@@ -31,16 +27,21 @@ package Game
 			
 			if (stage) {
 				loader = new Loader();
-				defaultVal = true;
+				
 				// test sending message
-				ExternalInterface.call("as3ToC#", "Hello world");
+				// ExternalInterface.call("as3ToC#", "Hello world");
+				
 				// retrieving movie variable from C# 
 				initMovie();
 				// add zoom in/out support
-				zoom();
+				zoomMap();
+				zoomMenu();
 			}
 		}
 		
+		/**
+		 * Initialize loading the SWF content
+		 */
 		private function initMovie():void {
 			ExternalInterface.addCallback("loadMovie", function (text : String) : String
 			{
@@ -52,11 +53,19 @@ package Game
 			});
 		}
 		
+		/**
+		 * Add the SWF content to the stage when it is loaded
+		 * @param	evt
+		 */
 		private function handleLoaded (evt:Event):void {
 			stage.addChild(loader.content);
 		}
 		
-		private function zoom():void {
+		/**
+		 * A function to add the ExternalInterface to accept call from outside (C#)
+		 * Resizing the map requires a lot of processing to make sure the camera doesnt look too bad
+		 */
+		private function zoomMap():void {
 			
 			ExternalInterface.addCallback("zoomMap", function(text : String) : String
 			{
@@ -76,10 +85,7 @@ package Game
 						/**
 						 * UI (without map): index = 2
 						 * Only map: index = 0
-						 */
-						originalWidth = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-						originalHeight = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-						
+						 */						
 						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
 						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
 						
@@ -93,36 +99,7 @@ package Game
 							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
 						}
 					}
-				}
-				
-				/**
-				// reprocess the map
-				var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
-				var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
-				var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-				var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-				
-				
-				 
-				// choose a greater number
-				var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
-				// check on the right
-				if (!checkMapFitRight(mapWidth, parentMapWidth)) {
-					// stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = originalWidth;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
-					mapWidth = greaterNumber;
-				}
-				
-				// check on the bottom
-				if (!checkMapFitBottom(mapHeight, parentMapHeight)) {
-					// stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = originalHeight;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
-					mapHeight = greaterNumber;
-				}
-				*/
-				
+				}		
 				
 				return "Width: " + stage.stageWidth + ", height: " + stage.stageHeight +
 					";\n Map Width: " + mapWidth + ", map height: " + mapHeight; // for testing purpose
@@ -130,48 +107,18 @@ package Game
 		}
 		
 		/**
-		 * Helper Function:
-		 * Check if the current map (stage's child) not have empty space on the right
-		 * Not fit when Map's parent width > Map's width
-		 * Set Map's X value by Map's parent width - Map's width
+		 * A function to add the ExternalInterface to accept call from outside (C#)
+		 * Resizing the menus, leaving only the map intact
 		 */
-		private function checkMapFitRight(mapWidth:Number, parentMapWidth:Number): Boolean {
-			return parentMapWidth == mapWidth;
-		}
-				
-		/**
-		 * Helper Function:
-		 * Check if the current map (stage's child) not have empty space on the bottom
-		 * Not fit when Map's parent height > Map's height
-		 * Set Map's Y value by Map's parent height - Map's height
-		 */
-		private function checkMapFitBottom(mapHeight:Number, parentMapHeight:Number): Boolean {
-			return parentMapHeight == mapHeight;
-		}
-		
-		/**
-		 * Helper Function:
-		 * Calculate the difference between 2 values
-		 */
-		private function calculateDifference(num1:Number, num2:Number): Number {
-			return num2 - num1;
-		}
-		
-		
-		/**
-		 * Helper Function:
-		 * Check if the current map (stage's child) not have empty space on the left
-		 */
-		private function checkMapFitLeft(): Boolean {
-			return false;
-		}
-		
-		/**
-		 * Helper Function:
-		 * Check if the current map (stage's child) not have empty space on the top
-		 */
-		private function checkMapFitTop(): Boolean {
-			return false;
+		private function zoomMenu():void {
+			
+			ExternalInterface.addCallback("zoomMenu", function(text : String) : String
+			{
+				var scale:Number = parseFloat(text);
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				return ""; // for testing purpose
+			});
 		}
 		
 	}
