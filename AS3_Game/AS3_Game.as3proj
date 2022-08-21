@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\AS3Game.swf" />
+    <movie path="..\Launcher_VLCM_lsaj\bin\Debug\AS3Game.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />

@@ -30,20 +30,26 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Game));
-            this.FormBorder = new System.Windows.Forms.Panel();
-            this.nameLabel = new System.Windows.Forms.Label();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
+            this.FormBorder = new System.Windows.Forms.Panel();
             this.translationButton = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.minimize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.maximize = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.exit = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
+            this.nameLabel = new System.Windows.Forms.Label();
             this.ApplicationSound = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
             this.FormBorder.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).BeginInit();
             this.SuspendLayout();
+            // 
+            // imageList1
+            // 
+            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // FormBorder
             // 
@@ -65,45 +71,6 @@
             this.FormBorder.MouseDown += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseDown);
             this.FormBorder.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseMove);
             this.FormBorder.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FormBorder_MouseUp);
-            // 
-            // nameLabel
-            // 
-            this.nameLabel.AutoSize = true;
-            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
-            this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
-            this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.nameLabel.Location = new System.Drawing.Point(30, 0);
-            this.nameLabel.Name = "nameLabel";
-            this.nameLabel.Size = new System.Drawing.Size(205, 21);
-            this.nameLabel.TabIndex = 1;
-            this.nameLabel.Text = "Launcher - lsaj.niua.com";
-            this.nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.nameLabel.DoubleClick += new System.EventHandler(this.nameLabel_DoubleClick);
-            this.nameLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseDown);
-            this.nameLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseMove);
-            this.nameLabel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseUp);
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.FormBorder, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 561);
-            this.tableLayoutPanel1.TabIndex = 2;
-            // 
-            // imageList1
-            // 
-            this.imageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.imageList1.ImageSize = new System.Drawing.Size(16, 16);
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // translationButton
             // 
@@ -185,6 +152,23 @@
             this.exit.UseVisualStyleBackColor = false;
             this.exit.Click += new System.EventHandler(this.exit_Click);
             // 
+            // nameLabel
+            // 
+            this.nameLabel.AutoSize = true;
+            this.nameLabel.Dock = System.Windows.Forms.DockStyle.Left;
+            this.nameLabel.Font = new System.Drawing.Font("Script MT Bold", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(163)));
+            this.nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.nameLabel.Location = new System.Drawing.Point(30, 0);
+            this.nameLabel.Name = "nameLabel";
+            this.nameLabel.Size = new System.Drawing.Size(205, 21);
+            this.nameLabel.TabIndex = 1;
+            this.nameLabel.Text = "Launcher - lsaj.niua.com";
+            this.nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.nameLabel.DoubleClick += new System.EventHandler(this.nameLabel_DoubleClick);
+            this.nameLabel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseDown);
+            this.nameLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseMove);
+            this.nameLabel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.nameLabel_MouseUp);
+            // 
             // ApplicationSound
             // 
             this.ApplicationSound.BackColor = System.Drawing.Color.Transparent;
@@ -204,6 +188,22 @@
             this.ApplicationSound.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.ApplicationSound.UseVisualStyleBackColor = false;
             this.ApplicationSound.Click += new System.EventHandler(this.ApplicationSound_Click);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.FormBorder, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 561);
+            this.tableLayoutPanel1.TabIndex = 2;
             // 
             // axShockwaveFlash
             // 
@@ -243,15 +243,15 @@
         }
 
         #endregion
+        private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Panel FormBorder;
-        private CustomControls.CButton ApplicationSound;
+        private CustomControls.CButton translationButton;
         private CustomControls.CButton minimize;
         private CustomControls.CButton maximize;
         private CustomControls.CButton exit;
         private System.Windows.Forms.Label nameLabel;
+        private CustomControls.CButton ApplicationSound;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.ImageList imageList1;
-        private CustomControls.CButton translationButton;
         private AxShockwaveFlashObjects.AxShockwaveFlash axShockwaveFlash;
     }
 }

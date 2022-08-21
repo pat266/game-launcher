@@ -77,10 +77,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // WebBrowser webBrowser = new WebBrowser();
             
+
             // set the necessary information to flash control of form game
             string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
             // axShockwaveFlash.Movie = movie;
             // axShockwaveFlash.LoadMovie(0, movie);
+            
             
             var localSWF = Application.StartupPath + @"\AS3Game.swf";
             // receive data from AS3
@@ -89,8 +91,11 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // sending movie data to AS3
             axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
             // MessageBox.Show(pass, "Some title", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+            
             System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\movie.txt", movie);
+            // string docText = string.Format("""<html><BODY><div width="100%" height="100%"><param name="movie" value="TGameLoader.swf"/> <param name="quality" value="high"/> <EMBED type=application/x-shockwave-flash height="100%" width="100%" src="{0}"></div></BODY></html>""", movie);
+            // System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\DocText.txt", docText);
+            
 
 
             Adjust_Gameform();
@@ -308,11 +313,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             else
             {
                 webBrowser1.Document.Body.Style = "zoom:200%";
-            } */
+            } 
+            */
 
             // sending movie data to AS3
-            axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + "increase" + "</string></arguments></invoke>");
-
+            string test = axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" + 0.1 + "</string></arguments></invoke>");
+            MessageBox.Show(test, "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
             // await StartTranslatingProcess();
         }
 

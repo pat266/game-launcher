@@ -4,3 +4,6 @@ Launcher_VLCM_lsaj/.env
 */obj/
 Launcher_VLCM_lsaj/publish/
 packages/
+./flash_movie.txt
+./flash_vars.txt
+./game_data.txt
