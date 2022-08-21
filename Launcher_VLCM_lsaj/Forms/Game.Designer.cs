@@ -40,6 +40,7 @@
             this.ApplicationSound = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
+            this.reset = new Launcher_VLCM_niua_lsaj.CustomControls.CButton();
             this.FormBorder.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axShockwaveFlash)).BeginInit();
@@ -54,6 +55,7 @@
             // FormBorder
             // 
             this.FormBorder.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.FormBorder.Controls.Add(this.reset);
             this.FormBorder.Controls.Add(this.translationButton);
             this.FormBorder.Controls.Add(this.minimize);
             this.FormBorder.Controls.Add(this.maximize);
@@ -215,6 +217,26 @@
             this.axShockwaveFlash.Size = new System.Drawing.Size(778, 525);
             this.axShockwaveFlash.TabIndex = 2;
             // 
+            // reset
+            // 
+            this.reset.BackColor = System.Drawing.Color.Transparent;
+            this.reset.BackgroundColor = System.Drawing.Color.Transparent;
+            this.reset.BorderColor = System.Drawing.Color.Transparent;
+            this.reset.BorderRadius = 0;
+            this.reset.BorderSize = 0;
+            this.reset.Dock = System.Windows.Forms.DockStyle.Right;
+            this.reset.FlatAppearance.BorderSize = 0;
+            this.reset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.reset.ForeColor = System.Drawing.Color.Transparent;
+            this.reset.Location = new System.Drawing.Point(664, 0);
+            this.reset.Name = "reset";
+            this.reset.Size = new System.Drawing.Size(30, 30);
+            this.reset.TabIndex = 7;
+            this.reset.TextColor = System.Drawing.Color.Transparent;
+            this.reset.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.reset.UseVisualStyleBackColor = false;
+            this.reset.Click += new System.EventHandler(this.reset_Click);
+            // 
             // Game
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -253,5 +275,6 @@
         private CustomControls.CButton ApplicationSound;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private AxShockwaveFlashObjects.AxShockwaveFlash axShockwaveFlash;
+        private CustomControls.CButton reset;
     }
 }

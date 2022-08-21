@@ -36,6 +36,7 @@ package Game
 				// add zoom in/out support
 				zoomMap();
 				zoomMenu();
+				resetZoomDefault();
 			}
 		}
 		
@@ -117,6 +118,23 @@ package Game
 				var scale:Number = parseFloat(text);
 				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
 				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				return ""; // for testing purpose
+			});
+		}
+		
+		/**
+		 * A function to add the ExternalInterface to accept call from outside (C#)
+		 * Resizing the menus, leaving only the map intact
+		 */
+		private function resetZoomDefault():void {
+			
+			ExternalInterface.addCallback("resetZoom", function(text : String) : String
+			{
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = 1;
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = 1;
+				
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleX"] = 1;
+				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleY"] = 1;
 				return ""; // for testing purpose
 			});
 		}

@@ -100,14 +100,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             axShockwaveFlash.LoadMovie(0, localSWF);
             // sending movie data to AS3
             axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
-            // MessageBox.Show(pass, "Some title", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-            System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\movie.txt", movie);
-            // string docText = string.Format("""<html><BODY><div width="100%" height="100%"><param name="movie" value="TGameLoader.swf"/> <param name="quality" value="high"/> <EMBED type=application/x-shockwave-flash height="100%" width="100%" src="{0}"></div></BODY></html>""", movie);
-            // System.IO.File.WriteAllText(@"C:\Users\nili266\Downloads\DocText.txt", docText);
-            
-
-
             Adjust_Gameform();
 
             Adjust_FormBorder();
@@ -177,16 +170,21 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         maximize.Image = Properties.Resources.maximize;
         maximize.MinimumSize = new Size(30, 30);
         maximize.MaximumSize = new Size(30, 30);
-
+            
         // minimize
         minimize.Image = Properties.Resources.minimize;
         minimize.MinimumSize = new Size(30, 30);
         minimize.MaximumSize = new Size(30, 30);
 
-        // minimize
+        // translation
         translationButton.Image = Properties.Resources.translation;
         translationButton.MinimumSize = new Size(30, 30);
         translationButton.MaximumSize = new Size(30, 30);
+
+        // reset
+        reset.Image = Properties.Resources.reset;
+        reset.MinimumSize = new Size(30, 30);
+        reset.MaximumSize = new Size(30, 30);
     }
     #endregion
 
@@ -701,7 +699,18 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                     zoomLevels[mapZoomIndex].ToString("N2") + "</string></arguments></invoke>");
             }
         }
+
+        /**
+         * Call the function in AS3 to reset both of the zoom levels
+         */
+        private void reset_Click(object sender, EventArgs e)
+        {
+            // call the function to reset the zoom to default from AS3
+            axShockwaveFlash.CallFunction("<invoke name=\"resetZoom\" returntype=\"xml\"><arguments><string>" +
+                "something" + "</string></arguments></invoke>");
+        }
         #endregion
+
 
     }
 }

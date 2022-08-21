@@ -22,7 +22,10 @@ I created this application to login and launch the game easily, as well as to tr
 ![](./images/sampleVid.gif)
 
 * Gif of the image translator:<br><br>
-![](./images/image_translation.gif)
+![](./images/game_launcher_translation.gif)
+
+* Gif of the zoom in/out feature (CTRL + scroll => map's size; CTRL + Shift + scroll => menu size):<br><br>
+![](./images/zoom.gif)
 
 * Some sample images:
     * Loaded login screen:<br><br>
@@ -32,7 +35,7 @@ I created this application to login and launch the game easily, as well as to tr
     ![](./images/loading_game.png)
     
     * Result of the image translation:<br><br>
-    ![](./test.png)
+    ![](./images//test.png)
 
 ## Stats
 
