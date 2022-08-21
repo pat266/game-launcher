@@ -422,9 +422,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
             Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
 
-            File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\game_data.txt", game_data);
-            File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_movie.txt", Program.flash_movie);
-            File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_vars.txt", Program.flash_vars);
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\game_data.txt", game_data);
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_movie.txt", Program.flash_movie);
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_vars.txt", Program.flash_vars);
 
             /**
             // load the game

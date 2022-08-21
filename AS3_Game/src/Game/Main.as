@@ -60,50 +60,40 @@ package Game
 			
 			ExternalInterface.addCallback("zoomMap", function(text : String) : String
 			{
-				//https://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/StageScaleMode.html
-				// stage.scaleMode = StageScaleMode.EXACT_FIT;
-				stage.scaleMode = StageScaleMode.NO_SCALE;
-				// stage.scaleMode = StageScaleMode.NO_BORDER;
-				// stage.scaleMode = StageScaleMode.SHOW_ALL;
-				// stage.align = StageAlign.BOTTOM_RIGHT;
-				
 				// check if the map is loaded up
 				var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
 				var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
 				// only change the size of the map if it exists
 				if (mapWidth != 0 && mapHeight != 0) {
-					/**
-				 * UI (without map): index = 2
-				 * Only map: index = 0
-				 */
-				var scale:Number = parseFloat(text);
-				var value:int = 0;
-				
-				if (stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] == 1.0) {
-					originalWidth = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-					originalHeight = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-					
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
-					
-					if (scale < 1) {
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
-						var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-						var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-						var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+					var scale:Number = parseFloat(text);
+					var value:int = 0;
+					stage.scaleMode = StageScaleMode.NO_SCALE;
+					// if the scale is changed back to 1
+					if (scale == 1.0) {
+						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
+						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
+					} else {
+						/**
+						 * UI (without map): index = 2
+						 * Only map: index = 0
+						 */
+						originalWidth = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
+						originalHeight = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
 						
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
+						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
+						
+						if (scale < 1) {
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
+							var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
+							var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
+							var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+							
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+						}
 					}
-					
-				}  else {
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
-					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
 				}
-				}
-				
-				
-				
 				
 				/**
 				// reprocess the map
@@ -135,7 +125,7 @@ package Game
 				
 				
 				return "Width: " + stage.stageWidth + ", height: " + stage.stageHeight +
-					";\n Map Width: " + mapWidth + ", map height: " + mapHeight;
+					";\n Map Width: " + mapWidth + ", map height: " + mapHeight; // for testing purpose
 			});
 		}
 		

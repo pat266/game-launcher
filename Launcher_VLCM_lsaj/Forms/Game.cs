@@ -36,9 +36,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         
         private OcrLite ocrEngine;
         private AggregateTranslator translator;
-
         private TranslatedImage translatedImageForm;
 
+        // store the information of the zoom level and its information
+        private float[] zoomLevels;
+        private int mapZoomIndex;
+        private int menuZoomIndex;
+        
         /**
          * Constructor
          */
@@ -52,7 +56,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             this.Icon = Properties.Resources.app_icon;
 
             // add KeyEvent to the form
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(KeyEvent);
+            this.KeyUp += new KeyEventHandler(KeyEvent);
+            this.MouseWheel += new MouseEventHandler(MouseScroll);
 
             // initialize the OCR Engine
             ocrEngine = new OcrLite();
@@ -68,6 +73,11 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // initialize the Translator
             translator = new AggregateTranslator();
+
+            // initialize the values of the zoom levels
+            zoomLevels = new float[] {0.1f, 0.25f, 0.5f, 1.0f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f};
+            mapZoomIndex = 3;
+            menuZoomIndex = 3;
         }
 
         /**
@@ -102,28 +112,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             Adjust_FormBorder();
         }
-
-        public void AS3_Receive(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
-        {
-            string message = "";
-
-            // message is in xml format so we need to parse it
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(e.request);
-            // get attributes to see which command flash is trying to call
-            XmlAttributeCollection attributes = document.FirstChild.Attributes;
-            String command = attributes.Item(0).InnerText;
-            // get parameters
-            XmlNodeList list = document.GetElementsByTagName("arguments");
-            // Interpret command
-            switch (command)
-            {
-                case "as3ToC#": message = list[0].InnerText; break;
-                case "Some_Other_Command": break;
-            }
-            // MessageBox.Show(message, "Received", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
+        
         /**
          * Method to handle various methods from pressing down the key
          */
@@ -298,28 +287,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
-            /**
-            int OLECMDID_OPTICAL_ZOOM = 63;
-            int OLECMDEXECOPT_DONTPROMPTUSER = 2;
-            object zoom = 200; //The value should be between 10 , 1000
-
-            var browser = webBrowser1.ActiveXInstance as SHDocVw.InternetExplorer;
-            browser.ExecWB(SHDocVw.OLECMDID.OLECMDID_OPTICAL_ZOOM, SHDocVw.OLECMDEXECOPT.OLECMDEXECOPT_DODEFAULT, 200, IntPtr.Zero);
-            
-            if (webBrowser1.Document.Body.Style == "zoom:200%")
-            {
-                webBrowser1.Document.Body.Style = "zoom:100%";
-            }
-            else
-            {
-                webBrowser1.Document.Body.Style = "zoom:200%";
-            } 
-            */
-
-            // sending movie data to AS3
-            string test = axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" + 0.1 + "</string></arguments></invoke>");
-            MessageBox.Show(test, "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
-            // await StartTranslatingProcess();
+            await StartTranslatingProcess();
         }
 
         #endregion
@@ -642,8 +610,99 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         #endregion
 
-        #region "Web Browser"
+        #region "Zoom In/Out - AS3"
+        /**
+         * A Function to receive data from ActionScript3 loaded SWF file
+         */
+        public void AS3_Receive(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+        {
+            string message = "";
 
+            // message is in xml format so we need to parse it
+            XmlDocument document = new XmlDocument();
+            document.LoadXml(e.request);
+            // get attributes to see which command flash is trying to call
+            XmlAttributeCollection attributes = document.FirstChild.Attributes;
+            String command = attributes.Item(0).InnerText;
+            // get parameters
+            XmlNodeList list = document.GetElementsByTagName("arguments");
+            // Interpret command
+            switch (command)
+            {
+                case "as3ToC#": message = list[0].InnerText; break;
+                case "Some_Other_Command": break;
+            }
+            // MessageBox.Show(message, "Received", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /**
+         * Method to handle various methods from pressing down the key
+         */
+        private void MouseScroll(object sender, MouseEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                // The user scrolled up.
+                Zoom(true);
+            }
+            else
+            {
+                // The user scrolled down.
+                Zoom(false);
+            }
+
+        }
+
+        /**
+         * A function to call the method in AS3 to zoom in/out the map or menus
+         */
+        private void Zoom(Boolean increase)
+        {
+            if ((Control.ModifierKeys & Keys.Shift) != 0)
+            {
+                // if pressing both control and shift keys, zoom the menus
+                if (increase)
+                {
+                    if (menuZoomIndex < zoomLevels.Length - 1)
+                    {
+                        menuZoomIndex++;
+                    }
+                }
+                else
+                {
+                    if (menuZoomIndex > 0)
+                    {
+                        menuZoomIndex--;
+                    }
+                }
+
+
+                MessageBox.Show("Scrolling up", "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
+            }
+            else if (Control.ModifierKeys == Keys.Control)
+            {
+                // if pressing only control key, zoom the map
+                if (increase)
+                {
+                    if (mapZoomIndex < zoomLevels.Length - 1)
+                    {
+                        mapZoomIndex++;
+                    }
+                }
+                else
+                {
+                    if (mapZoomIndex > 0)
+                    {
+                        mapZoomIndex--;
+                    }
+                }
+                // call the function to zoom map from AS3
+                string test = axShockwaveFlash.CallFunction("<invoke name=\"zoomMap\" returntype=\"xml\"><arguments><string>" +
+                    zoomLevels[mapZoomIndex].ToString("N3") + "</string></arguments></invoke>");
+
+                // MessageBox.Show("Scrolling down", "Received", MessageBoxButtons.OK, MessageBoxIcon.None);
+            }
+        }
         #endregion
 
     }
