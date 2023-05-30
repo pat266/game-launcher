@@ -117,8 +117,8 @@ body {
 		weiduan:"0",
 		deptserver:"lsajgame2",	
 		chatPort:"443,433",
-		auth:"c2lkPTM1NiZ1aWQ9MjUwMzUxMTA2JmlwPTE2Mi4yMzkuMjM2LjI0MiZ0aW1lPTE2ODU0MTg0OTkmaW5kdWxnZT1uJnRvdGFsbW9uZXk9MTAwJmlkZW50aXR5PXk=",
-		sign:"541b67fb38562b925b0c01becb562775"			
+		auth:"c2lkPTM1NiZ1aWQ9MjUwMzUxMTA2JmlwPTE2Mi4yMzkuMjM2LjI0MiZ0aW1lPTE2ODU0ODM3NzMmaW5kdWxnZT1uJnRvdGFsbW9uZXk9MTAwJmlkZW50aXR5PXk=",
+		sign:"0f7cb7251e44dd299b0e17146a6581b1"			
 		
 	};
 

@@ -17,12 +17,17 @@ namespace Launcher_VLCM_niua_lsaj
         public TranslatedImage()
         {
             InitializeComponent();
-            this.BackColor = ColorTranslator.FromHtml("#1C1C1C");
+            this.BackColor = ColorTranslator.FromHtml("#121212"); // dark primary
+            this.saveImage.BackColor = ColorTranslator.FromHtml("#1F1B24"); // dark secondary
+            this.saveImage.ForeColor = Color.White;
 
             picture = new PictureBox();
             picture.SizeMode = PictureBoxSizeMode.AutoSize;
             flowLayoutPanel1.AutoScroll = true;
             flowLayoutPanel1.Controls.Add(picture);
+
+            this.KeyPreview = true; // Enable key event handling for the form
+            this.KeyDown += MainForm_KeyDown; // Attach the event handler
         }
 
         public void SetImage(Image image)
@@ -30,6 +35,8 @@ namespace Launcher_VLCM_niua_lsaj
             picture.Image = image;
             this.Width = image.Width + 40;
             this.Height = image.Height + 100;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle; // Set the form's border style to fixed single
+            this.MaximizeBox = false; // Disable maximizing the form
         }
 
         private void cButton1_Click(object sender, EventArgs e)
@@ -53,6 +60,14 @@ namespace Launcher_VLCM_niua_lsaj
                         break;
                 }
                 picture.Image.Save(sfd.FileName, format);
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                this.Close(); // Close the form when the Escape key is pressed
             }
         }
     }
