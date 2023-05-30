@@ -62,7 +62,8 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Launcher_VLCM_niua_lsaj.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -126,8 +127,9 @@
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetEnv, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">

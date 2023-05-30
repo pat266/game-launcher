@@ -17,7 +17,8 @@ namespace Launcher_VLCM_niua_lsaj
         public TranslatedImage()
         {
             InitializeComponent();
-            
+            this.BackColor = ColorTranslator.FromHtml("#1C1C1C");
+
             picture = new PictureBox();
             picture.SizeMode = PictureBoxSizeMode.AutoSize;
             flowLayoutPanel1.AutoScroll = true;
@@ -54,6 +55,5 @@ namespace Launcher_VLCM_niua_lsaj
                 picture.Image.Save(sfd.FileName, format);
             }
         }
-
     }
 }

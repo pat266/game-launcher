@@ -10,6 +10,7 @@ using Captcha;
 using DotNetEnv;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics;
 
 namespace Launcher_VLCM_niua_lsaj.Forms
 {
@@ -95,8 +96,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 // retrieve the max number of server
                 max_server = await Task.Run(() => Login_Helper.get_max_server());
 
-                if (combo_server.Text == "")
-                    combo_server.Text = max_server.ToString();
+                combo_server.Text = "356"; // 1924 for niua
+                // if (combo_server.Text == "")
+                //     combo_server.Text = max_server.ToString();
             }
         }
 
@@ -276,7 +278,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 // create the appropriate data format to login
                 byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
                     textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
-                Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
+                Debug.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
 
                 // send login request
                 byte[] response_data_for_login =
@@ -353,6 +355,108 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          * Utilize the input data and login to the server
          */
         private async Task Login_Async()
+        {
+            // attempt to login 5 times
+            for (int i = 0; i < 5; i++)
+            {
+                Program.flash_movie = "";
+                Program.flash_vars = "";
+
+                // create the appropriate data format to login
+                byte[] login_data = Encoding.UTF8.GetBytes(string.Format("code={0}&password={1}&vcode={2}&usercode={0}",
+                    textBox_username.Text, Login_Helper.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+                // Console.WriteLine("Login data: " + Encoding.UTF8.GetString(login_data));
+
+                // send login request
+                byte[] response_data_for_login = await Task.Run(() =>
+                    Web_Request.Web_Request.send_request("https://www.game2.cn/websiteAjax/op/login/",
+                                                        "POST",
+                                                        login_data,
+                                                        Program.cookies));
+
+                File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\response1.txt", Encoding.UTF8.GetString(response_data_for_login));
+
+                if (response_data_for_login == null)
+                    return;
+
+                // check if login is successful
+                if (!Encoding.UTF8.GetString(response_data_for_login).Contains("1"))
+                {
+                    // if it still fails after 5 times, show error message and return
+                    if (i >= 4)
+                    {
+                        MessageBox.Show("Login information or captcha is incorrect!",
+                                    "Login Error",
+                                    MessageBoxButtons.OK,
+                                    MessageBoxIcon.Error);
+                        // reload captcha
+                        Load_Captcha();
+                        return;
+                    }
+                    else
+                    {
+                        // if it fails, reload captcha and solve it again
+                        Load_Captcha();
+                    }
+
+                }
+                else // if the login is successful
+                {
+                    // break out of the login attempt
+                    break;
+                }
+            }
+
+
+            // send request to access the game
+            byte[] response_data_for_game = await Task.Run(() =>
+                Web_Request.Web_Request.send_request(string.Format("http://www.game2.cn/playGame/code/lsaj{0}/",
+                                                                    combo_server.Text),
+                                                     "GET",
+                                                     null,
+                                                     Program.cookies));
+            File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\response2.txt", Encoding.UTF8.GetString(response_data_for_game));
+
+            if (response_data_for_game == null)
+                return;
+
+            // get the data to load game
+            string game_data = Encoding.UTF8.GetString(response_data_for_game);
+            // find the SWF object to load to flash
+            Program.flash_movie = Login_Helper.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            // find the parameters (variables) to load to flash
+            Program.flash_vars = Login_Helper.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = Login_Helper.parse_to_query_string(Program.flash_vars);
+
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\game_data.txt", game_data);
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_movie.txt", Program.flash_movie);
+            // File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\flash_vars.txt", Program.flash_vars);
+
+            /**
+            // load the game
+            Console.WriteLine("Game data: " + game_data);
+            Console.WriteLine("Flash movie: " + Program.flash_movie);
+            Console.WriteLine("Flash vars: " + Program.flash_vars);
+            **/
+
+            // basic check to see if we can load the game
+            if (Program.flash_movie == "" || Program.flash_vars == "")
+            {
+                MessageBox.Show("Cannot get data to load game!",
+                                "Flash Info Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+            // close the login window
+            Close();
+        }
+
+        /**
+         * Main method:
+         * Utilize the input data and login to the server
+         */
+        private async Task Login_Niua_Async()
         {
             // attempt to login 5 times
             for (int i = 0; i < 5; i++)
