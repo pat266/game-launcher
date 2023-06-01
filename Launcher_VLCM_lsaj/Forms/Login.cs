@@ -374,8 +374,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                                         login_data,
                                                         Program.cookies));
 
-                File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\response1.txt", Encoding.UTF8.GetString(response_data_for_login));
-
                 if (response_data_for_login == null)
                     return;
 
@@ -415,7 +413,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                                                      "GET",
                                                      null,
                                                      Program.cookies));
-            File.WriteAllText(@"C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\response2.txt", Encoding.UTF8.GetString(response_data_for_game));
 
             if (response_data_for_game == null)
                 return;
