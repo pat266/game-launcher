@@ -19,6 +19,24 @@ namespace Launcher_VLCM_niua_lsaj
         {
             // get the captcha based on the cookies
             byte[] captcha_data =
+                Web_Request.Web_Request.send_request("https://www.game2.cn/verifyCode.php",
+                                                    "GET",
+                                                    null,
+                                                    cookieContainer);
+            if (captcha_data == null)
+                return null;
+
+            // put the captcha in picture box control in the login form
+            using (MemoryStream memory_stream = new MemoryStream(captcha_data))
+            {
+                return Image.FromStream(memory_stream);
+            }
+        }
+
+        public static Image get_random_captcha_niua(CookieContainer cookieContainer)
+        {
+            // get the captcha based on the cookies
+            byte[] captcha_data =
                 Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php",
                                                     "GET",
                                                     null,
@@ -32,7 +50,7 @@ namespace Launcher_VLCM_niua_lsaj
                 return Image.FromStream(memory_stream);
             }
         }
-        
+
         /**
          * Helper method:
          * Encrypt the password using MD5 since the server does not accept plain text password.

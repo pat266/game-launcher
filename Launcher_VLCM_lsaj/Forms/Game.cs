@@ -76,6 +76,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // load the Onnx model
             loadOnnxModel();
 
+            // set dark mode
+            setDarkMode();
+
             // initialize the Translator
             translator = new AggregateTranslator();
 
@@ -196,6 +199,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             restart.MinimumSize = new Size(30, 30);
             restart.MaximumSize = new Size(30, 30);
         }
+
+        private void setDarkMode()
+        {
+            this.BackColor = Color.Black;
+        }
+
+
         #endregion
 
         #region "Application Volume"
@@ -742,8 +752,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             axShockwaveFlash.CallFunction("<invoke name=\"resetZoom\" returntype=\"xml\"><arguments><string>" +
                 "something" + "</string></arguments></invoke>");
         }
-        #endregion
 
+        #endregion
 
     }
 }

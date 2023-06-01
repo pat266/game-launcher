@@ -76,8 +76,6 @@
 		
 		private var GoodsInfo:Class;
 		
-		private var AttributeInfo:Class;
-		
 		// các biến cần dùng để xử lý của auto
 		
 		private var is_active_auto:Boolean;
@@ -130,97 +128,9 @@
 		
 		private var auto_use_goods_name:String;
 		
-		private var timer_do_send_10051:Timer;
-
-		public function Main()
-		{
-			is_active_auto = true;
-			user_id = "";
-			server_id = 0;
-			char_name = "";
-			square = 25;
-			is_allow_create_auto_feature = false;
-			is_allow_auto = false;
-			is_allow_revive = false;
-			is_allow_ride_mount = true;
-			timer_allow_ride_mount = new Timer(6000);
-			is_auto_start = false;
-			is_auto_revive = true;
-			timer_other_task = new Timer(1000);
-			is_auto_ride_mount = true;
-			time_delay_auto_san_boss = 200;
-			timer_auto_san_boss = new Timer(time_delay_auto_san_boss);
-			timer_auto_refresh_boss_status = new Timer(5000);
-			time_delay_auto_use_goods = 100;
-			timer_auto_use_goods = new Timer(time_delay_auto_use_goods);
-			boss_arr = [];
-			is_allow_san_boss = false;
-			auto_san_boss_type = 1;
-			is_allow_auto_use_goods = false;
-			auto_use_goods_name = "";
-			timer_do_send_10051 = new Timer(60000);
-			addEventListener(Event.ADDED_TO_STAGE,added_to_stage);
-		}
-
-		private function added_to_stage(e:Event):void
-		{
-			removeEventListener(Event.ADDED_TO_STAGE,added_to_stage);
-			ExternalInterface.addCallback("loadMovie",_loadMovie);
-			fscommand("loadMovie"); // báo cho ứng dụng thực hiện load movie
-		}
-
-		private function _loadMovie(movie:String):void
-		{
-			char_name = "..."; // truyền tên đăng nhập vào đây nếu muốn bước sau tự động chọn nhân vật
-			var url_request:URLRequest = new URLRequest(movie);
-			Security.allowDomain("*");
-			flash_movie_loader = new Loader();
-			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,flash_movie_loader_complete);
-			flash_movie_loader.load(url_request);
-		}
-
-		private function flash_movie_loader_complete(e:Event):void
-		{
-			flash_movie_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,flash_movie_loader_complete);
-			flash_movie_loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,flash_movie_loader_uncaught_error_event);
-			stage.addChild(flash_movie_loader.content);
-			stage.addEventListener(Event.ENTER_FRAME, stage_enter_frame); // thêm sự kiện enter frame của stage để kiểm tra và load các class của game
-			
-			// add zoom in/out support
-			zoomMap();
-			zoomMenu();
-			resetZoomDefault();
-			
-			// add restart the game support
-			restartGame();
-		}
-		
-		/**
-		 * Add the SWF content to the stage when it is loaded
-		 * @param	evt
-		 */
-		private function handleLoaded (evt:Event):void {
-			stage.addChild(flash_movie_loader.content);
-		}
-		
-		/**
-		 * A function to add the ExternalInterface to accept call from outside (C#)
-		 * Restart the game
-		 */
-		private function restartGame():void {
-			
-			ExternalInterface.addCallback("restartGame", function(text : String) : String
-			{
-				stage.removeChild(flash_movie_loader.content);
-				flash_movie_loader.unload();
-				flash_movie_loader.load(new URLRequest(this.movie));
-				flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded);
-				
-				return ""; // for testing purpose
-			});
-		}
-		
-		/**
+		private var go_to_map_20252_arr:Array;
+        
+        /**
 		 * A function to add the ExternalInterface to accept call from outside (C#)
 		 * Resizing the map requires a lot of processing to make sure the camera doesnt look too bad
 		 */
@@ -297,6 +207,65 @@
 			});
 		}
 
+		public function Main()
+		{
+			is_active_auto = true;
+			user_id = "";
+			server_id = 0;
+			char_name = "";
+			square = 25;
+			is_allow_create_auto_feature = false;
+			is_allow_auto = false;
+			is_allow_revive = false;
+			is_allow_ride_mount = true;
+			timer_allow_ride_mount = new Timer(6000);
+			is_auto_start = false;
+			is_auto_revive = true;
+			timer_other_task = new Timer(1000);
+			is_auto_ride_mount = true;
+			time_delay_auto_san_boss = 200;
+			timer_auto_san_boss = new Timer(time_delay_auto_san_boss);
+			timer_auto_refresh_boss_status = new Timer(5000);
+			time_delay_auto_use_goods = 100;
+			timer_auto_use_goods = new Timer(time_delay_auto_use_goods);
+			boss_arr = [];
+			is_allow_san_boss = false;
+			auto_san_boss_type = 1;
+			is_allow_auto_use_goods = false;
+			auto_use_goods_name = "";
+			go_to_map_20252_arr = [];
+			addEventListener(Event.ADDED_TO_STAGE,added_to_stage);
+            // add zoom in/out support
+            zoomMap();
+            zoomMenu();
+		}
+
+		private function added_to_stage(e:Event): void
+		{
+			removeEventListener(Event.ADDED_TO_STAGE, added_to_stage);
+			ExternalInterface.addCallback("loadMovie", _loadMovie);
+			fscommand("loadMovie"); // báo cho ứng dụng thực hiện load movie
+		}
+
+		private function _loadMovie(movie:String):void
+		{
+			char_name = "简自豪"; // truyền tên đăng nhập vào đây nếu muốn bước sau tự động chọn nhân vật
+			var url_request:URLRequest = new URLRequest(movie);
+			Security.allowDomain("*");
+			flash_movie_loader = new Loader();
+			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,flash_movie_loader_complete);
+			flash_movie_loader.load(url_request);
+		}
+
+		private function flash_movie_loader_complete(e:Event):void
+		{
+			flash_movie_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE,flash_movie_loader_complete);
+			flash_movie_loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,
+																	flash_movie_loader_uncaught_error_event);
+			stage.addChild(flash_movie_loader.content);
+			stage.addEventListener(Event.ENTER_FRAME,stage_enter_frame); // thêm sự kiện enter frame của stage để kiểm tra và load các class của game
+		}
+
 		private function flash_movie_loader_uncaught_error_event(e:UncaughtErrorEvent):void
 		{
 			return;
@@ -319,9 +288,9 @@
 			TSoundManager["setBgSoundMute"](true);
 			TSoundManager["setShortSoundMute"](true);
 			// đăng ký các message cần thiết để xử lý các bước sau
-			register_message(10012,received_10012,"received_10012"); // message đăng nhập thành công vào server
-			register_message(10014,received_10014,"received_10014"); // message trả về thông tin các nhân vật
-			register_message(10022,received_10022,"received_10022"); // message trả về thông tin của nhân vật đã chọn
+			register_message(10012, received_10012, "received_10012"); // message đăng nhập thành công vào server
+			register_message(10014, received_10014, "received_10014"); // message trả về thông tin các nhân vật
+			register_message(10022, received_10022, "received_10022"); // message trả về thông tin của nhân vật đã chọn
 		}
 
 		private function has_definition(path:String):Boolean
@@ -334,7 +303,10 @@
 			return flash_movie_loader.contentLoaderInfo.applicationDomain.getDefinition(path) as Class;
 		}
 
-		private function load_classes_part_1():void
+		/**
+		 * Loads and assigns definitions for various classes used in the game.
+		 */
+		private function load_classes_part_1(): void
 		{
 			if (has_definition("com.tgame.manager::TSoundManager"))
 			{
@@ -374,168 +346,9 @@
 			}
 		}
 
-		private function register_message(message:int,func:Function,message_key:String):void
-		{
-			NetWorkManager["registerMsg"](message,func,message_key);
-		}
-
-		private function received_10012(message:Object):void
-		{
-			remove_message(10012,"received_10012"); // huỷ message 10012
-			var data:ByteArray = get_data(message);
-			reset_data_position(data);
-			var login_success:int = data.readByte();
-			if (login_success == 1)
-			{
-				var game_account:int = data.readInt();
-				var is_chenmi:int = data.readByte();
-				var login_auth:String = data.readUTF();
-				var login_sign:String = data.readUTF();
-				server_id = data.readInt(); // lấy thông tin server_id từ message
-				user_id = data.readUTF(); // lấy thông tin user_id từ message
-				var login_time:Number = data.readDouble();
-			}
-			reset_data_position(data);
-		}
-		
-		private function remove_message(message:int,message_key:String):void
-		{
-			NetWorkManager["removeMsg"](message,message_key);
-		}
-		
-		private function get_data(message:Object):ByteArray
-		{
-			return message["body"] as ByteArray;
-		}
-		
-		private function reset_data_position(data:ByteArray):void
-		{
-			data.position = 0;
-		}
-		
-		private function received_10014(message:Object):void
-		{
-			remove_message(10014,"received_10014"); // huỷ message 10014
-			var data:ByteArray = get_data(message);
-			reset_data_position(data);
-			data.readByte() == 1;
-			var char_count:int = data.readByte();
-			var char_arr:Array = [];
-			for (var i:int = 0; i < char_count; i++)
-			{
-				var char_id:int = data.readInt();
-				var head_img:String = HeadResChange["headResChangeToString"](data.readByte());
-				var char_name:String = data.readUTF();
-				var char_level:int = data.readShort();
-				var party_id:int = data.readByte();
-				var vip_lv:int = data.readByte();
-				var char_data:Object = set_char_data(char_id,head_img,char_name,char_level,party_id,vip_lv);
-				char_arr.push(char_data); // đưa char_data vừa lấy được vào char_arr
-			}
-			reset_data_position(data);
-			select_char(char_arr); // chọn nhân vật
-			NetWorkManager["lineSocket"]["addEventListener"](TSocketEvent["CLOSE"],line_socket_close); // thêm sự kiện xử lý mất kết nối
-		}
-		
-		private function line_socket_close(e:Object):void
-		{
-			fscommand("disconnected"); // báo cho ứng dụng biết là đã mất kết nối để xử lý
-		}
-
-		private function set_char_data(char_id:int,head_img:String,char_name:String,char_level:int,party_id:int,vip_lv:int):Object
-		{
-			return {"char_id":char_id,"head_img":head_img,"char_name":char_name,"char_level":char_level,"party_id":party_id,"vip_lv":vip_lv};
-		}
-
-		private function select_char(char_arr:Array):void
-		{
-			if (char_arr.length <= 0)
-			{
-				return;
-			}
-			// lấy dữ liệu nhân vật với char_name đã được truyền trước đó nếu có
-			var char_data:Object = get_char_data(char_arr);
-			if (char_data == null)
-			{
-				return;
-			}
-			// set thông tin nhân vật vào dữ liệu của game
-			GameConfig["loginRoleVO"] = get_login_role_vo(char_data);
-			// tiến hành các thao tác vào game
-			GameState["hasSelectedChar"] = true;
-			ProcessManager["enterLine"]();
-			FacadeManager["killFacade"](PipeConstants["STARTUP_LOGIN"]);
-		}
-
-		private function get_char_data(char_arr:Array):Object
-		{
-			for (var i:int = 0; i < char_arr.length; i++)
-			{
-				if (char_arr[i]["char_name"] == char_name || char_arr[i]["char_name"] == get_full_char_name())
-				{
-					return char_arr[i];
-				}
-			}
-			return null;
-		}
-
-		private function get_full_char_name():String
-		{
-			return "[" + server_id + "区]" + char_name;
-		}
-
-		private function get_login_role_vo(char_data:Object):Object
-		{
-			var login_role_vo:Object = new LoginRoleVO();
-			login_role_vo["roleID"] = char_data["char_id"];
-			login_role_vo["headImg"] = char_data["head_img"];
-			login_role_vo["nickName"] = char_data["char_name"];
-			login_role_vo["level"] = char_data["char_level"];
-			login_role_vo["partyID"] = char_data["party_id"];
-			login_role_vo["vipLV"] = char_data["vip_lv"];
-			login_role_vo["sex"] = login_role_vo["getSex"]();
-			return login_role_vo as LoginRoleVO;
-		}
-		
-		private function received_10022(message:Object):void
-		{
-			remove_message(10022,"received_10022"); // huỷ message 10022
-			var data:ByteArray = get_data(message);
-			reset_data_position(data);
-			var test_data:int = data.readInt();
-			var char_id:int = data.readInt();
-			var is_GM:Boolean = data.readByte() == 1;
-			var char_name:String = data.readUTF();
-			var head_img_type:int = data.readByte();
-			var party_id:int = data.readByte();
-			var party_tag:int = data.readByte();
-			if (party_tag == 1)
-			{
-				var banghui_id:int = data.readInt();
-				var banghui_name:String = data.readUTF();
-			}
-			reset_data_position(data);
-			load_classes_part_2(); // load các class phần thứ 2 (các class cần thiết còn lại)
-			get_ui()["loadingBar"]["addEventListener"](Event.ADDED_TO_STAGE,loading_bar_added_to_stage); // thêm sự kiện xử lý màn hình load game
-			get_ui()["loadingBar"]["addEventListener"](Event.REMOVED_FROM_STAGE,loading_bar_remove_from_stage); // thêm sự kiện xử lý màn hình load game
-			square = Math.floor(Math.sqrt(SceneConfig["TILE_WIDTH"] * SceneConfig["TILE_HEIGHT"]));
-			// tắt một số các setting của game
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K6"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K7"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K2"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K3"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K4"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K8"],true]);
-			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K12"],true]);
-			// kiểm tra user_id nào được phép dùng auto
-			if (user_id == "...")
-			{
-				is_active_auto = true;
-			}
-			is_allow_create_auto_feature = true; // cho phép tạo ra các tính năng cho auto
-			create_auto_feature(); // tạo các tính năng cho auto
-		}
-		
+		/**
+		 * Loads and assigns definitions for various classes used in the game.
+		 */
 		private function load_classes_part_2():void
 		{
 			if (has_definition("com.tgame.manager::PipeManager"))
@@ -590,10 +403,6 @@
 			{
 				GoodsInfo = get_definition("com.tgame.common.vo.character.info::GoodsInfo");
 			}
-			if (has_definition("com.tgame.common.vo.character.info::AttributeInfo"))
-			{
-				AttributeInfo = get_definition("com.tgame.common.vo.character.info::AttributeInfo");
-			}
 			if (has_definition("com.zcp.engine::Scene"))
 			{
 				Scene = get_definition("com.zcp.engine::Scene");
@@ -606,6 +415,183 @@
 			{
 				MainUI = get_definition("com.tgame.shell.view.components::MainUI");
 			}
+		}
+
+		private function register_message(message:int, func:Function, message_key:String): void
+		{
+			NetWorkManager["registerMsg"](message, func, message_key);
+		}
+
+		private function remove_message(message:int, message_key:String): void
+		{
+			NetWorkManager["removeMsg"](message, message_key);
+		}
+
+		/**
+		 * Check if the message has been registered
+		 * Account login is successfully received.
+		 */
+		private function received_10012(message: Object):void
+		{
+			remove_message(10012, "received_10012"); // cancel message 10012
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			var login_success:int = data.readByte();
+			if (login_success == 1)
+			{
+				var game_account:int = data.readInt();
+				var is_chenmi:int = data.readByte();
+				var login_auth:String = data.readUTF();
+				var login_sign:String = data.readUTF();
+				server_id = data.readInt(); // lấy thông tin server_id từ message
+				user_id = data.readUTF(); // lấy thông tin user_id từ message
+				var login_time: Number = data.readDouble();
+			}
+			reset_data_position(data);
+		}
+
+		/**
+		 * Check if the message has been registered
+		 * Get information of my character.
+		 */
+		private function received_10014(message:Object):void
+		{
+			remove_message(10014,"received_10014"); // cancel message 10014
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			data.readByte() == 1;
+			var char_count:int = data.readByte();
+			var char_arr:Array = [];
+			for (var i:int = 0; i < char_count; i++)
+			{
+				var char_id:int = data.readInt();
+				var head_img:String = HeadResChange["headResChangeToString"](data.readByte());
+				var char_name:String = data.readUTF();
+				var char_level:int = data.readShort();
+				var party_id:int = data.readByte();
+				var vip_lv:int = data.readByte();
+				var char_data:Object = set_char_data(char_id,head_img,char_name,char_level,party_id,vip_lv);
+				char_arr.push(char_data); // đưa char_data vừa lấy được vào char_arr
+			}
+			reset_data_position(data);
+			select_char(char_arr); // chọn nhân vật
+			NetWorkManager["lineSocket"]["addEventListener"](TSocketEvent["CLOSE"],line_socket_close); // thêm sự kiện xử lý mất kết nối
+		}
+
+		/**
+		 * Check if the message has been registered
+		 * Get information of selected character.
+		 */
+		private function received_10022(message:Object):void
+		{
+			remove_message(10022, "received_10022"); // cancel message 10022
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			var test_data:int = data.readInt();
+			var char_id:int = data.readInt();
+			var is_GM:Boolean = data.readByte() == 1;
+			var char_name:String = data.readUTF();
+			var head_img_type:int = data.readByte();
+			var party_id:int = data.readByte();
+			var party_tag:int = data.readByte();
+			if (party_tag == 1)
+			{
+				var banghui_id:int = data.readInt();
+				var banghui_name:String = data.readUTF();
+			}
+			reset_data_position(data);
+			load_classes_part_2(); // load các class phần thứ 2 (các class cần thiết còn lại)
+			get_ui()["loadingBar"]["addEventListener"](Event.ADDED_TO_STAGE,loading_bar_added_to_stage); // thêm sự kiện xử lý màn hình load game
+			get_ui()["loadingBar"]["addEventListener"](Event.REMOVED_FROM_STAGE,loading_bar_remove_from_stage); // thêm sự kiện xử lý màn hình load game
+			square = Math.floor(Math.sqrt(SceneConfig["TILE_WIDTH"] * SceneConfig["TILE_HEIGHT"]));
+			// tắt một số các setting của game
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K6"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K7"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K2"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K3"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K4"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K8"],true]);
+			send_command(PipeConstants["SETTING_DATA"],[SettingKey["K12"],true]);
+			// kiểm tra user_id nào được phép dùng auto
+			if (user_id == "...")
+			{
+				is_active_auto = true;
+			}
+			is_allow_create_auto_feature = true; // cho phép tạo ra các tính năng cho auto
+			create_auto_feature(); // tạo các tính năng cho auto
+		}
+		
+		private function get_data(message:Object):ByteArray
+		{
+			return message["body"] as ByteArray;
+		}
+		
+		private function reset_data_position(data:ByteArray):void
+		{
+			data.position = 0;
+		}
+		
+		private function line_socket_close(e:Object):void
+		{
+			fscommand("disconnected"); // báo cho ứng dụng biết là đã mất kết nối để xử lý
+		}
+
+		private function set_char_data(char_id:int,head_img:String,char_name:String,char_level:int,party_id:int,vip_lv:int):Object
+		{
+			return {"char_id":char_id,"head_img":head_img,"char_name":char_name,"char_level":char_level,"party_id":party_id,"vip_lv":vip_lv};
+		}
+
+		/**
+		 * TODO: get char data
+		 */
+		private function select_char(char_arr:Array):void
+		{
+			if (char_arr.length <= 0)
+			{
+				return;
+			}
+			// lấy dữ liệu nhân vật với char_name đã được truyền trước đó nếu có
+			var char_data:Object = get_char_data(char_arr);
+			if (char_data == null)
+			{
+				return;
+			}
+			// set thông tin nhân vật vào dữ liệu của game
+			GameConfig["loginRoleVO"] = get_login_role_vo(char_data);
+			// tiến hành các thao tác vào game
+			GameState["hasSelectedChar"] = true;
+			ProcessManager["enterLine"]();
+			FacadeManager["killFacade"](PipeConstants["STARTUP_LOGIN"]);
+		}
+
+		private function get_char_data(char_arr:Array):Object
+		{
+			for (var i:int = 0; i < char_arr.length; i++)
+			{
+				if (char_arr[i]["char_name"] == char_name || char_arr[i]["char_name"] == get_full_char_name())
+				{
+					return char_arr[i];
+				}
+			}
+			return null;
+		}
+
+		private function get_full_char_name():String
+		{
+			return "[" + server_id + "区]" + char_name;
+		}
+
+		private function get_login_role_vo(char_data:Object):Object
+		{
+			var login_role_vo:Object = new LoginRoleVO();
+			login_role_vo["roleID"] = char_data["char_id"];
+			login_role_vo["headImg"] = char_data["head_img"];
+			login_role_vo["nickName"] = char_data["char_name"];
+			login_role_vo["level"] = char_data["char_level"];
+			login_role_vo["partyID"] = char_data["party_id"];
+			login_role_vo["vipLV"] = char_data["vip_lv"];
+			login_role_vo["sex"] = login_role_vo["getSex"]();
+			return login_role_vo as LoginRoleVO;
 		}
 		
 		private function get_ui():Object
@@ -644,8 +630,8 @@
 			register_message(20078,received_20078,"received_20078"); // message nhân vật đếm thời gian chờ hồi sinh
 			register_message(20076,received_20076,"received_20076"); // message nhân vật hồi sinh
 			register_message(50048,received_50048,"received_50048"); // message nhân vật cưỡi thú
-			register_message(40022, received_40022, "received_40022"); // message trả về danh sách boss
-			timer_do_send_10051.addEventListener(TimerEvent.TIMER,do_send_10051); // thêm sự kiện cho timer xử lý gửi message 10051 sau một khoảng thời gian chỉ định
+			register_message(40022,received_40022,"received_40022"); // message trả về danh sách boss
+			register_message(22224,received_22224,"received_22224"); // message trả về thông báo, trong đó có trình tự vào map 20252
 			timer_auto_san_boss.addEventListener(TimerEvent.TIMER,auto_san_boss); // thêm sự kiện cho timer xử lý quá trình săn boss
 			timer_auto_refresh_boss_status.addEventListener(TimerEvent.TIMER,auto_refresh_boss_status); // thêm sự kiện cho timer refresh danh sách boss
 			timer_auto_use_goods.addEventListener(TimerEvent.TIMER,auto_use_goods); // thêm sự kiện cho timer xử lý tính năng dùng vật phẩm
@@ -655,23 +641,45 @@
 			get_stage()["addEventListener"](KeyboardEvent.KEY_UP,stage_key_up); // thêm sự kiện nhả phím
 		}
 		
-		private function do_send_10051(e:TimerEvent):void
+		private function received_22224(message:Object):void
 		{
-			if (! is_active_auto)
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			var msg_type:String = data.readUTF();
+			if (msg_type == "10")
 			{
-				return;
+				var shuzi_arr:Array = data.readUTF().split("#");
 			}
-			if (! is_auto_start)
+			reset_data_position(data);
+			for (var i:int = 0; i < shuzi_arr.length; i++)
 			{
-				return;
-			}
-			if (! is_allow_auto)
-			{
-				return;
-			}
-			if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
-			{
-				send_10051(get_mainchar_location_x(),get_mainchar_location_y());
+				switch (shuzi_arr[i])
+				{
+					case "1" :
+						go_to_map_20252_arr.push(20255);
+						break;
+					case "2" :
+						go_to_map_20252_arr.push(20256);
+						break;
+					case "3" :
+						go_to_map_20252_arr.push(20257);
+						break;
+					case "4" :
+						go_to_map_20252_arr.push(20258);
+						break;
+					case "5" :
+						go_to_map_20252_arr.push(20259);
+						break;
+					case "6" :
+						go_to_map_20252_arr.push(20260);
+						break;
+					case "7" :
+						go_to_map_20252_arr.push(20261);
+						break;
+					case "8" :
+						go_to_map_20252_arr.push(20262);
+						break;
+				}
 			}
 		}
 		
@@ -742,7 +750,7 @@
 				{
 					continue;
 				}
-				if (boss_id == 1082 || boss_id == 1141 || boss_id == 1271 || boss_id == 1191 || boss_id == 1231 || boss_id == 1351 || boss_id == 1431 || boss_id == 1471 || boss_id == 1561 || boss_id == 1711 || boss_id == 1641 || boss_id == 1761 || boss_id == 1842 || boss_id == 1841 || boss_id == 2040 || boss_id == 63429 || boss_id == 2570)
+				if (boss_id == 1082 || boss_id == 1141 || boss_id == 1271 || boss_id == 1191 || boss_id == 1231 || boss_id == 1351 || boss_id == 1431 || boss_id == 1471 || boss_id == 1561 || boss_id == 1711 || boss_id == 1641 || boss_id == 1761 || boss_id == 1842 || boss_id == 1841 || boss_id == 2040 || boss_id == 2250 || boss_id == 63429 || boss_id == 2570)
 				{
 					boss_arr.push([boss_id,boss_name,boss_grade,boss_scene_id,boss_x,boss_y]);
 				}
@@ -871,7 +879,23 @@
 			{
 				return;
 			}
-			send_20075(); // gửi message hồi sinh
+			var goods_1201_position:int = has_goods(1201);
+			if (goods_1201_position != -1)
+			{
+				send_20075(); // gửi message hồi sinh
+				return;
+			}
+			if (get_gold_ticket() < 2)
+			{
+				notify("Không đủ 2 vé vàng để mua hoa hồng!",2);
+				return;
+			}
+			send_12103(44); // gửi message mua hoa hồng
+		}
+		
+		private function get_gold_ticket():Number
+		{
+			return get_mainchar_data()["moneyInfo"]["jinpiao"];
 		}
 		
 		private function get_mainchar_afk_info():Object
@@ -1077,14 +1101,12 @@
 				timer_auto_san_boss.start();
 				timer_auto_refresh_boss_status.start();
 				timer_other_task.start();
-				timer_do_send_10051.start();
 				notify("Bật auto săn BOSS");
 				return;
 			}
 			timer_other_task.reset();
 			timer_auto_refresh_boss_status.reset();
 			timer_auto_san_boss.reset();
-			timer_do_send_10051.reset();
 			is_auto_start = false;
 			notify("Tắt auto săn BOSS");
 		}
@@ -1126,14 +1148,26 @@
 			{
 				return;
 			}
+			// kiểm tra buff thẻ VIP để truyền tống bản đồ nhanh hơn
+			if (! has_buff(1300))
+			{
+				var goods_1300_position:int = has_goods(1300);
+				if (goods_1300_position != -1)
+				{
+					send_command(PipeConstants["SEND_ITEM_USE"],[1300,goods_1300_position]);
+					return;
+				}
+				if (get_gold_ticket() < 388)
+				{
+					notify("Không đủ 388 vé vàng để mua thẻ VIP!",2);
+					return;
+				}
+				send_12103(1); // gửi message mua thẻ VIP
+				return;
+			}
 			// kiểm tra kênh và đổi kênh
 			if (GameConfig["lineID"] != 2)
 			{
-				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
-				{
-					out_map_200212();
-					return;
-				}
 				if (get_current_map_id() != 20002)
 				{
 					go_to_map_20002();
@@ -1145,11 +1179,6 @@
 			// về thành nếu không có boss
 			if (boss_arr.length <= 0)
 			{
-				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
-				{
-					out_map_200212();
-					return;
-				}
 				if (get_current_map_id() != 20002)
 				{
 					go_to_map_20002();
@@ -1211,7 +1240,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(get_current_map_id(),target_item["tile_x"],target_item["tile_y"],false);
+					walk(target_item["tile_x"],target_item["tile_y"],false);
 				}
 				return true;
 			}
@@ -1219,28 +1248,25 @@
 			return true;
 		}
 		
-		private function go_to_map_20002():void
+		private function has_goods(goods_id:int):int
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
+			for each(var goods:Object in get_goods_bag_arr())
 			{
-				send_10133(20002);
-				return;
+				if (goods["id"] == goods_id)
+				{
+					return goods["position"];
+				}
 			}
-			walk(20002);
+			return -1;
 		}
 		
-		private function get_mainchar_attribute_info():Object
+		private function go_to_map_20002():void
 		{
-			return get_mainchar_data()["attributeInfo"] as AttributeInfo;
+			send_10133(20002);
 		}
 		
 		private function san_boss(boss_name:String,boss_grade:int,boss_map:int,boss_x:int,boss_y:int):void
 		{
-			if (! get_mainchar_attribute_info()["isVIP"] && boss_map != 200214 && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
-			{
-				out_map_200212();
-				return;
-			}
 			if (get_current_map_id() != boss_map)
 			{
 				switch(boss_map)
@@ -1289,6 +1315,9 @@
 						return;
 					case 20214:
 						go_to_map_20214();
+						return;
+					case 20252:
+						//go_to_map_20252();
 						return;
 					case 20035:
 						go_to_map_20035();
@@ -1345,35 +1374,9 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(boss_map,boss_x,boss_y);
+					walk(boss_x,boss_y);
 				}
 			}
-		}
-		
-		private function out_map_200212():void
-		{
-			if (get_current_map_id() != 20212)
-			{
-				walk(200212);
-				return;
-			}
-			if (get_mainchar()["tile_x"] != 27 || get_mainchar()["tile_y"] != 135)
-			{
-				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
-				{
-					walk(20212,27,135);
-				}
-				return;
-			}
-			send_30001(1775,20002);
-		}
-		
-		private function send_30001(npc_id:int,map_id:int):void
-		{
-			var data:ByteArray = new ByteArray();
-			data.writeInt(npc_id);
-			data.writeInt(map_id);
-			send_message(30001,data);
 		}
 		
 		private function get_mainchar_skill_info():Object
@@ -1392,7 +1395,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20003,21,146);
+					walk(21,146);
 				}
 				return;
 			}
@@ -1401,12 +1404,7 @@
 		
 		private function go_to_map_20003():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20003);
-				return;
-			}
-			walk(20003);
+			send_10133(20003);
 		}
 		
 		private function go_to_map_20166():void
@@ -1420,7 +1418,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20004,14,106);
+					walk(14,106);
 				}
 				return;
 			}
@@ -1429,12 +1427,7 @@
 		
 		private function go_to_map_20004():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20004);
-				return;
-			}
-			walk(20004);
+			send_10133(20004);
 		}
 		
 		private function go_to_map_20164():void
@@ -1448,7 +1441,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20005,63,104);
+					walk(63,104);
 				}
 				return;
 			}
@@ -1457,12 +1450,7 @@
 		
 		private function go_to_map_20005():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20005);
-				return;
-			}
-			walk(20005);
+			send_10133(20005);
 		}
 		
 		private function go_to_map_20173():void
@@ -1476,7 +1464,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20006,10,73);
+					walk(10,73);
 				}
 				return;
 			}
@@ -1485,12 +1473,7 @@
 		
 		private function go_to_map_20006():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20006);
-				return;
-			}
-			walk(20006);
+			send_10133(20006);
 		}
 		
 		private function go_to_map_20172():void
@@ -1504,7 +1487,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20009,13,34);
+					walk(13,34);
 				}
 				return;
 			}
@@ -1513,12 +1496,7 @@
 		
 		private function go_to_map_20009():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20009);
-				return;
-			}
-			walk(20009);
+			send_10133(20009);
 		}
 		
 		private function go_to_map_20165():void
@@ -1532,7 +1510,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20007,139,24);
+					walk(139,24);
 				}
 				return;
 			}
@@ -1541,12 +1519,7 @@
 		
 		private function go_to_map_20007():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20007);
-				return;
-			}
-			walk(20007);
+			send_10133(20007);
 		}
 		
 		private function go_to_map_20163():void
@@ -1560,7 +1533,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20008,29,103);
+					walk(29,103);
 				}
 				return;
 			}
@@ -1578,7 +1551,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20007,14,130);
+					walk(14,130);
 				}
 				return;
 			}
@@ -1596,7 +1569,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20010,141,42);
+					walk(141,42);
 				}
 				return;
 			}
@@ -1605,12 +1578,7 @@
 		
 		private function go_to_map_20010():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20010);
-				return;
-			}
-			walk(20010);
+			send_10133(20010);
 		}
 		
 		private function go_to_map_20167():void
@@ -1624,7 +1592,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20011,25,20);
+					walk(25,20);
 				}
 				return;
 			}
@@ -1633,12 +1601,7 @@
 		
 		private function go_to_map_20011():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20011);
-				return;
-			}
-			walk(20011);
+			send_10133(20011);
 		}
 		
 		private function go_to_map_20174():void
@@ -1652,7 +1615,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20013,141,15);
+					walk(141,15);
 				}
 				return;
 			}
@@ -1661,12 +1624,7 @@
 		
 		private function go_to_map_20013():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20013);
-				return;
-			}
-			walk(20013);
+			send_10133(20013);
 		}
 		
 		private function go_to_map_20169():void
@@ -1680,7 +1638,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20012,35,13);
+					walk(35,13);
 				}
 				return;
 			}
@@ -1689,12 +1647,7 @@
 		
 		private function go_to_map_20012():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20012);
-				return;
-			}
-			walk(20012);
+			send_10133(20012);
 		}
 		
 		private function go_to_map_20161():void
@@ -1708,7 +1661,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20014,36,106);
+					walk(36,106);
 				}
 				return;
 			}
@@ -1717,12 +1670,7 @@
 		
 		private function go_to_map_20014():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20014);
-				return;
-			}
-			walk(20014);
+			send_10133(20014);
 		}
 		
 		private function go_to_map_20162():void
@@ -1736,7 +1684,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20015,133,23);
+					walk(133,23);
 				}
 				return;
 			}
@@ -1745,12 +1693,7 @@
 		
 		private function go_to_map_20015():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20015);
-				return;
-			}
-			walk(20015);
+			send_10133(20015);
 		}
 		
 		private function go_to_map_20171():void
@@ -1764,7 +1707,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20015,143,153);
+					walk(143,153);
 				}
 				return;
 			}
@@ -1782,7 +1725,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20213,127,24);
+					walk(127,24);
 				}
 				return;
 			}
@@ -1800,7 +1743,7 @@
 			{
 				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
 				{
-					walk(20212,40,19);
+					walk(40,19);
 				}
 				return;
 			}
@@ -1809,35 +1752,12 @@
 		
 		private function go_to_map_20212():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20212);
-				return;
-			}
-			if (get_current_map_id() != 20002)
-			{
-				go_to_map_20002();
-				return;
-			}
-			if (get_mainchar_location_x() != 144 || get_mainchar_location_y() != 139)
-			{
-				if (get_mainchar()["getStatus"]() != CharStatusType["WALK"])
-				{
-					walk(20002,144,139);
-				}
-				return;
-			}
-			send_30001(1656,20212);
+			send_10133(20212);
 		}
 		
 		private function go_to_map_20035():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20035);
-				return;
-			}
-			walk(20035);
+			send_10133(20035);
 		}
 		
 		private function go_to_map_20283():void
@@ -1852,12 +1772,7 @@
 		
 		private function go_to_map_20280():void
 		{
-			if (get_mainchar_attribute_info()["isVIP"])
-			{
-				send_10133(20280);
-				return;
-			}
-			walk(20280);
+			send_10133(20280);
 		}
 		
 		private function send_70567():void
@@ -1896,9 +1811,9 @@
 			send_message(10083,data);
 		}
 		
-		private function walk(map_id:int,tile_x:int = -1,tile_y:int = -1,show_auto_find_path_text:Boolean = true):void
+		private function walk(tile_x:int,tile_y:int,show_auto_find_path_text:Boolean = true):void
 		{
-			MainCharSeachPathManager["mainCharWalk"](map_id + "," + tile_x + "," + tile_y + ",0",show_auto_find_path_text);
+			MainCharSeachPathManager["mainCharWalk"](get_current_map_id() + "," + tile_x + "," + tile_y + ",0",show_auto_find_path_text);
 		}
 		
 		private function send_10051(tile_x:int,tile_y:int):void
@@ -1907,6 +1822,19 @@
 			data.writeShort(tile_x);
 			data.writeShort(tile_y);
 			send_message(10051,data);
+		}
+		
+		private function has_buff(buff_id:int):Boolean
+		{
+			return get_mainchar_data()["buffInfo"]["hasBuff"](buff_id);
+		}
+		
+		private function send_12103(item_id:int):void
+		{
+			var data:ByteArray = new ByteArray();
+			data.writeInt(item_id);
+			data.writeShort(1);
+			send_message(12103,data);
 		}
 		
 		private function send_10133(map_id:int):void
