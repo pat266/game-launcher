@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Launcher_VLCM_niua_lsaj.Forms;
 
@@ -28,6 +31,7 @@ namespace Launcher_VLCM_niua_lsaj
             cookies = new CookieContainer();
             flash_movie = "";
             flash_vars = "";
+
             login.ShowDialog(); // hiện form đăng nhập để nhập thông tin
 
             // kiểm tra kết quả trả về (dữ liệu cần để laod game) của form đăng nhập

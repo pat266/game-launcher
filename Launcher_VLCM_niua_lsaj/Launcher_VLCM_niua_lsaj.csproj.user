@@ -10,9 +10,6 @@
     <Compile Update="CustomControls\CComboBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Update="CustomControls\CDatePicker.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Update="CustomControls\CRadioButton.cs">
       <SubType>Component</SubType>
     </Compile>

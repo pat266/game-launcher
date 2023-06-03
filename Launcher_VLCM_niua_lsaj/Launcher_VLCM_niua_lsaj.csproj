@@ -19,7 +19,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Launcher_VLCM_niua_lsaj.Program</StartupObject>
-    <PackageIcon>app_icon.ico</PackageIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AxInterop.ShockwaveFlashObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -40,34 +39,10 @@
     <Content Include="dll\Web_Request.dll" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Emgu.CV" Version="4.4.0.4099" />
-    <PackageReference Include="Emgu.CV.Bitmap" Version="4.4.0.4099" />
-    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.4.0.4099" />
-    <PackageReference Include="GTranslate" Version="2.1.6" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Captcha\Captcha.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Update="Resources\app_icon.ico">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CustomControls\" />
