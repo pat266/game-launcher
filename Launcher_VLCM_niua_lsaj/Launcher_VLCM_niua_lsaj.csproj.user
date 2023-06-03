@@ -4,6 +4,24 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="CustomControls\CButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CDatePicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CToggleButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="Forms\Game.cs">
       <SubType>Form</SubType>
     </Compile>
