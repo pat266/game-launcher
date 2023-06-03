@@ -5,7 +5,7 @@ using Launcher_VLCM_niua_lsaj.Forms;
 
 namespace Launcher_VLCM_niua_lsaj
 {
-    static class Program
+    static class Controller
     {
         private static Login login { get; set; } // form đăng nhập
 
