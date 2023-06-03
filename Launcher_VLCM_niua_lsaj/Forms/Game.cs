@@ -530,7 +530,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          * Detect text in the image and draw Bounding Rectangles around it.
          * Using IronOCR to get both bounding rectangles and Onnx model for extracting text
          */
-        private async Task<OcrResult> ProcessText_Onnx(
+        /*private async Task<OcrResult> ProcessText_Onnx(
             Bitmap bitmap,
             int imgResize,
             int padding = 50,
@@ -557,7 +557,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             System.GC.Collect(); // clean up the memory
             return ocrResult;
-        }
+        }*/
 
         private async Task StartTranslatingProcess()
         {
