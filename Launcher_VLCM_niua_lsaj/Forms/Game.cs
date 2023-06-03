@@ -34,7 +34,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private bool _AfterFullSreen = false;
         private Point _Offset;
         
-        private OcrLite ocrEngine;
+        // private OcrLite ocrEngine;
         private AggregateTranslator translator;
         private TranslatedImage translatedImageForm;
 
@@ -59,7 +59,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             this.MouseWheel += new MouseEventHandler(MouseScroll);
 
             // initialize the OCR Engine
-            ocrEngine = new OcrLite();
+            // ocrEngine = new OcrLite();
 
             // mute the game
             Mute_Game();
@@ -72,7 +72,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             SetToolTip();
 
             // load the Onnx model
-            loadOnnxModel();
+            // loadOnnxModel();
 
             // set dark mode
             setDarkMode();
@@ -92,7 +92,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void Game_Load(object sender, EventArgs e)
         {
             // set the necessary information to flash control of form game
-            string movie = string.Format("{0}?{1}", Controller.flash_movie, Controller.flash_vars);
+            string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
             // axShockwaveFlash.Movie = movie;
             // axShockwaveFlash.LoadMovie(0, movie);
             
@@ -473,7 +473,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Helper Method to load ONNX model
          */
-        private void loadOnnxModel(
+        /*private void loadOnnxModel(
             string detName = "dbnet.onnx",
             string clsName = "angle_net.onnx",
             string recName = "crnn_lite_lstm.onnx",
@@ -524,7 +524,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 MessageBox.Show("Initialization failed, please confirm the model folder and file, and then reinitialize!");
             }
             System.GC.Collect();
-        }
+        }*/
 
         /**
          * Detect text in the image and draw Bounding Rectangles around it.
@@ -569,7 +569,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             if (img == null)
                 return;
 
-            Bitmap bitmap = new Bitmap(img);
+            /*Bitmap bitmap = new Bitmap(img);
             bitmap.ToImage<Bgr, byte>();
             this.WindowState = FormWindowState.Normal;
 
@@ -588,8 +588,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // show the translated image
 
             Mat matImg = ocrResult.BoxImg;
-            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());
+            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());*/
 
+            LoadingScreen loadingScreen = new LoadingScreen();
+            loadingScreen.Show();
+            loadingScreen.TopMost = true;
+            translatedImageForm.SetImage(img);
 
             // loadingFormThread.Abort(); // remove loading form
             loadingScreen.Close();

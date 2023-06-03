@@ -5,7 +5,9 @@ VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher_VLCM_niua_lsaj", "Launcher_VLCM_niua_lsaj\Launcher_VLCM_niua_lsaj.csproj", "{2D4BD904-E85E-4664-AD17-5920D9B049AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Captcha", "Captcha\Captcha.csproj", "{120114AD-14AD-41CB-8E74-957933707F00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captcha", "Captcha\Captcha.csproj", "{120114AD-14AD-41CB-8E74-957933707F00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomControls", "CustomControls\CustomControls.csproj", "{5D13E6DC-2FF5-4987-9154-72A797DE7CA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,8 +23,15 @@ Global
 		{120114AD-14AD-41CB-8E74-957933707F00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{120114AD-14AD-41CB-8E74-957933707F00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{120114AD-14AD-41CB-8E74-957933707F00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D13E6DC-2FF5-4987-9154-72A797DE7CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D13E6DC-2FF5-4987-9154-72A797DE7CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D13E6DC-2FF5-4987-9154-72A797DE7CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D13E6DC-2FF5-4987-9154-72A797DE7CA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF91B22B-0E60-4BF0-B866-E2CF1502FBF8}
 	EndGlobalSection
 EndGlobal

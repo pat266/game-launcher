@@ -25,7 +25,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // lấy dữ liệu mã xác nhận từ web
             byte[] captcha_data =
-                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Controller.cookies);
+                Web_Request.Web_Request.send_request("http://www.niua.com/seccode.php", "GET", null, Program.cookies);
             if (captcha_data == null)
             {
                 return;
@@ -112,8 +112,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private void login()
         {
-            Controller.flash_movie = "";
-            Controller.flash_vars = "";
+            Program.flash_movie = "";
+            Program.flash_vars = "";
 
             // tạo dữ liệu đăng nhập
             byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
@@ -122,7 +122,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // gửi yêu cầu đăng nhập và lấy dữ liệu phản hồi
             byte[] response_data_for_login =
                 Web_Request.Web_Request.send_request("http://www.niua.com/loginWin.php?g=lsaj", "POST", login_data,
-                    Controller.cookies);
+                    Program.cookies);
             if (response_data_for_login == null)
             {
                 return;
@@ -140,7 +140,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // gửi yêu cầu vào game và lấy dữ liệu phản hồi
             byte[] response_data_for_game = Web_Request.Web_Request.send_request(
                 string.Format("http://www.niua.com/playGame/code/lsaj{0}/", textBox_server.Text), "GET", null,
-                Controller.cookies);
+                Program.cookies);
             if (response_data_for_game == null)
             {
                 return;
@@ -148,12 +148,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // lấy dữ liệu cần để load game
             string game_data = Encoding.UTF8.GetString(response_data_for_game);
-            Controller.flash_movie = find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
-            Controller.flash_vars = find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
-            Controller.flash_vars = parse_to_query_string(Controller.flash_vars);
+            Program.flash_movie = find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            Program.flash_vars = find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = parse_to_query_string(Program.flash_vars);
 
             // kiểm tra dữ liệu cần để load game có lấy được hay không
-            if (Controller.flash_movie == "" || Controller.flash_vars == "")
+            if (Program.flash_movie == "" || Program.flash_vars == "")
             {
                 MessageBox.Show("Không lấy được dữ liệu cần để load game!", "Lỗi", MessageBoxButtons.OK,
                     MessageBoxIcon.Error);

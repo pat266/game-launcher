@@ -34,5 +34,8 @@
     <Compile Update="Forms\SnippingTool.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Forms\TranslatedImage.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -25,7 +25,7 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
 
         //-> Other Values
         private bool droppedDown = false;
-        private Image calendarIcon = Properties.Resources.calendarWhite;
+        private Image calendarIcon = (Bitmap)Properties.Resources.ResourceManager.GetObject("calendarWhite");
         private RectangleF iconButtonArea;
         private const int calendarIconWidth = 34;
         private const int arrowIconWidth = 17;
@@ -38,8 +38,8 @@ namespace Launcher_VLCM_niua_lsaj.CustomControls
             {
                 skinColor = value;
                 if (skinColor.GetBrightness() >= 0.6F)
-                    calendarIcon = Properties.Resources.calendarDark;
-                else calendarIcon = Properties.Resources.calendarWhite;
+                    calendarIcon = (Bitmap)Properties.Resources.ResourceManager.GetObject("calendarDark");
+                else calendarIcon = (Bitmap)Properties.Resources.ResourceManager.GetObject("calendarWhite");
                 this.Invalidate();
             }
         }
