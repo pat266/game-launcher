@@ -15,9 +15,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             using (Bitmap bmp = new Bitmap(rc.Width, rc.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb))
             {
                 using (Graphics gr = Graphics.FromImage(bmp))
-                    gr.CopyFromScreen(0, 0, 0, 0, bmp.Size);
+                    gr.CopyFromScreen(rc.Left, rc.Top, 0, 0, bmp.Size);
                 using (var snipper = new SnippingTool(bmp))
                 {
+                    // Set the start position of the form to be on the current screen
+                    snipper.StartPosition = FormStartPosition.Manual;
+                    snipper.Location = rc.Location;
+
                     if (snipper.ShowDialog() == DialogResult.OK)
                     {
                         return snipper.Image;

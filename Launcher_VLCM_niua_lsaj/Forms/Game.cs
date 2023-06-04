@@ -151,7 +151,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void Adjust_Gameform()
         {
             // set the intial size
-            this.Size = new Size(1024, 768);
+            this.Size = new Size(1500, 1100);
 
             // center the application
             this.CenterToScreen();
