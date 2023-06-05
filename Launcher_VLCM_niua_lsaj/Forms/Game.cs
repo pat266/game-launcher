@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
 using System.Reflection;
-// using OcrLiteLib;
+using OcrLiteLib;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private bool _AfterFullSreen = false;
         private Point _Offset;
 
-        // private OcrLite ocrEngine;
+        private OcrLite ocrEngine;
         private AggregateTranslator translator;
         private TranslatedImage translatedImageForm;
 
@@ -59,9 +59,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             this.KeyUp += new KeyEventHandler(KeyEvent);
             this.MouseWheel += new MouseEventHandler(MouseScroll);
 
-            // initialize the OCR Engine
-            // ocrEngine = new OcrLite();
-
             // mute the game
             Mute_Game();
 
@@ -72,14 +69,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             toolTip = new ToolTip();
             SetToolTip();
 
-            // load the Onnx model
-            // loadOnnxModel();
-
             // set dark mode
             setDarkMode();
-
-            // initialize the Translator
-            translator = new AggregateTranslator();
 
             // initialize the values of the zoom levels
             zoomLevels = new float[] { 0.1f, 0.25f, 0.5f, 1.0f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f };
@@ -97,7 +88,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             this.axShockwaveFlash.Enabled = true;
             this.axShockwaveFlash.Location = new Point(3, 33);
             this.axShockwaveFlash.Name = "axShockwaveFlash";
-            this.axShockwaveFlash.Size = new Size(778, 525);
             this.axShockwaveFlash.TabIndex = 2;
             // Add the component to the form's control collection
             this.tableLayoutPanel1.Controls.Add(this.axShockwaveFlash, 0, 1);
@@ -107,13 +97,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             // set the necessary information to flash control of form game
             string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
-            // axShockwaveFlash.Movie = movie;
-            // axShockwaveFlash.LoadMovie(0, movie);
-
 
             var localSWF = Application.StartupPath + @"\AS3Game.swf";
             // receive data from AS3
-            // axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive);
+            axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive);
             axShockwaveFlash.LoadMovie(0, localSWF);
             // sending movie data to AS3
             axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
@@ -314,6 +301,18 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
+            if (ocrEngine == null)
+            {
+                // initialize the OCR Engine and load the Onnx model
+                loadOnnxModel();
+            }
+
+            if (translator == null)
+            {
+                // initialize the Translator
+                translator = new AggregateTranslator();
+            }
+            
             await StartTranslatingProcess();
         }
 
@@ -487,7 +486,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         /**
          * Helper Method to load ONNX model
          */
-        /*private void loadOnnxModel(
+        private void loadOnnxModel(
             string detName = "ch_PP-OCRv3_det_infer.onnx",
             string clsName = "ch_ppocr_mobile_v2.0_cls_infer.onnx",
             string recName = "ch_PP-OCRv3_rec_infer.onnx",
@@ -535,13 +534,13 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             {
                 MessageBox.Show("Initialization failed, please confirm the model folder and file, and then reinitialize!");
             }
-        }*/
+        }
 
         /**
          * Detect text in the image and draw Bounding Rectangles around it.
          * Using IronOCR to get both bounding rectangles and Onnx model for extracting text
          */
-        /*private async Task<OcrResult> ProcessText_Onnx(
+        private async Task<OcrResult> ProcessText_Onnx(
             Bitmap bitmap,
             int imgResize,
             int padding = 50,
@@ -562,13 +561,17 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Image<Bgr, byte> imageCV = bitmap.ToImage<Bgr, byte>(); //Image Class from Emgu.CV
             Mat mat = imageCV.Mat;
 
+            /*OcrResult ocrResult = await Task.Run(() => ocrEngine.Detect(
+                mat, padding, imgResize, boxScoreThresh, boxThresh, unClipRatio,
+                doAngle, mostAngle, extractText, translateText, translator));*/
+
             OcrResult ocrResult = await Task.Run(() => ocrEngine.Detect(
                 mat, padding, imgResize, boxScoreThresh, boxThresh, unClipRatio,
-                doAngle, mostAngle, extractText, translateText, translator));
+                doAngle, mostAngle));
 
             System.GC.Collect(); // clean up the memory
             return ocrResult;
-        }*/
+        }
 
         private async Task StartTranslatingProcess()
         {
@@ -580,7 +583,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             if (img == null)
                 return;
 
-            /*Bitmap bitmap = new Bitmap(img);
+            Bitmap bitmap = new Bitmap(img);
             bitmap.ToImage<Bgr, byte>();
             this.WindowState = FormWindowState.Normal;
 
@@ -599,21 +602,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             // show the translated image
 
             Mat matImg = ocrResult.BoxImg;
-            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());*/
-
-
-            LoadingScreen loadingScreen = new LoadingScreen();
-            loadingScreen.Show();
-            loadingScreen.TopMost = true;
-
-            if (translatedImageForm != null)
-            {
-                translatedImageForm.Close();
-                translatedImageForm = null;
-                System.GC.Collect();
-            }
-            translatedImageForm = new TranslatedImage();
-            translatedImageForm.SetImage(img);
+            translatedImageForm.SetImage(matImg.ToImage<Bgr, Byte>().ToBitmap());
 
             // loadingFormThread.Abort(); // remove loading form
             loadingScreen.Close();

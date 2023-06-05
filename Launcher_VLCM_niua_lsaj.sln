@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Launcher_VLCM_niua_lsaj", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captcha", "Captcha\Captcha.csproj", "{546B2AAA-110B-4DDB-AAA7-53F711B5C263}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcrLiteLib", "OcrLiteLib\OcrLiteLib.csproj", "{31C316BC-C7C6-4E4B-A57A-94EC50A44255}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{546B2AAA-110B-4DDB-AAA7-53F711B5C263}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{546B2AAA-110B-4DDB-AAA7-53F711B5C263}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{546B2AAA-110B-4DDB-AAA7-53F711B5C263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31C316BC-C7C6-4E4B-A57A-94EC50A44255}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31C316BC-C7C6-4E4B-A57A-94EC50A44255}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31C316BC-C7C6-4E4B-A57A-94EC50A44255}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31C316BC-C7C6-4E4B-A57A-94EC50A44255}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

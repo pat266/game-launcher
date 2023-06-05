@@ -51,4 +51,8 @@
   <ItemGroup>
     <Folder Include="CustomControls\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Captcha\Captcha.csproj" />
+    <ProjectReference Include="..\OcrLiteLib\OcrLiteLib.csproj" />
+  </ItemGroup>
 </Project>
