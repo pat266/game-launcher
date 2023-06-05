@@ -301,18 +301,18 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
         private async void translationButton_Click(object sender, EventArgs e)
         {
+            if (translator == null)
+            {
+                // initialize the Translator
+                translator = new AggregateTranslator();
+            }
+
             if (ocrEngine == null)
             {
                 // initialize the OCR Engine and load the Onnx model
                 loadOnnxModel();
             }
 
-            if (translator == null)
-            {
-                // initialize the Translator
-                translator = new AggregateTranslator();
-            }
-            
             await StartTranslatingProcess();
         }
 
@@ -527,7 +527,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
                 if (ocrEngine == null)
                 {
                     ocrEngine = new OcrLite();
-                    ocrEngine.InitModels(detPath, clsPath, recPath, keysPath, (int)numThread);
+                    ocrEngine.InitModels(detPath, clsPath, recPath, keysPath, (int)numThread, this.translator);
                 }
             }
             else

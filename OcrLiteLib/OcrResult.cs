@@ -46,6 +46,7 @@ namespace OcrLiteLib
         public float AngleScore { get; set; }
         public float AngleTime { get; set; }
         public string Text { get; set; }
+        public string TranslatedText { get; set; }
         public List<float> CharScores { get; set; }
         public float CrnnTime { get; set; }
         public float BlockTime { get; set; }
@@ -71,6 +72,7 @@ namespace OcrLiteLib
         public List<TextBlock> TextBlocks { get; set; }
         public float DbNetTime { get; set; }
         public Mat BoxImg { get; set; }
+        public Rectangle OriginalRect { get; set; } // add-on to crop the original image
         public float DetectTime { get; set; }
         public string StrRes { get; set; }
 
@@ -87,4 +89,3 @@ namespace OcrLiteLib
 
     }
 }
-

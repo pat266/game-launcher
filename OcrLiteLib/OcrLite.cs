@@ -4,6 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using GTranslate.Translators;
+using System.Threading.Tasks;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+
 
 namespace OcrLiteLib
 {
@@ -15,6 +21,8 @@ namespace OcrLiteLib
         private AngleNet angleNet;
         private CrnnNet crnnNet;
 
+        private AggregateTranslator translator;
+
         public OcrLite()
         {
             dbNet = new DbNet();
@@ -22,13 +30,14 @@ namespace OcrLiteLib
             crnnNet = new CrnnNet();
         }
 
-        public void InitModels(string detPath, string clsPath, string recPath, string keysPath, int numThread)
+        public void InitModels(string detPath, string clsPath, string recPath, string keysPath, int numThread, AggregateTranslator translator)
         {
             try
             {
                 dbNet.InitModel(detPath, numThread);
                 angleNet.InitModel(clsPath, numThread);
                 crnnNet.InitModel(recPath, keysPath, numThread);
+                this.translator = translator;
             }
             catch (Exception ex)
             {
@@ -37,7 +46,7 @@ namespace OcrLiteLib
             }
         }
 
-        public OcrResult Detect(Mat originSrc, int padding, int maxSideLen, float boxScoreThresh, float boxThresh,
+        public async Task<OcrResult> Detect(Mat originSrc, int padding, int maxSideLen, float boxScoreThresh, float boxThresh,
                               float unClipRatio, bool doAngle, bool mostAngle)
         {
             // Mat originSrc = CvInvoke.Imread(img, ImreadModes.Color);//default : BGR
@@ -58,10 +67,22 @@ namespace OcrLiteLib
 
             ScaleParam scale = ScaleParam.GetScaleParam(paddingSrc, resize);
 
-            return DetectOnce(paddingSrc, paddingRect, scale, boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
+            OcrResult ocrResult = await Task.Run(() => DetectOnce(
+                paddingSrc, paddingRect, scale, boxScoreThresh, boxThresh, unClipRatio, doAngle,
+                mostAngle).Result);
+
+            // translating text or extracting text
+            if (translator != null)
+            {
+                await TranslateText(ocrResult, translator);
+                ocrResult.BoxImg = await Task.Run(() => OcrUtils.WriteTextInBoxes(ocrResult.BoxImg, ocrResult.TextBlocks));
+            }
+
+            CropImageToOriginalSize(ocrResult);
+            return ocrResult;
         }
 
-        private OcrResult DetectOnce(Mat src, Rectangle originRect, ScaleParam scale, float boxScoreThresh, float boxThresh,
+        private async Task<OcrResult> DetectOnce(Mat src, Rectangle originRect, ScaleParam scale, float boxScoreThresh, float boxThresh,
                               float unClipRatio, bool doAngle, bool mostAngle)
         {
             Mat textBoxPaddingImg = src.Clone();
@@ -129,24 +150,101 @@ namespace OcrLiteLib
             }
             //textBlocks.ForEach(x => Console.WriteLine(x));
 
+            // DO WORK HERE BEFORE SIZE IS CHANGED
+
+            // draw the textboxes
+            OcrUtils.DrawTextBoxes(textBoxPaddingImg, textBoxes, thickness);
+            // translating text or extracting text
+            textBoxPaddingImg = await Task.Run(() => OcrUtils.WriteTextInBoxes(textBoxPaddingImg, textBlocks, false));
+
             var endTicks = DateTime.Now.Ticks;
             var fullDetectTime = (endTicks - startTicks) / 10000F;
-            //Console.WriteLine($"fullDetectTime({fullDetectTime}ms)");
-
-            //cropped to original size
-            Mat boxImg = new Mat(textBoxPaddingImg, originRect);
-
+            
             StringBuilder strRes = new StringBuilder();
             textBlocks.ForEach(x => strRes.AppendLine(x.Text));
 
             OcrResult ocrResult = new OcrResult();
             ocrResult.TextBlocks = textBlocks;
             ocrResult.DbNetTime = dbNetTime;
-            ocrResult.BoxImg = boxImg;
+            ocrResult.BoxImg = textBoxPaddingImg;
+            ocrResult.OriginalRect = originRect; // keep this to crop this later
             ocrResult.DetectTime = fullDetectTime;
             ocrResult.StrRes = strRes.ToString();
 
+            System.GC.Collect(); // clean unwanted memory
             return ocrResult;
+        }
+
+        /**
+         * A static method to crop the image to original size
+         */
+        public static void CropImageToOriginalSize(OcrResult ocrResult)
+        {
+            //cropped to original size
+            Mat rgbBoxImg = new Mat(ocrResult.BoxImg, ocrResult.OriginalRect);
+            Mat boxImg = new Mat();
+            CvInvoke.CvtColor(rgbBoxImg, boxImg, ColorConversion.Rgb2Bgr);//convert to BGR for Output Result Img
+
+            ocrResult.BoxImg = boxImg;
+            System.GC.Collect(); // clean unwanted memory
+        }
+
+        /**
+         * A static method to combine all of the text in TextBlocks into one string
+         * for bulk translation (can separate into 2 or more due to characters contrainst)
+         * Add a delimiter between each text block
+         */
+        public static List<string> GetRawTextFromTextBlocks(List<TextBlock> textBlocks, string separator, int maxStrSize = 1000)
+        {
+            List<string> result = new List<string>();
+            string combinedText = "";
+
+            for (int i = 0; i < textBlocks.Count; i++)
+            {
+                TextBlock textBlock = textBlocks[i];
+                combinedText += textBlock.Text;
+                if (combinedText.ToCharArray().Length > maxStrSize - separator.Length)
+                {
+                    result.Add(combinedText);
+                    combinedText = "";
+                }
+                else if (textBlock != textBlocks.Last())
+                {
+                    combinedText += separator;
+                }
+            }
+            result.Add(combinedText);
+
+            return result;
+        }
+
+        /**
+         * Combine text in a 
+         */
+        public static async Task TranslateText(OcrResult ocrResult, AggregateTranslator translator, string separator = "\n\n")
+        {
+            // combine text in TextBlocks into one (or more) string
+            List<string> rawTexts = GetRawTextFromTextBlocks(ocrResult.TextBlocks, separator);
+            List<string> translatedText = new List<string>();
+
+            foreach (string rawText in rawTexts)
+            {
+                var result = await translator.TranslateAsync(rawText, "en");
+                string translatedTextStr = result.Translation;
+
+                List<string> resultList = Regex.Split(translatedTextStr, @separator).ToList();
+                // List<string> resultList = result.Translation.Split(separator.ToCharArray()).ToList();
+                translatedText.AddRange(resultList);
+            }
+            if (translatedText.Count > 0 && ocrResult.TextBlocks.Count > 0)
+            {
+                // change the value of TranslatedText in TextBlocks
+                for (int i = 0; i < translatedText.Count; i++)
+                {
+                    ocrResult.TextBlocks[i].TranslatedText = translatedText[i];
+                }
+            }
+
         }
 
     }
