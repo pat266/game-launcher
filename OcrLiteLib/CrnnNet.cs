@@ -14,17 +14,18 @@ namespace OcrLiteLib
     {
         private readonly float[] MeanValues = { 127.5F, 127.5F, 127.5F };
         private readonly float[] NormValues = { 1.0F / 127.5F, 1.0F / 127.5F, 1.0F / 127.5F };
-        private const int crnnDstHeight = 32;
-        private const int crnnCols = 5531;
+        private const int crnnDstHeight = 48;
+        private const int crnnCols = 6625;
 
         private InferenceSession crnnNet;
         private List<string> keys;
+        private List<string> inputNames;
 
         public CrnnNet() { }
 
         ~CrnnNet()
         {
-            // crnnNet.Dispose();
+            crnnNet.Dispose();
         }
 
         public void InitModel(string path, string keysPath, int numThread)
@@ -36,6 +37,7 @@ namespace OcrLiteLib
                 op.InterOpNumThreads = numThread;
                 op.IntraOpNumThreads = numThread;
                 crnnNet = new InferenceSession(path, op);
+                inputNames = crnnNet.InputMetadata.Keys.ToList();
                 keys = InitKeys(keysPath);
             }
             catch (Exception ex)
@@ -48,12 +50,14 @@ namespace OcrLiteLib
         {
             StreamReader sr = new StreamReader(path, Encoding.UTF8);
             List<string> keys = new List<string>();
+            keys.Add("#");
             String line;
             while ((line = sr.ReadLine()) != null)
             {
                 //Console.WriteLine(line.ToString());
                 keys.Add(line);
             }
+            keys.Add(" ");
             Console.WriteLine($"keys Size = {keys.Count}");
             return keys;
         }
@@ -85,19 +89,17 @@ namespace OcrLiteLib
             Tensor<float> inputTensors = OcrUtils.SubstractMeanNormalize(srcResize, MeanValues, NormValues);
             var inputs = new List<NamedOnnxValue>
             {
-                NamedOnnxValue.CreateFromTensor("input", inputTensors)
+                NamedOnnxValue.CreateFromTensor(inputNames[0], inputTensors)
             };
             try
             {
                 using (IDisposableReadOnlyCollection<DisposableNamedOnnxValue> results = crnnNet.Run(inputs))
                 {
                     var resultsArray = results.ToArray();
-                    Console.WriteLine(resultsArray);
+                    var dimensions = resultsArray[0].AsTensor<float>().Dimensions;
                     float[] outputData = resultsArray[0].AsEnumerable<float>().ToArray();
 
-                    int crnnRows = outputData.Count() / crnnCols;
-
-                    return ScoreToTextLine(outputData, crnnRows, crnnCols);
+                    return ScoreToTextLine(outputData, dimensions[1], dimensions[2]);
                 }
             }
             catch (Exception ex)
@@ -109,7 +111,7 @@ namespace OcrLiteLib
             return textLine;
         }
 
-        private TextLine ScoreToTextLine(float[] srcData, int rows, int cols)
+        private TextLine ScoreToTextLine(float[] srcData, int h, int w)
         {
             StringBuilder sb = new StringBuilder();
             TextLine textLine = new TextLine();
@@ -117,41 +119,24 @@ namespace OcrLiteLib
             int lastIndex = 0;
             List<float> scores = new List<float>();
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < h; i++)
             {
                 int maxIndex = 0;
                 float maxValue = -1000F;
-
-                //do softmax
-                List<float> expList = new List<float>();
-                for (int j = 0; j < cols; j++)
+                for (int j = 0; j < w; j++)
                 {
-                    float expSingle = (float)Math.Exp(srcData[i * cols + j]);
-                    expList.Add(expSingle);
-                }
-                float partition = expList.Sum();
-                for (int j = 0; j < cols; j++)
-                {
-                    float softmax = expList[j] / partition;
-                    if (softmax > maxValue)
+                    int idx = i * w + j;
+                    if (srcData[idx] > maxValue)
                     {
-                        maxValue = softmax;
                         maxIndex = j;
+                        maxValue = srcData[idx];
                     }
                 }
-
-                //no softmax
-                /*for (int j = 0; j < cols; j++) {
-                    if (srcData[i * cols + j] > maxValue) {
-                        maxValue = srcData[i * cols + j];
-                        maxIndex = j;
-                    }
-                }*/
 
                 if (maxIndex > 0 && maxIndex < keys.Count && (!(i > 0 && maxIndex == lastIndex)))
                 {
                     scores.Add(maxValue);
-                    sb.Append(keys[maxIndex - 1]);
+                    sb.Append(keys[maxIndex]);
                 }
                 lastIndex = maxIndex;
             }

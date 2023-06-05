@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="CustomControls\CButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CComboBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CTextBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="CustomControls\CToggleButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Forms\Game.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\LoadingScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\SnippingTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Forms\TranslatedImage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

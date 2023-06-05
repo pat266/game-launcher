@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace OcrLiteLib
 {
@@ -15,15 +16,16 @@ namespace OcrLiteLib
         private readonly float[] MeanValues = { 127.5F, 127.5F, 127.5F };
         private readonly float[] NormValues = { 1.0F / 127.5F, 1.0F / 127.5F, 1.0F / 127.5F };
         private const int angleDstWidth = 192;
-        private const int angleDstHeight = 32;
+        private const int angleDstHeight = 48;
         private const int angleCols = 2;
         private InferenceSession angleNet;
+        private List<string> inputNames;
 
         public AngleNet() { }
 
         ~AngleNet()
         {
-            // angleNet.Dispose();
+            angleNet.Dispose();
         }
 
         public void InitModel(string path, int numThread)
@@ -34,7 +36,8 @@ namespace OcrLiteLib
                 op.GraphOptimizationLevel = GraphOptimizationLevel.ORT_ENABLE_EXTENDED;
                 op.InterOpNumThreads = numThread;
                 op.IntraOpNumThreads = numThread;
-                angleNet = new InferenceSession(path);
+                angleNet = new InferenceSession(path, op);
+                inputNames = angleNet.InputMetadata.Keys.ToList();
             }
             catch (Exception ex)
             {
@@ -99,11 +102,12 @@ namespace OcrLiteLib
         private Angle GetAngle(Mat src)
         {
             Angle angle = new Angle();
-            Mat angleImg = AdjustTargetImg(src, angleDstWidth, angleDstHeight);
+            Mat angleImg = new Mat();
+            CvInvoke.Resize(src, angleImg, new Size(angleDstWidth, angleDstHeight));
             Tensor<float> inputTensors = OcrUtils.SubstractMeanNormalize(angleImg, MeanValues, NormValues);
             var inputs = new List<NamedOnnxValue>
             {
-                NamedOnnxValue.CreateFromTensor("input", inputTensors)
+                NamedOnnxValue.CreateFromTensor(inputNames[0], inputTensors)
             };
             try
             {
@@ -121,7 +125,6 @@ namespace OcrLiteLib
                 //throw ex;
             }
             return angle;
-
         }
 
         private Angle ScoreToAngle(float[] srcData, int angleCols)

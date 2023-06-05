@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net;
 
 namespace OcrLiteLib
 {
@@ -19,11 +20,13 @@ namespace OcrLiteLib
 
         private InferenceSession dbNet;
 
+        private List<string> inputNames;
+
         public DbNet() { }
 
         ~DbNet()
         {
-            // dbNet.Dispose();
+            dbNet.Dispose();
         }
 
         public void InitModel(string path, int numThread)
@@ -35,6 +38,7 @@ namespace OcrLiteLib
                 op.InterOpNumThreads = numThread;
                 op.IntraOpNumThreads = numThread;
                 dbNet = new InferenceSession(path, op);
+                inputNames = dbNet.InputMetadata.Keys.ToList();
             }
             catch (Exception ex)
             {
@@ -50,7 +54,7 @@ namespace OcrLiteLib
             Tensor<float> inputTensors = OcrUtils.SubstractMeanNormalize(srcResize, MeanValues, NormValues);
             var inputs = new List<NamedOnnxValue>
             {
-                NamedOnnxValue.CreateFromTensor("input0", inputTensors)
+                NamedOnnxValue.CreateFromTensor(inputNames[0], inputTensors)
             };
             try
             {
@@ -71,53 +75,65 @@ namespace OcrLiteLib
 
         private static List<TextBox> GetTextBoxes(DisposableNamedOnnxValue[] outputTensor, int rows, int cols, ScaleParam s, float boxScoreThresh, float boxThresh, float unClipRatio)
         {
-            float minArea = 3.0f;
+            float maxSideThresh = 3.0f;//长边门限
             List<TextBox> rsBoxes = new List<TextBox>();
-
-            float[] outputData = outputTensor[0].AsEnumerable<float>().ToArray();
-            List<byte> norf = new List<byte>();
-            foreach (float data in outputData)
+            //-----Data preparation-----
+            float[] predData = outputTensor[0].AsEnumerable<float>().ToArray();
+            List<byte> cbufData = new List<byte>();
+            foreach (float data in predData)
             {
-                int val = data > boxThresh ? 255 : 0;
-                norf.Add((byte)val);
+                var val = data * 255;
+                cbufData.Add(Convert.ToByte(val));
             }
-            Mat fMapMat = new Mat(rows, cols, DepthType.Cv32F, 1);
-            fMapMat.SetTo(outputData);
-            Console.WriteLine(fMapMat);
+            Mat predMat = new Mat(rows, cols, DepthType.Cv32F, 1);
+            predMat.SetTo(predData);
 
-            Mat norfMapMat = new Mat(rows, cols, DepthType.Cv8U, 1);
-            norfMapMat.SetTo(norf.ToArray());
-            Console.WriteLine(norfMapMat);
+            Mat cbufMat = new Mat(rows, cols, DepthType.Cv8U, 1);
+            cbufMat.SetTo(cbufData.ToArray());
+
+            //-----boxThresh-----
+            Mat thresholdMat = new Mat();
+            CvInvoke.Threshold(cbufMat, thresholdMat, boxThresh * 255.0, 255.0, ThresholdType.Binary);
+
+            //-----dilate-----
+            Mat dilateMat = new Mat();
+            Mat dilateElement = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(2, 2), new Point(-1, -1));
+            CvInvoke.Dilate(thresholdMat, dilateMat, dilateElement, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(128, 128, 128));
 
             VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
 
-            CvInvoke.FindContours(norfMapMat, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+            CvInvoke.FindContours(dilateMat, contours, null, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+
             for (int i = 0; i < contours.Size; i++)
             {
-                float minEdgeSize = 0;
-                List<PointF> box = GetMiniBox(contours[i], out minEdgeSize);
-                if (minEdgeSize < minArea)
+                if (contours[i].Size <= 2)
                 {
                     continue;
                 }
-                double score = GetScore(contours[i], fMapMat);
+                float maxSide = 0;
+                List<PointF> minBox = GetMiniBox(contours[i], out maxSide);
+                if (maxSide < maxSideThresh)
+                {
+                    continue;
+                }
+                double score = GetScore(contours[i], predMat);
                 if (score < boxScoreThresh)
                 {
                     continue;
                 }
-                List<Point> newBox = Unclip(box, unClipRatio);
-                if (newBox == null)
+                List<Point> clipBox = Unclip(minBox, unClipRatio);
+                if (clipBox == null)
                 {
                     continue;
                 }
 
-                List<PointF> minBox = GetMiniBox(newBox, out minEdgeSize);
-                if (minEdgeSize < minArea + 2)
+                List<PointF> clipMinBox = GetMiniBox(clipBox, out maxSide);
+                if (maxSide < maxSideThresh + 2)
                 {
                     continue;
                 }
                 List<Point> finalPoints = new List<Point>();
-                foreach (var item in minBox)
+                foreach (var item in clipMinBox)
                 {
                     int x = (int)(item.X / s.ScaleWidth);
                     int ptx = Math.Min(Math.Max(x, 0), s.SrcWidth);
@@ -296,6 +312,12 @@ namespace OcrLiteLib
 
         private static List<Point> Unclip(List<PointF> box, float unclip_ratio)
         {
+            RotatedRect clipRect = CvInvoke.MinAreaRect(box.ToArray());
+            if (clipRect.Size.Height < 1.001 && clipRect.Size.Width < 1.001)
+            {
+                return null;
+            }
+
             List<IntPoint> theCliperPts = new List<IntPoint>();
             foreach (PointF pt in box)
             {

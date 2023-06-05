@@ -61,14 +61,6 @@ namespace OcrLiteLib
             }
             var color = new MCvScalar(255, 0, 0);//R(255) G(0) B(0)
 
-            /**
-            CvInvoke.Line(boxImg, box[0], box[1], color, thickness);
-            CvInvoke.Line(boxImg, box[1], box[2], color, thickness);
-            CvInvoke.Line(boxImg, box[2], box[3], color, thickness);
-            CvInvoke.Line(boxImg, box[3], box[0], color, thickness);
-            **/
-
-            // /**
             int width = GetWidth(box);
             int height = GetHeight(box);
             Point topLeftPoint = GetTopLeftPoint(box);
@@ -149,7 +141,7 @@ namespace OcrLiteLib
             }
         }
 
-        public static Mat WriteTextInBoxes(Mat src, List<TextBlock> textBlocks, bool translateText)
+        public static Mat WriteTextInBoxes(Mat src, List<TextBlock> textBlocks, bool translateText=true)
         {
             // List<TextBlock> textblocks = result.TextBlocks;
             // OcrUtils.DrawTextBoxes(textBoxPaddingImg, textBoxes, thickness);
@@ -168,16 +160,16 @@ namespace OcrLiteLib
         {
             // declare the font to write
             Font font = new Font("Tahoma", 24, GraphicsUnit.Point);
-            
+
             // draw the background of the text
             DrawBackgroundBox(src, box);
-            
+
             // define the width and height of the box for text
             int width = GetWidth(box);
             int height = GetHeight(box);
             Point topLeftPoint = GetTopLeftPoint(box);
             // topLeftPoint.Y += 3; // move the text down to make it look clearly
-            
+
             // define the area of the rectangle
             Rectangle rectangle = new Rectangle(topLeftPoint, new Size(width, height));
 
@@ -188,6 +180,7 @@ namespace OcrLiteLib
 
             // draw the text
             Image<Bgr, byte> srcImg = src.ToImage<Bgr, byte>();
+            
             using (Graphics g = Graphics.FromImage(srcImg.AsBitmap()))
             {
                 int alpha = 255; // from 0-255, 128 is 50% opacity
@@ -366,4 +359,3 @@ namespace OcrLiteLib
 
     }
 }
-
