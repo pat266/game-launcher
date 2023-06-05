@@ -61,14 +61,6 @@ namespace OcrLiteLib
             }
             var color = new MCvScalar(255, 0, 0);//R(255) G(0) B(0)
 
-            /**
-            CvInvoke.Line(boxImg, box[0], box[1], color, thickness);
-            CvInvoke.Line(boxImg, box[1], box[2], color, thickness);
-            CvInvoke.Line(boxImg, box[2], box[3], color, thickness);
-            CvInvoke.Line(boxImg, box[3], box[0], color, thickness);
-            **/
-
-            // /**
             int width = GetWidth(box);
             int height = GetHeight(box);
             Point topLeftPoint = GetTopLeftPoint(box);
