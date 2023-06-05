@@ -488,10 +488,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          * Helper Method to load ONNX model
          */
         /*private void loadOnnxModel(
-            string detName = "dbnet.onnx",
-            string clsName = "angle_net.onnx",
-            string recName = "crnn_lite_lstm.onnx",
-            string keysName = "keys.txt",
+            string detName = "ch_PP-OCRv3_det_infer.onnx",
+            string clsName = "ch_ppocr_mobile_v2.0_cls_infer.onnx",
+            string recName = "ch_PP-OCRv3_rec_infer.onnx",
+            string keysName = "ppocr_keys_v1.txt",
             int numThread = 4
             )
         {
@@ -506,17 +506,17 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             bool isDetExists = File.Exists(detPath);
             if (!isDetExists)
             {
-                MessageBox.Show("Model file not found at: " + detPath);
+                MessageBox.Show("Det file not found at: " + detPath);
             }
             bool isClsExists = File.Exists(clsPath);
             if (!isClsExists)
             {
-                MessageBox.Show("Model file not found at: " + clsPath);
+                MessageBox.Show("Cls file not found at: " + clsPath);
             }
             bool isRecExists = File.Exists(recPath);
             if (!isRecExists)
             {
-                MessageBox.Show("Model file not found at: " + recPath);
+                MessageBox.Show("Rec file not found at: " + recPath);
             }
             bool isKeysExists = File.Exists(keysPath);
             if (!isKeysExists)
@@ -525,19 +525,16 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             if (isDetExists && isClsExists && isRecExists && isKeysExists)
             {
-                if (ocrEngine != null)
+                if (ocrEngine == null)
                 {
-                    ocrEngine = null;
-                    System.GC.Collect();
+                    ocrEngine = new OcrLite();
+                    ocrEngine.InitModels(detPath, clsPath, recPath, keysPath, (int)numThread);
                 }
-                ocrEngine = new OcrLite();
-                ocrEngine.InitModels(detPath, clsPath, recPath, keysPath, (int)numThread);
             }
             else
             {
                 MessageBox.Show("Initialization failed, please confirm the model folder and file, and then reinitialize!");
             }
-            System.GC.Collect();
         }*/
 
         /**
@@ -548,9 +545,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Bitmap bitmap,
             int imgResize,
             int padding = 50,
-            float boxScoreThresh = 0.618f,
+            float boxScoreThresh = 0.500f,
             float boxThresh = 0.300f,
-            float unClipRatio = 2.0f,
+            float unClipRatio = 1.6f,
             bool doAngle = true,
             bool mostAngle = true,
             bool extractText = false,

@@ -19,6 +19,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void Login_Load(object sender, EventArgs e)
         {
             load_captcha(); // load mã xác nhận
+            textBox_username.Text = "samdeptrai26@gmail.com";
+            textBox_password.Text = "Samdeptrai26";
+            textBox_server.Text = "1000";
         }
 
         private void load_captcha()
