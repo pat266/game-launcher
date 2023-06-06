@@ -11,9 +11,15 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
+        Captcha.CaptchaSolver captchaSolver;
         public Login()
         {
             InitializeComponent();
+
+            // solve the captcha automatically
+            string appPath = AppDomain.CurrentDomain.BaseDirectory;
+            string captchaPath = appPath + "models\\captcha\\captcha_model.onnx";
+            this.captchaSolver = new Captcha.CaptchaSolver(captchaPath);
         }
 
         private void Login_Load(object sender, EventArgs e)
@@ -31,10 +37,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             {
                 return;
             }
-
             // đưa dữ liệu mã xác nhận vào picture box control trên form đăng nhập
             try
             {
+                textBox_captcha.Text = this.captchaSolver.SolveCaptcha(captcha_data);
+
+                // convert byte array to image
                 using (MemoryStream memory_stream = new MemoryStream(captcha_data))
                 {
                     pictureBox_captcha.Image = Image.FromStream(memory_stream);
