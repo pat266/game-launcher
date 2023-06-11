@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Captcha;
+using Launcher_VLCM_niua_lsaj.Utils;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Media;
@@ -11,15 +13,12 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 {
     public partial class Login : Form
     {
-        Captcha.CaptchaSolver captchaSolver;
-        public Login()
+        CaptchaSolver captchaSolver;
+        public Login(CaptchaSolver captchaSolver)
         {
             InitializeComponent();
-
-            // solve the captcha automatically
-            string appPath = AppDomain.CurrentDomain.BaseDirectory;
-            string captchaPath = appPath + "models\\captcha\\captcha_model.onnx";
-            this.captchaSolver = new Captcha.CaptchaSolver(captchaPath);
+            this.Icon = (Icon)Properties.Resources.ResourceManager.GetObject("app_icon");
+            this.captchaSolver = captchaSolver;
         }
 
         private void Login_Load(object sender, EventArgs e)
@@ -80,20 +79,17 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         {
             if (textBox_username.Text == "")
             {
-                SystemSounds.Beep.Play();
                 textBox_username.Focus();
                 return false;
             }
 
             if (textBox_password.Text == "")
             {
-                SystemSounds.Beep.Play();
                 textBox_password.Focus();
                 return false;
             }
             if (textBox_server.Text == "")
             {
-                SystemSounds.Beep.Play();
                 textBox_server.Focus();
                 return false;
             }
@@ -112,7 +108,6 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             }
             if (textBox_captcha.Text == "")
             {
-                SystemSounds.Beep.Play();
                 textBox_captcha.Focus();
                 return false;
             }
@@ -126,7 +121,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // tạo dữ liệu đăng nhập
             byte[] login_data = Encoding.UTF8.GetBytes(string.Format("op=login&email={0}&password={1}&seccode={2}",
-                textBox_username.Text, md5_encrypt(textBox_password.Text), textBox_captcha.Text));
+                textBox_username.Text, LoginUtil.md5_encrypt(textBox_password.Text), textBox_captcha.Text));
             
             // gửi yêu cầu đăng nhập và lấy dữ liệu phản hồi
             byte[] response_data_for_login =
@@ -157,9 +152,9 @@ namespace Launcher_VLCM_niua_lsaj.Forms
 
             // lấy dữ liệu cần để load game
             string game_data = Encoding.UTF8.GetString(response_data_for_game);
-            Program.flash_movie = find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
-            Program.flash_vars = find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
-            Program.flash_vars = parse_to_query_string(Program.flash_vars);
+            Program.flash_movie = LoginUtil.find_string(game_data, "(?<=swfobject\\.embedSWF\\(\").*?(?=\".*?\\))");
+            Program.flash_vars = LoginUtil.find_string(game_data, "(?<=parameters\\s*?=\\s*?{)[^\\0]*?(?=};)");
+            Program.flash_vars = LoginUtil.parse_to_query_string(Program.flash_vars);
 
             // kiểm tra dữ liệu cần để load game có lấy được hay không
             if (Program.flash_movie == "" || Program.flash_vars == "")
@@ -172,51 +167,5 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             Close(); // đóng form đăng nhập
         }
 
-        private string md5_encrypt(string text) // hàm mã hoá chuỗi sang MD5
-        {
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] data = Encoding.UTF8.GetBytes(text);
-                byte[] result = md5.ComputeHash(data);
-                StringBuilder string_builder = new StringBuilder();
-                foreach (byte b in result)
-                {
-                    string_builder.Append(b.ToString("X2"));
-                }
-                return string_builder.ToString().ToLower();
-            }
-        }
-
-        public string find_string(string input, string pattern) // hàm tìm kiếm chuỗi và trả về kết quả
-        {
-            Match match = Regex.Match(input, pattern);
-            return match.Success ? match.Value : "";
-        }
-
-        public string remove_white_space(string text) // hàm xoá tất cả khoảng trắng trong chuỗi
-        {
-            return Regex.Replace(text, "\\s", "");
-        }
-
-        public string parse_to_query_string(string text) // hàm chuyển dữ liệu sang query string
-        {
-            string result = "";
-            string[] text_split = Regex.Split(text, "\\n");
-            for (int i = 0; i < text_split.Length; i++)
-            {
-                text_split[i] = remove_white_space(text_split[i]);
-                if (text_split[i] == "")
-                {
-                    continue;
-                }
-                text_split[i] = Regex.Replace(text_split[i], ",$", "");
-                string[] text_split_split = Regex.Split(text_split[i], "(?<=^[^:]*?):");
-                text_split_split[1] = Regex.Replace(text_split_split[1], "^\"", "");
-                text_split_split[1] = Regex.Replace(text_split_split[1], "\"$", "");
-                result += string.Format("{0}={1}&", text_split_split[0], text_split_split[1]);
-            }
-            result = Regex.Replace(result, "&$", "");
-            return result;
-        }
     }
 }

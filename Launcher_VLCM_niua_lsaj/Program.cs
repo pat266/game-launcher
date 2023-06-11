@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Captcha;
 using Launcher_VLCM_niua_lsaj.Forms;
 
 namespace Launcher_VLCM_niua_lsaj
@@ -20,13 +21,20 @@ namespace Launcher_VLCM_niua_lsaj
 
         public static string flash_vars { get; set; } // dữ liệu cần để load game
 
+        static CaptchaSolver captchaSolver;
+
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.SetCompatibleTextRenderingDefault(false);
-            login = new Login();
+
+            string appPath = AppDomain.CurrentDomain.BaseDirectory;
+            string captchaPath = appPath + "models\\captcha\\captcha_model.onnx";
+            Program.captchaSolver = new CaptchaSolver(captchaPath);
+
+            login = new Login(Program.captchaSolver);
             game = new Game();
             cookies = new CookieContainer();
             flash_movie = "";
