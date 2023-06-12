@@ -84,7 +84,7 @@
             reset.FlatAppearance.BorderSize = 0;
             reset.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             reset.ForeColor = System.Drawing.Color.Transparent;
-            reset.Location = new System.Drawing.Point(250, 0);
+            reset.Location = new System.Drawing.Point(196, 0);
             reset.Name = "reset";
             reset.Size = new System.Drawing.Size(30, 30);
             reset.TabIndex = 8;
@@ -124,7 +124,7 @@
             translationButton.FlatAppearance.BorderSize = 0;
             translationButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             translationButton.ForeColor = System.Drawing.Color.Transparent;
-            translationButton.Location = new System.Drawing.Point(220, 0);
+            translationButton.Location = new System.Drawing.Point(166, 0);
             translationButton.Name = "translationButton";
             translationButton.Size = new System.Drawing.Size(30, 30);
             translationButton.TabIndex = 6;
@@ -201,9 +201,9 @@
             nameLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             nameLabel.Location = new System.Drawing.Point(30, 0);
             nameLabel.Name = "nameLabel";
-            nameLabel.Size = new System.Drawing.Size(190, 22);
+            nameLabel.Size = new System.Drawing.Size(136, 22);
             nameLabel.TabIndex = 1;
-            nameLabel.Text = "Launcher - lsaj.niua.com";
+            nameLabel.Text = "Launcher - LSAJ";
             nameLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             nameLabel.DoubleClick += nameLabel_DoubleClick;
             nameLabel.MouseDown += nameLabel_MouseDown;
