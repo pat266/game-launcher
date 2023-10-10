@@ -137,6 +137,12 @@
 		private var auto_use_goods_name:String;
 		
 		private var timer_do_send_10051:Timer;
+		
+		private var channelID: int;
+		
+		private var validBossIds:Array;
+		
+		private var hasChangedChannel:Boolean;
 
 		public function Main()
 		{
@@ -155,12 +161,15 @@
 			is_auto_revive = true;
 			timer_other_task = new Timer(1000);
 			is_auto_ride_mount = true;
-			time_delay_auto_san_boss = 200;
+			time_delay_auto_san_boss = 500;
 			timer_auto_san_boss = new Timer(time_delay_auto_san_boss);
 			timer_auto_refresh_boss_status = new Timer(5000);
 			time_delay_auto_use_goods = 100;
+			hasChangedChannel = false;
 			timer_auto_use_goods = new Timer(time_delay_auto_use_goods);
 			boss_arr = [];
+			// validBossIds = [1082, 1141, 1271, 1191, 1231, 1351, 1431, 1471, 1561, 1711, 1641, 1761, 1842, 1841, 2040, 63429, 2570];
+			validBossIds = [1082, 1141, 1271, 1191, 1231, 1351, 1431, 1471, 1561, 1711, 1641];
 			is_allow_san_boss = false;
 			auto_san_boss_type = 1;
 			is_allow_auto_use_goods = false;
@@ -701,6 +710,7 @@
 			PipeManager["sendMsg"](message,data);
 		}
 		
+		// TODO
 		private function create_auto_feature():void
 		{
 			if (! is_active_auto)
@@ -815,13 +825,48 @@
 				{
 					continue;
 				}
-				if (boss_id == 1082 || boss_id == 1141 || boss_id == 1271 || boss_id == 1191 || boss_id == 1231 || boss_id == 1351 || boss_id == 1431 || boss_id == 1471 || boss_id == 1561 || boss_id == 1711 || boss_id == 1641 || boss_id == 1761 || boss_id == 1842 || boss_id == 1841 || boss_id == 2040 || boss_id == 63429 || boss_id == 2570)
-				{
-					boss_arr.push([boss_id,boss_name,boss_grade,boss_scene_id,boss_x,boss_y]);
+				if (validBossIds.indexOf(boss_id) != -1) {
+					boss_arr.push([boss_id, boss_name, boss_grade, boss_scene_id, boss_x, boss_y]);
 				}
 			}
 			reset_data_position(data);
 			is_allow_san_boss = true;
+		}
+		
+		private function get_bosses_list(message:Object):Array
+		{
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			var boss_arr:Array = [];
+			var boss_count:int = data.readByte();
+			for (var i:int = 0; i < boss_count; i++)
+			{
+				var boss_id:int = data.readInt();
+				var boss_name:String = data.readUTF();
+				var boss_grade:int = data.readShort();
+				var boss_map:String = data.readUTF();
+				var boss_time:String = data.readUTF();
+				var boss_scene_id:int = data.readInt();
+				var boss_x:int = data.readInt();
+				var boss_y:int = data.readInt();
+				var boss_say:int = data.readByte();
+				var particular:String = data.readUTF();
+				var pip:String = data.readUTF();
+				var pip_id:int = data.readInt();
+				var is_online:int = data.readByte();
+				var blood:int = data.readByte();
+				var skill:String = data.readUTF();
+				if (boss_time != "未死亡")
+				{
+					continue;
+				}
+				if (validBossIds.indexOf(boss_id) != -1) {
+					boss_arr.push([boss_id, boss_name, boss_grade, boss_scene_id, boss_x, boss_y]);
+				}
+			}
+			reset_data_position(data);
+			is_allow_san_boss = true;
+			return boss_arr;
 		}
 		
 		private function received_20046(message:Object):void
@@ -1141,9 +1186,11 @@
 		
 		private function change_auto_state():void
 		{
+			hasChangedChannel = false;
 			if (! is_auto_start)
 			{
 				boss_arr = [];
+				channelID = 1;
 				is_allow_san_boss = false;
 				send_40021();
 				is_auto_start = true;
@@ -1199,34 +1246,54 @@
 			{
 				return;
 			}
+			
 			// kiểm tra kênh và đổi kênh
-			if (GameConfig["lineID"] != 2)
+			if (GameConfig["lineID"] != channelID)
 			{
 				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
 				{
+					// truyền tống về lại tương dương
 					out_map_200212();
 					return;
 				}
 				if (get_current_map_id() != 20002)
 				{
+					// đi bộ về lại tương dương
 					go_to_map_20002();
 					return;
 				}
-				send_10111(2); // gửi message đổi sang kênh 2
+				send_10111(channelID); // gửi message đổi kênh
+				
+				hasChangedChannel = false;
+				// received_40022("received_40022");
+				// register_message(40022, received_40022, "received_40022"); // message trả về danh sách boss
+				manual_refresh_boss_status();
 				return;
 			}
+			manual_refresh_boss_status(); // message trả về danh sách boss
+			
 			// về thành nếu không có boss
 			if (boss_arr.length <= 0)
 			{
 				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
 				{
+					// truyền tống về lại tương dương
 					out_map_200212();
 					return;
 				}
 				if (get_current_map_id() != 20002)
 				{
+					// đi bộ về lại tương dương
 					go_to_map_20002();
 				}
+				if (channelID < 6 && !hasChangedChannel) {
+					channelID++;
+					hasChangedChannel = true;
+				} else if (channelID >= 6) {
+					// tắt auto săn boss
+					change_auto_state(); 
+				}
+				// send_10111(channelID);
 				return;
 			}
 			switch(auto_san_boss_type)
@@ -1996,6 +2063,23 @@
 			data.writeByte(line_id);
 			data.writeDouble(getTimer());
 			send_message(10111,data);
+		}
+		
+		private function manual_refresh_boss_status():void
+		{
+			if (! is_active_auto)
+			{
+				return;
+			}
+			if (! is_auto_start)
+			{
+				return;
+			}
+			if (! is_allow_auto)
+			{
+				return;
+			}
+			send_40021();
 		}
 		
 		private function auto_refresh_boss_status(e:TimerEvent):void
