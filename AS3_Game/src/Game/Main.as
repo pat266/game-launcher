@@ -126,6 +126,8 @@
 		
 		private var timer_auto_use_goods:Timer;
 		
+		private var timer_auto_bug_multihit:Timer;
+		
 		private var boss_arr:Array;
 		
 		private var is_allow_san_boss:Boolean;
@@ -133,6 +135,8 @@
 		private var auto_san_boss_type:int;
 		
 		private var is_allow_auto_use_goods:Boolean;
+		
+		private var is_allow_bug_multihit:Boolean;
 		
 		private var auto_use_goods_name:String;
 		
@@ -175,6 +179,8 @@
 			is_allow_auto_use_goods = false;
 			auto_use_goods_name = "";
 			timer_do_send_10051 = new Timer(60000);
+			is_allow_bug_multihit = false;
+			timer_auto_bug_multihit = new Timer(500);
 			addEventListener(Event.ADDED_TO_STAGE, added_to_stage);
 		}
 
@@ -261,6 +267,7 @@
 					timer_auto_san_boss.removeEventListener(TimerEvent.TIMER, auto_san_boss);
 					timer_auto_refresh_boss_status.removeEventListener(TimerEvent.TIMER, auto_refresh_boss_status);
 					timer_auto_use_goods.removeEventListener(TimerEvent.TIMER, auto_use_goods);
+					timer_auto_bug_multihit.removeEventListener(TimerEvent.TIMER, auto_bug_multihit);
 					timer_allow_ride_mount.removeEventListener(TimerEvent.TIMER, allow_ride_mount);
 					timer_other_task.removeEventListener(TimerEvent.TIMER, other_task);
 
@@ -728,10 +735,10 @@
 			register_message(20076,received_20076,"received_20076"); // message nhân vật hồi sinh
 			register_message(50048,received_50048,"received_50048"); // message nhân vật cưỡi thú
 			register_message(40022, received_40022, "received_40022"); // message trả về danh sách boss
-			timer_do_send_10051.addEventListener(TimerEvent.TIMER,do_send_10051); // thêm sự kiện cho timer xử lý gửi message 10051 sau một khoảng thời gian chỉ định
 			timer_auto_san_boss.addEventListener(TimerEvent.TIMER,auto_san_boss); // thêm sự kiện cho timer xử lý quá trình săn boss
 			timer_auto_refresh_boss_status.addEventListener(TimerEvent.TIMER,auto_refresh_boss_status); // thêm sự kiện cho timer refresh danh sách boss
-			timer_auto_use_goods.addEventListener(TimerEvent.TIMER,auto_use_goods); // thêm sự kiện cho timer xử lý tính năng dùng vật phẩm
+			timer_auto_use_goods.addEventListener(TimerEvent.TIMER, auto_use_goods); // thêm sự kiện cho timer xử lý tính năng dùng vật phẩm
+			timer_auto_bug_multihit.addEventListener(TimerEvent.TIMER, auto_bug_multihit); // thêm sự kiện cho timer xử lý tính năng spam cung
 			timer_allow_ride_mount.addEventListener(TimerEvent.TIMER,allow_ride_mount); // thêm sự kiện cho timer xử lý tính năng cưỡi thú
 			timer_other_task.addEventListener(TimerEvent.TIMER,other_task); // thêm sự kiện cho timer xử lý một số công việc khác
 			get_stage()["addEventListener"](KeyboardEvent.KEY_DOWN,stage_key_down); // thêm sự kiện nhấn phím
@@ -776,7 +783,7 @@
 			{
 				return;
 			}
-			for each(var goods in get_goods_bag_arr())
+			for each(var goods:Array in get_goods_bag_arr())
 			{
 				if ("[" + goods["res"]["name"] + "]" == auto_use_goods_name)
 				{
@@ -786,6 +793,43 @@
 			}
 			notify("Không có vật phẩm " + auto_use_goods_name + "!",2);
 			change_auto_use_goods_state();
+		}
+		
+		private function auto_bug_multihit(e:TimerEvent):void
+		{
+			if (! is_active_auto)
+			{
+				return;
+			}
+			if (! is_allow_auto)
+			{
+				return;
+			}
+			if (! is_allow_bug_multihit)
+			{
+				return;
+			}
+			// spam cung
+			for each(var scene_char:Object in get_scene()["sceneCharacters"])
+			{
+				try
+				{
+					if (scene_char["isMainChar"]() || ! scene_char["usable"])
+					{
+						continue;
+					}
+					if (scene_char["getStatus"]() != CharStatusType["DEATH"] && scene_char["type"] == SceneCharacterType["MONSTER"])
+					{
+						send_10283(57001);
+						return;
+					}
+				}
+				catch (error:Error)
+				{
+					continue;
+				}
+			}
+			// change_auto_bug_multihit_state();
 		}
 		
 		private function get_goods_bag_arr():Array
@@ -1131,14 +1175,24 @@
 			}
 			switch (e.keyCode)
 			{
+				// F1
 				case 112:
 					change_auto_use_goods_state();
 					return;
+					
+				// F2
 				case 113 :
 					change_auto_state();
 					return;
+					
+				// F3
 				case 114:
 					change_auto_san_boss_type();
+					return;
+					
+				// phím F4
+                case 115:
+					change_auto_bug_multihit_state();
 					return;
 			}
 		}
@@ -1162,6 +1216,20 @@
 			get_main_ui()["chatContainer"]["input"]["richText"] = "";
 			timer_auto_use_goods.start();
 			notify("Tự động sử dụng vật phẩm " + auto_use_goods_name);
+		}
+		
+		private function change_auto_bug_multihit_state():void
+		{
+			if (is_allow_bug_multihit)
+			{
+				is_allow_bug_multihit = false;
+				timer_auto_bug_multihit.reset();
+				notify("Tắt auto cung");
+				return;
+			}
+			is_allow_bug_multihit = true;
+			timer_auto_bug_multihit.start();
+			notify("Bật auto cung");
 		}
 		
 		private function get_main_ui():Object
@@ -1469,7 +1537,7 @@
 					continue;
 				}
 			}
-			var boss_point = new Point(boss_x,boss_y);
+			var boss_point:Point = new Point(boss_x,boss_y);
 			if (calculate_distance(char_point,boss_point) <= 1000 && target_char != null && target_char["data"]["attributeInfo"]["hpNow"] != 0)
 			{
 				send_command(PipeConstants["CHANGED_LOCKEDCHAR_BASE_ATTR"],target_char);
@@ -2034,6 +2102,16 @@
 			data.writeInt(target_char_id);
 			data.writeDouble(getTimer());
 			send_message(10083,data);
+		}
+		
+		private function send_10283(skill_id:int):void
+		{
+			var data:ByteArray = new ByteArray();
+			data.writeInt(skill_id);
+			data.writeShort(get_mainchar()["tile_x"]);
+			data.writeShort(get_mainchar()["tile_y"]);
+			data.writeDouble(getTimer());
+			send_message(10283,data);
 		}
 		
 		private function walk(map_id:int,tile_x:int = -1,tile_y:int = -1,show_auto_find_path_text:Boolean = true):void
