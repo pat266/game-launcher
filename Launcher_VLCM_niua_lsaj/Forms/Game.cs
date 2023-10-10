@@ -45,6 +45,8 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private int mapZoomIndex;
         private int menuZoomIndex;
 
+        private _IShockwaveFlashEvents_FlashCallEventHandler flashCallHandler;
+
         public Game()
         {
             InitializeComponent();
@@ -81,6 +83,10 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void Initialize_Flash()
         {
             // Create the object
+            if (this.axShockwaveFlash != null)
+            {
+                this.axShockwaveFlash.Dispose();
+            }
             this.axShockwaveFlash = new AxShockwaveFlashObjects.AxShockwaveFlash();
 
             // Set properties
@@ -99,11 +105,19 @@ namespace Launcher_VLCM_niua_lsaj.Forms
             string movie = string.Format("{0}?{1}", Program.flash_movie, Program.flash_vars);
 
             var localSWF = Application.StartupPath + @"\AS3Game.swf";
+            // Initialize the handler if not already
+            if (flashCallHandler == null)
+            {
+                flashCallHandler = new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive);
+            }
+            // Unsubscribe the handler, then subscribe it to ensure no duplicates
+            this.axShockwaveFlash.FlashCall -= flashCallHandler; 
+            this.axShockwaveFlash.FlashCall += flashCallHandler;
             // receive data from AS3
-            axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive);
-            axShockwaveFlash.LoadMovie(0, localSWF);
+            // this.axShockwaveFlash.FlashCall += new _IShockwaveFlashEvents_FlashCallEventHandler(AS3_Receive);
+            this.axShockwaveFlash.LoadMovie(0, localSWF);
             // sending movie data to AS3
-            axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
+            this.axShockwaveFlash.CallFunction("<invoke name=\"loadMovie\" returntype=\"xml\"><arguments><string>" + movie + "</string></arguments></invoke>");
 
             Adjust_Gameform();
 
@@ -321,9 +335,14 @@ namespace Launcher_VLCM_niua_lsaj.Forms
          */
         private void restart_Click(object sender, EventArgs e)
         {
-            // call the function to reset the zoom to default from AS3
-            axShockwaveFlash.CallFunction("<invoke name=\"restartGame\" returntype=\"xml\"><arguments><string>" +
-                "something" + "</string></arguments></invoke>");
+            this.axShockwaveFlash.CallFunction("<invoke name=\"restartGame\" returntype=\"xml\"><arguments><string>" + "s" + "</string></arguments></invoke>");
+            // 1. Unload the currently running SWF movie
+            this.axShockwaveFlash.LoadMovie(0, "");
+            this.tableLayoutPanel1.Controls.Remove(this.axShockwaveFlash);
+            Initialize_Flash();
+            System.GC.Collect();
+            // 2. Load the game again by calling Game_Load
+            Game_Load(this, EventArgs.Empty);
         }
 
         /**
@@ -717,8 +736,7 @@ namespace Launcher_VLCM_niua_lsaj.Forms
         private void reset_Click(object sender, EventArgs e)
         {
             // call the function to reset the zoom to default from AS3
-            axShockwaveFlash.CallFunction("<invoke name=\"resetZoom\" returntype=\"xml\"><arguments><string>" +
-                "something" + "</string></arguments></invoke>");
+            string returnStr = this.axShockwaveFlash.CallFunction("<invoke name=\"resetZoom\" returntype=\"xml\"><arguments><string>" + "s" + "</string></arguments></invoke>");
         }
 
         #endregion

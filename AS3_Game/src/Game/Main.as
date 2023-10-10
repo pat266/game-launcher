@@ -5,6 +5,7 @@
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;
+	import flash.utils.setTimeout;
 	import flash.events.UncaughtErrorEvent;
 	import flash.external.ExternalInterface;
 	import flash.geom.Point;
@@ -19,6 +20,9 @@
 	import flash.display.Stage;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
+	import flash.system.System;
+
+
 
 	public class Main extends Sprite
 	{
@@ -80,6 +84,8 @@
 		
 		// các biến cần dùng để xử lý của auto
 		
+		private var movie_url:String;
+		
 		private var is_active_auto:Boolean;
 		
 		private var user_id:String;
@@ -136,6 +142,7 @@
 		{
 			is_active_auto = true;
 			user_id = "";
+			movie_url = "";
 			server_id = 0;
 			char_name = "";
 			square = 25;
@@ -159,7 +166,7 @@
 			is_allow_auto_use_goods = false;
 			auto_use_goods_name = "";
 			timer_do_send_10051 = new Timer(60000);
-			addEventListener(Event.ADDED_TO_STAGE,added_to_stage);
+			addEventListener(Event.ADDED_TO_STAGE, added_to_stage);
 		}
 
 		private function added_to_stage(e:Event):void
@@ -169,14 +176,18 @@
 			fscommand("loadMovie"); // báo cho ứng dụng thực hiện load movie
 		}
 
+		// TODO: Pass character name 
 		private function _loadMovie(movie:String):void
 		{
 			char_name = "..."; // truyền tên đăng nhập vào đây nếu muốn bước sau tự động chọn nhân vật
+			
 			var url_request:URLRequest = new URLRequest(movie);
 			Security.allowDomain("*");
 			flash_movie_loader = new Loader();
-			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,flash_movie_loader_complete);
+			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, flash_movie_loader_complete);
+			this.movie_url = movie;
 			flash_movie_loader.load(url_request);
+			System.gc();
 		}
 
 		private function flash_movie_loader_complete(e:Event):void
@@ -185,22 +196,14 @@
 			flash_movie_loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,flash_movie_loader_uncaught_error_event);
 			stage.addChild(flash_movie_loader.content);
 			stage.addEventListener(Event.ENTER_FRAME, stage_enter_frame); // thêm sự kiện enter frame của stage để kiểm tra và load các class của game
-			
-			// add zoom in/out support
+			// add zoom in/out support callbacks
 			zoomMap();
 			zoomMenu();
 			resetZoomDefault();
 			
-			// add restart the game support
+			// add restart the game support callbacks
 			restartGame();
-		}
-		
-		/**
-		 * Add the SWF content to the stage when it is loaded
-		 * @param	evt
-		 */
-		private function handleLoaded (evt:Event):void {
-			stage.addChild(flash_movie_loader.content);
+			
 		}
 		
 		/**
@@ -208,15 +211,73 @@
 		 * Restart the game
 		 */
 		private function restartGame():void {
-			
-			ExternalInterface.addCallback("restartGame", function(text : String) : String
-			{
-				stage.removeChild(flash_movie_loader.content);
-				flash_movie_loader.unload();
-				flash_movie_loader.load(new URLRequest(this.movie));
-				flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded);
-				
-				return ""; // for testing purpose
+			var capturedMovieURL:String = this.movie_url;
+			var self:Main = this; // Capture a reference to the current instance of Main
+						
+			ExternalInterface.addCallback("restartGame", function(text : String) : String {
+				// Error handling
+				try {
+					// Step 1: Remove callbacks
+					ExternalInterface.addCallback("restartGame", null);
+					ExternalInterface.addCallback("zoomMap", null);
+					ExternalInterface.addCallback("zoomMenu", null);
+					ExternalInterface.addCallback("resetZoom", null);
+					ExternalInterface.addCallback("loadMovie", null);
+
+					// Step 2: Unload the current SWF
+					if (self.stage) {
+						self.stage.removeEventListener(Event.ENTER_FRAME, stage_enter_frame);
+						if (self.flash_movie_loader && self.flash_movie_loader.content && self.stage.contains(self.flash_movie_loader.content)) {
+							self.stage.removeChild(self.flash_movie_loader.content);
+						}
+					}
+					if (self.flash_movie_loader) {
+						self.flash_movie_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, flash_movie_loader_complete);
+						self.flash_movie_loader.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, flash_movie_loader_uncaught_error_event);
+						self.flash_movie_loader.unloadAndStop(true);
+						self.flash_movie_loader = null;
+					}
+					
+					// stopping all of the timers
+					// 1. Stop the timers
+					timer_do_send_10051.stop();
+					timer_auto_san_boss.stop();
+					timer_auto_refresh_boss_status.stop();
+					timer_auto_use_goods.stop();
+					timer_allow_ride_mount.stop();
+					timer_other_task.stop();
+
+					// 2. Remove the event listeners
+					timer_do_send_10051.removeEventListener(TimerEvent.TIMER, do_send_10051);
+					timer_auto_san_boss.removeEventListener(TimerEvent.TIMER, auto_san_boss);
+					timer_auto_refresh_boss_status.removeEventListener(TimerEvent.TIMER, auto_refresh_boss_status);
+					timer_auto_use_goods.removeEventListener(TimerEvent.TIMER, auto_use_goods);
+					timer_allow_ride_mount.removeEventListener(TimerEvent.TIMER, allow_ride_mount);
+					timer_other_task.removeEventListener(TimerEvent.TIMER, other_task);
+
+					get_stage()["removeEventListener"](KeyboardEvent.KEY_DOWN, stage_key_down);
+					get_stage()["removeEventListener"](KeyboardEvent.KEY_UP, stage_key_up);
+					
+					NetWorkManager["lineSocket"]["removeEventListener"](TSocketEvent["CLOSE"], line_socket_close);
+					get_ui()["loadingBar"]["removeEventListener"](Event.ADDED_TO_STAGE,loading_bar_added_to_stage); // thêm sự kiện xử lý màn hình load game
+					get_ui()["loadingBar"]["removeEventListener"](Event.REMOVED_FROM_STAGE,loading_bar_remove_from_stage); // thêm sự kiện xử lý màn hình load game
+
+					// 3. Nullify or reset the timer references
+					timer_do_send_10051 = null;
+					timer_auto_san_boss = null;
+					timer_auto_refresh_boss_status = null;
+					timer_auto_use_goods = null;
+					timer_allow_ride_mount = null;
+					timer_other_task = null;
+					
+					
+					System.gc();
+					// Step 3: Load the SWF again
+					// setTimeout(_loadMovie, 2000, capturedMovieURL);
+				} catch (error:Error) {
+					trace("Error in restartGame: " + error.message);
+				}
+				return "";
 			});
 		}
 		
@@ -225,40 +286,43 @@
 		 * Resizing the map requires a lot of processing to make sure the camera doesnt look too bad
 		 */
 		private function zoomMap():void {
-			
+			var self:Main = this; // Capture a reference to the current instance of Main
 			ExternalInterface.addCallback("zoomMap", function(text : String) : String
 			{
-				// check if the map is loaded up
-				var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
-				var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
-				// only change the size of the map if it exists
-				if (mapWidth != 0 && mapHeight != 0) {
-					var scale:Number = parseFloat(text);
-					var value:int = 0;
-					stage.scaleMode = StageScaleMode.NO_SCALE;
-					// if the scale is changed back to 1
-					if (scale == 1.0) {
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
-					} else {
-						/**
-						 * UI (without map): index = 2
-						 * Only map: index = 0
-						 */						
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
-						
-						if (scale < 1) {
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
-							var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-							var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-							var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+				if (self.stage && self.stage.numChildren > 0) {
+					// check if the map is loaded up
+					var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
+					var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
+					// only change the size of the map if it exists
+					if (mapWidth != 0 && mapHeight != 0) {
+						var scale:Number = parseFloat(text);
+						var value:int = 0;
+						stage.scaleMode = StageScaleMode.NO_SCALE;
+						// if the scale is changed back to 1
+						if (scale == 1.0) {
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
+						} else {
+							/**
+							 * UI (without map): index = 2
+							 * Only map: index = 0
+							 */						
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
 							
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+							if (scale < 1) {
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
+								var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
+								var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
+								var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+								
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+							}
 						}
 					}
-				}		
+				}
+				
 				
 				return "Width: " + stage.stageWidth + ", height: " + stage.stageHeight +
 					";\n Map Width: " + mapWidth + ", map height: " + mapHeight; // for testing purpose
@@ -270,12 +334,15 @@
 		 * Resizing the menus, leaving only the map intact
 		 */
 		private function zoomMenu():void {
-			
+			var self:Main = this; // Capture a reference to the current instance of Main
 			ExternalInterface.addCallback("zoomMenu", function(text : String) : String
 			{
-				var scale:Number = parseFloat(text);
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				if (self.stage && self.stage.numChildren > 0) {
+					var scale:Number = parseFloat(text);
+					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
+					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				}
+				
 				return ""; // for testing purpose
 			});
 		}
@@ -285,15 +352,21 @@
 		 * Reset the zoom levels to default
 		 */
 		private function resetZoomDefault():void {
-			
-			ExternalInterface.addCallback("resetZoom", function(text : String) : String
-			{
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = 1;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = 1;
-				
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleX"] = 1;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleY"] = 1;
-				return ""; // for testing purpose
+			var self:Main = this; // Capture a reference to the current instance of Main
+			ExternalInterface.addCallback("resetZoom", function(text : String) : String {
+				try {
+					if (self.stage && self.stage.numChildren > 0) {
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = 1;
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = 1;
+
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleX"] = 1;
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleY"] = 1;
+					}
+					return "Success"; // If everything went fine
+				} catch (error:Error) {
+					return "Error in resetZoom: " + error.message; // Return the error message to C#
+				}
+				return "Stage or its children are not initialized."; // Handle cases where the condition is false
 			});
 		}
 
