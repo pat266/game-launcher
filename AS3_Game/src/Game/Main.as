@@ -5,6 +5,7 @@
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;
+	import flash.utils.setTimeout;
 	import flash.events.UncaughtErrorEvent;
 	import flash.external.ExternalInterface;
 	import flash.geom.Point;
@@ -19,6 +20,9 @@
 	import flash.display.Stage;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
+	import flash.system.System;
+
+
 
 	public class Main extends Sprite
 	{
@@ -80,6 +84,8 @@
 		
 		// các biến cần dùng để xử lý của auto
 		
+		private var movie_url:String;
+		
 		private var is_active_auto:Boolean;
 		
 		private var user_id:String;
@@ -120,6 +126,8 @@
 		
 		private var timer_auto_use_goods:Timer;
 		
+		private var timer_auto_bug_multihit:Timer;
+		
 		private var boss_arr:Array;
 		
 		private var is_allow_san_boss:Boolean;
@@ -128,14 +136,23 @@
 		
 		private var is_allow_auto_use_goods:Boolean;
 		
+		private var is_allow_bug_multihit:Boolean;
+		
 		private var auto_use_goods_name:String;
 		
 		private var timer_do_send_10051:Timer;
+		
+		private var channelID: int;
+		
+		private var validBossIds:Array;
+		
+		private var hasChangedChannel:Boolean;
 
 		public function Main()
 		{
 			is_active_auto = true;
 			user_id = "";
+			movie_url = "";
 			server_id = 0;
 			char_name = "";
 			square = 25;
@@ -148,18 +165,23 @@
 			is_auto_revive = true;
 			timer_other_task = new Timer(1000);
 			is_auto_ride_mount = true;
-			time_delay_auto_san_boss = 200;
+			time_delay_auto_san_boss = 500;
 			timer_auto_san_boss = new Timer(time_delay_auto_san_boss);
 			timer_auto_refresh_boss_status = new Timer(5000);
 			time_delay_auto_use_goods = 100;
+			hasChangedChannel = false;
 			timer_auto_use_goods = new Timer(time_delay_auto_use_goods);
 			boss_arr = [];
+			// validBossIds = [1082, 1141, 1271, 1191, 1231, 1351, 1431, 1471, 1561, 1711, 1641, 1761, 1842, 1841, 2040, 63429, 2570];
+			validBossIds = [1082, 1141, 1271, 1191, 1231, 1351, 1431, 1471, 1561, 1711, 1641];
 			is_allow_san_boss = false;
 			auto_san_boss_type = 1;
 			is_allow_auto_use_goods = false;
 			auto_use_goods_name = "";
 			timer_do_send_10051 = new Timer(60000);
-			addEventListener(Event.ADDED_TO_STAGE,added_to_stage);
+			is_allow_bug_multihit = false;
+			timer_auto_bug_multihit = new Timer(500);
+			addEventListener(Event.ADDED_TO_STAGE, added_to_stage);
 		}
 
 		private function added_to_stage(e:Event):void
@@ -169,14 +191,18 @@
 			fscommand("loadMovie"); // báo cho ứng dụng thực hiện load movie
 		}
 
+		// TODO: Pass character name 
 		private function _loadMovie(movie:String):void
 		{
 			char_name = "..."; // truyền tên đăng nhập vào đây nếu muốn bước sau tự động chọn nhân vật
+			
 			var url_request:URLRequest = new URLRequest(movie);
 			Security.allowDomain("*");
 			flash_movie_loader = new Loader();
-			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE,flash_movie_loader_complete);
+			flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, flash_movie_loader_complete);
+			this.movie_url = movie;
 			flash_movie_loader.load(url_request);
+			System.gc();
 		}
 
 		private function flash_movie_loader_complete(e:Event):void
@@ -185,22 +211,14 @@
 			flash_movie_loader.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR,flash_movie_loader_uncaught_error_event);
 			stage.addChild(flash_movie_loader.content);
 			stage.addEventListener(Event.ENTER_FRAME, stage_enter_frame); // thêm sự kiện enter frame của stage để kiểm tra và load các class của game
-			
-			// add zoom in/out support
+			// add zoom in/out support callbacks
 			zoomMap();
 			zoomMenu();
 			resetZoomDefault();
 			
-			// add restart the game support
+			// add restart the game support callbacks
 			restartGame();
-		}
-		
-		/**
-		 * Add the SWF content to the stage when it is loaded
-		 * @param	evt
-		 */
-		private function handleLoaded (evt:Event):void {
-			stage.addChild(flash_movie_loader.content);
+			
 		}
 		
 		/**
@@ -208,15 +226,74 @@
 		 * Restart the game
 		 */
 		private function restartGame():void {
-			
-			ExternalInterface.addCallback("restartGame", function(text : String) : String
-			{
-				stage.removeChild(flash_movie_loader.content);
-				flash_movie_loader.unload();
-				flash_movie_loader.load(new URLRequest(this.movie));
-				flash_movie_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, handleLoaded);
-				
-				return ""; // for testing purpose
+			var capturedMovieURL:String = this.movie_url;
+			var self:Main = this; // Capture a reference to the current instance of Main
+						
+			ExternalInterface.addCallback("restartGame", function(text : String) : String {
+				// Error handling
+				try {
+					// Step 1: Remove callbacks
+					ExternalInterface.addCallback("restartGame", null);
+					ExternalInterface.addCallback("zoomMap", null);
+					ExternalInterface.addCallback("zoomMenu", null);
+					ExternalInterface.addCallback("resetZoom", null);
+					ExternalInterface.addCallback("loadMovie", null);
+
+					// Step 2: Unload the current SWF
+					if (self.stage) {
+						self.stage.removeEventListener(Event.ENTER_FRAME, stage_enter_frame);
+						if (self.flash_movie_loader && self.flash_movie_loader.content && self.stage.contains(self.flash_movie_loader.content)) {
+							self.stage.removeChild(self.flash_movie_loader.content);
+						}
+					}
+					if (self.flash_movie_loader) {
+						self.flash_movie_loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, flash_movie_loader_complete);
+						self.flash_movie_loader.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, flash_movie_loader_uncaught_error_event);
+						self.flash_movie_loader.unloadAndStop(true);
+						self.flash_movie_loader = null;
+					}
+					
+					// stopping all of the timers
+					// 1. Stop the timers
+					timer_do_send_10051.stop();
+					timer_auto_san_boss.stop();
+					timer_auto_refresh_boss_status.stop();
+					timer_auto_use_goods.stop();
+					timer_allow_ride_mount.stop();
+					timer_other_task.stop();
+
+					// 2. Remove the event listeners
+					timer_do_send_10051.removeEventListener(TimerEvent.TIMER, do_send_10051);
+					timer_auto_san_boss.removeEventListener(TimerEvent.TIMER, auto_san_boss);
+					timer_auto_refresh_boss_status.removeEventListener(TimerEvent.TIMER, auto_refresh_boss_status);
+					timer_auto_use_goods.removeEventListener(TimerEvent.TIMER, auto_use_goods);
+					timer_auto_bug_multihit.removeEventListener(TimerEvent.TIMER, auto_bug_multihit);
+					timer_allow_ride_mount.removeEventListener(TimerEvent.TIMER, allow_ride_mount);
+					timer_other_task.removeEventListener(TimerEvent.TIMER, other_task);
+
+					get_stage()["removeEventListener"](KeyboardEvent.KEY_DOWN, stage_key_down);
+					get_stage()["removeEventListener"](KeyboardEvent.KEY_UP, stage_key_up);
+					
+					NetWorkManager["lineSocket"]["removeEventListener"](TSocketEvent["CLOSE"], line_socket_close);
+					get_ui()["loadingBar"]["removeEventListener"](Event.ADDED_TO_STAGE,loading_bar_added_to_stage); // thêm sự kiện xử lý màn hình load game
+					get_ui()["loadingBar"]["removeEventListener"](Event.REMOVED_FROM_STAGE,loading_bar_remove_from_stage); // thêm sự kiện xử lý màn hình load game
+
+					// 3. Nullify or reset the timer references
+					timer_do_send_10051 = null;
+					timer_auto_san_boss = null;
+					timer_auto_refresh_boss_status = null;
+					timer_auto_use_goods = null;
+					timer_allow_ride_mount = null;
+					timer_other_task = null;
+					
+					
+					System.gc();
+					// Step 3: Load the SWF again
+					// setTimeout(_loadMovie, 2000, capturedMovieURL);
+				} catch (error:Error) {
+					trace("Error in restartGame: " + error.message);
+				}
+				return "";
 			});
 		}
 		
@@ -225,40 +302,43 @@
 		 * Resizing the map requires a lot of processing to make sure the camera doesnt look too bad
 		 */
 		private function zoomMap():void {
-			
+			var self:Main = this; // Capture a reference to the current instance of Main
 			ExternalInterface.addCallback("zoomMap", function(text : String) : String
 			{
-				// check if the map is loaded up
-				var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
-				var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
-				// only change the size of the map if it exists
-				if (mapWidth != 0 && mapHeight != 0) {
-					var scale:Number = parseFloat(text);
-					var value:int = 0;
-					stage.scaleMode = StageScaleMode.NO_SCALE;
-					// if the scale is changed back to 1
-					if (scale == 1.0) {
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
-					} else {
-						/**
-						 * UI (without map): index = 2
-						 * Only map: index = 0
-						 */						
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
-						stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
-						
-						if (scale < 1) {
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
-							var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
-							var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
-							var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+				if (self.stage && self.stage.numChildren > 0) {
+					// check if the map is loaded up
+					var mapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"];
+					var mapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"];
+					// only change the size of the map if it exists
+					if (mapWidth != 0 && mapHeight != 0) {
+						var scale:Number = parseFloat(text);
+						var value:int = 0;
+						stage.scaleMode = StageScaleMode.NO_SCALE;
+						// if the scale is changed back to 1
+						if (scale == 1.0) {
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = 1;
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = 1;
+						} else {
+							/**
+							 * UI (without map): index = 2
+							 * Only map: index = 0
+							 */						
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] = scale;
+							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleY"] = scale;
 							
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
-							stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+							if (scale < 1) {
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["scaleX"] *= (stage.stageWidth / stage.stageHeight);
+								var parentMapWidth:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["width"];
+								var parentMapHeight:Number = stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["height"];
+								var greaterNumber:Number = (parentMapWidth > parentMapHeight) ? parentMapWidth : parentMapHeight;
+								
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["width"] = greaterNumber;
+								stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](value)["height"] = greaterNumber;
+							}
 						}
 					}
-				}		
+				}
+				
 				
 				return "Width: " + stage.stageWidth + ", height: " + stage.stageHeight +
 					";\n Map Width: " + mapWidth + ", map height: " + mapHeight; // for testing purpose
@@ -270,12 +350,15 @@
 		 * Resizing the menus, leaving only the map intact
 		 */
 		private function zoomMenu():void {
-			
+			var self:Main = this; // Capture a reference to the current instance of Main
 			ExternalInterface.addCallback("zoomMenu", function(text : String) : String
 			{
-				var scale:Number = parseFloat(text);
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				if (self.stage && self.stage.numChildren > 0) {
+					var scale:Number = parseFloat(text);
+					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = scale;
+					stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = scale;
+				}
+				
 				return ""; // for testing purpose
 			});
 		}
@@ -285,15 +368,21 @@
 		 * Reset the zoom levels to default
 		 */
 		private function resetZoomDefault():void {
-			
-			ExternalInterface.addCallback("resetZoom", function(text : String) : String
-			{
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = 1;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = 1;
-				
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleX"] = 1;
-				stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleY"] = 1;
-				return ""; // for testing purpose
+			var self:Main = this; // Capture a reference to the current instance of Main
+			ExternalInterface.addCallback("resetZoom", function(text : String) : String {
+				try {
+					if (self.stage && self.stage.numChildren > 0) {
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleX"] = 1;
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](2)["scaleY"] = 1;
+
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleX"] = 1;
+						self.stage["getChildAt"](1)["getChildAt"](0)["getChildAt"](0)["getChildAt"](0)["scaleY"] = 1;
+					}
+					return "Success"; // If everything went fine
+				} catch (error:Error) {
+					return "Error in resetZoom: " + error.message; // Return the error message to C#
+				}
+				return "Stage or its children are not initialized."; // Handle cases where the condition is false
 			});
 		}
 
@@ -628,6 +717,7 @@
 			PipeManager["sendMsg"](message,data);
 		}
 		
+		// TODO
 		private function create_auto_feature():void
 		{
 			if (! is_active_auto)
@@ -645,10 +735,10 @@
 			register_message(20076,received_20076,"received_20076"); // message nhân vật hồi sinh
 			register_message(50048,received_50048,"received_50048"); // message nhân vật cưỡi thú
 			register_message(40022, received_40022, "received_40022"); // message trả về danh sách boss
-			timer_do_send_10051.addEventListener(TimerEvent.TIMER,do_send_10051); // thêm sự kiện cho timer xử lý gửi message 10051 sau một khoảng thời gian chỉ định
 			timer_auto_san_boss.addEventListener(TimerEvent.TIMER,auto_san_boss); // thêm sự kiện cho timer xử lý quá trình săn boss
 			timer_auto_refresh_boss_status.addEventListener(TimerEvent.TIMER,auto_refresh_boss_status); // thêm sự kiện cho timer refresh danh sách boss
-			timer_auto_use_goods.addEventListener(TimerEvent.TIMER,auto_use_goods); // thêm sự kiện cho timer xử lý tính năng dùng vật phẩm
+			timer_auto_use_goods.addEventListener(TimerEvent.TIMER, auto_use_goods); // thêm sự kiện cho timer xử lý tính năng dùng vật phẩm
+			timer_auto_bug_multihit.addEventListener(TimerEvent.TIMER, auto_bug_multihit); // thêm sự kiện cho timer xử lý tính năng spam cung
 			timer_allow_ride_mount.addEventListener(TimerEvent.TIMER,allow_ride_mount); // thêm sự kiện cho timer xử lý tính năng cưỡi thú
 			timer_other_task.addEventListener(TimerEvent.TIMER,other_task); // thêm sự kiện cho timer xử lý một số công việc khác
 			get_stage()["addEventListener"](KeyboardEvent.KEY_DOWN,stage_key_down); // thêm sự kiện nhấn phím
@@ -693,7 +783,7 @@
 			{
 				return;
 			}
-			for each(var goods in get_goods_bag_arr())
+			for each(var goods:Array in get_goods_bag_arr())
 			{
 				if ("[" + goods["res"]["name"] + "]" == auto_use_goods_name)
 				{
@@ -703,6 +793,43 @@
 			}
 			notify("Không có vật phẩm " + auto_use_goods_name + "!",2);
 			change_auto_use_goods_state();
+		}
+		
+		private function auto_bug_multihit(e:TimerEvent):void
+		{
+			if (! is_active_auto)
+			{
+				return;
+			}
+			if (! is_allow_auto)
+			{
+				return;
+			}
+			if (! is_allow_bug_multihit)
+			{
+				return;
+			}
+			// spam cung
+			for each(var scene_char:Object in get_scene()["sceneCharacters"])
+			{
+				try
+				{
+					if (scene_char["isMainChar"]() || ! scene_char["usable"])
+					{
+						continue;
+					}
+					if (scene_char["getStatus"]() != CharStatusType["DEATH"] && scene_char["type"] == SceneCharacterType["MONSTER"])
+					{
+						send_10283(57001);
+						return;
+					}
+				}
+				catch (error:Error)
+				{
+					continue;
+				}
+			}
+			// change_auto_bug_multihit_state();
 		}
 		
 		private function get_goods_bag_arr():Array
@@ -742,13 +869,48 @@
 				{
 					continue;
 				}
-				if (boss_id == 1082 || boss_id == 1141 || boss_id == 1271 || boss_id == 1191 || boss_id == 1231 || boss_id == 1351 || boss_id == 1431 || boss_id == 1471 || boss_id == 1561 || boss_id == 1711 || boss_id == 1641 || boss_id == 1761 || boss_id == 1842 || boss_id == 1841 || boss_id == 2040 || boss_id == 63429 || boss_id == 2570)
-				{
-					boss_arr.push([boss_id,boss_name,boss_grade,boss_scene_id,boss_x,boss_y]);
+				if (validBossIds.indexOf(boss_id) != -1) {
+					boss_arr.push([boss_id, boss_name, boss_grade, boss_scene_id, boss_x, boss_y]);
 				}
 			}
 			reset_data_position(data);
 			is_allow_san_boss = true;
+		}
+		
+		private function get_bosses_list(message:Object):Array
+		{
+			var data:ByteArray = get_data(message);
+			reset_data_position(data);
+			var boss_arr:Array = [];
+			var boss_count:int = data.readByte();
+			for (var i:int = 0; i < boss_count; i++)
+			{
+				var boss_id:int = data.readInt();
+				var boss_name:String = data.readUTF();
+				var boss_grade:int = data.readShort();
+				var boss_map:String = data.readUTF();
+				var boss_time:String = data.readUTF();
+				var boss_scene_id:int = data.readInt();
+				var boss_x:int = data.readInt();
+				var boss_y:int = data.readInt();
+				var boss_say:int = data.readByte();
+				var particular:String = data.readUTF();
+				var pip:String = data.readUTF();
+				var pip_id:int = data.readInt();
+				var is_online:int = data.readByte();
+				var blood:int = data.readByte();
+				var skill:String = data.readUTF();
+				if (boss_time != "未死亡")
+				{
+					continue;
+				}
+				if (validBossIds.indexOf(boss_id) != -1) {
+					boss_arr.push([boss_id, boss_name, boss_grade, boss_scene_id, boss_x, boss_y]);
+				}
+			}
+			reset_data_position(data);
+			is_allow_san_boss = true;
+			return boss_arr;
 		}
 		
 		private function received_20046(message:Object):void
@@ -1013,14 +1175,24 @@
 			}
 			switch (e.keyCode)
 			{
+				// F1
 				case 112:
 					change_auto_use_goods_state();
 					return;
+					
+				// F2
 				case 113 :
 					change_auto_state();
 					return;
+					
+				// F3
 				case 114:
 					change_auto_san_boss_type();
+					return;
+					
+				// phím F4
+                case 115:
+					change_auto_bug_multihit_state();
 					return;
 			}
 		}
@@ -1046,6 +1218,20 @@
 			notify("Tự động sử dụng vật phẩm " + auto_use_goods_name);
 		}
 		
+		private function change_auto_bug_multihit_state():void
+		{
+			if (is_allow_bug_multihit)
+			{
+				is_allow_bug_multihit = false;
+				timer_auto_bug_multihit.reset();
+				notify("Tắt auto cung");
+				return;
+			}
+			is_allow_bug_multihit = true;
+			timer_auto_bug_multihit.start();
+			notify("Bật auto cung");
+		}
+		
 		private function get_main_ui():Object
 		{
 			return get_ui()["mainUI"] as MainUI;
@@ -1068,9 +1254,11 @@
 		
 		private function change_auto_state():void
 		{
+			hasChangedChannel = false;
 			if (! is_auto_start)
 			{
 				boss_arr = [];
+				channelID = 1;
 				is_allow_san_boss = false;
 				send_40021();
 				is_auto_start = true;
@@ -1126,34 +1314,54 @@
 			{
 				return;
 			}
+			
 			// kiểm tra kênh và đổi kênh
-			if (GameConfig["lineID"] != 2)
+			if (GameConfig["lineID"] != channelID)
 			{
 				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
 				{
+					// truyền tống về lại tương dương
 					out_map_200212();
 					return;
 				}
 				if (get_current_map_id() != 20002)
 				{
+					// đi bộ về lại tương dương
 					go_to_map_20002();
 					return;
 				}
-				send_10111(2); // gửi message đổi sang kênh 2
+				send_10111(channelID); // gửi message đổi kênh
+				
+				hasChangedChannel = false;
+				// received_40022("received_40022");
+				// register_message(40022, received_40022, "received_40022"); // message trả về danh sách boss
+				manual_refresh_boss_status();
 				return;
 			}
+			manual_refresh_boss_status(); // message trả về danh sách boss
+			
 			// về thành nếu không có boss
 			if (boss_arr.length <= 0)
 			{
 				if (! get_mainchar_attribute_info()["isVIP"] && get_current_map_id() >= 200212 && get_current_map_id() <= 200214)
 				{
+					// truyền tống về lại tương dương
 					out_map_200212();
 					return;
 				}
 				if (get_current_map_id() != 20002)
 				{
+					// đi bộ về lại tương dương
 					go_to_map_20002();
 				}
+				if (channelID < 6 && !hasChangedChannel) {
+					channelID++;
+					hasChangedChannel = true;
+				} else if (channelID >= 6) {
+					// tắt auto săn boss
+					change_auto_state(); 
+				}
+				// send_10111(channelID);
 				return;
 			}
 			switch(auto_san_boss_type)
@@ -1329,7 +1537,7 @@
 					continue;
 				}
 			}
-			var boss_point = new Point(boss_x,boss_y);
+			var boss_point:Point = new Point(boss_x,boss_y);
 			if (calculate_distance(char_point,boss_point) <= 1000 && target_char != null && target_char["data"]["attributeInfo"]["hpNow"] != 0)
 			{
 				send_command(PipeConstants["CHANGED_LOCKEDCHAR_BASE_ATTR"],target_char);
@@ -1896,6 +2104,16 @@
 			send_message(10083,data);
 		}
 		
+		private function send_10283(skill_id:int):void
+		{
+			var data:ByteArray = new ByteArray();
+			data.writeInt(skill_id);
+			data.writeShort(get_mainchar()["tile_x"]);
+			data.writeShort(get_mainchar()["tile_y"]);
+			data.writeDouble(getTimer());
+			send_message(10283,data);
+		}
+		
 		private function walk(map_id:int,tile_x:int = -1,tile_y:int = -1,show_auto_find_path_text:Boolean = true):void
 		{
 			MainCharSeachPathManager["mainCharWalk"](map_id + "," + tile_x + "," + tile_y + ",0",show_auto_find_path_text);
@@ -1923,6 +2141,23 @@
 			data.writeByte(line_id);
 			data.writeDouble(getTimer());
 			send_message(10111,data);
+		}
+		
+		private function manual_refresh_boss_status():void
+		{
+			if (! is_active_auto)
+			{
+				return;
+			}
+			if (! is_auto_start)
+			{
+				return;
+			}
+			if (! is_allow_auto)
+			{
+				return;
+			}
+			send_40021();
 		}
 		
 		private function auto_refresh_boss_status(e:TimerEvent):void

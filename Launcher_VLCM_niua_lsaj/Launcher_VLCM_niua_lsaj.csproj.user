@@ -3,6 +3,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Users\nili266\Desktop\GitHub Repo\Launcher_VLCM_lsaj\Launcher_VLCM_niua_lsaj\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Update="CustomControls\CButton.cs">
       <SubType>Component</SubType>

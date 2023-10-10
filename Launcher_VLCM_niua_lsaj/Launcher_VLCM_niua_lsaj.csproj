@@ -19,6 +19,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Launcher_VLCM_niua_lsaj.Program</StartupObject>
+    <ApplicationIcon>Resources\app_icon.ico</ApplicationIcon>
+    <AssemblyName>Launcher_LSAJ</AssemblyName>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AxInterop.ShockwaveFlashObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -37,6 +40,10 @@
     <Content Include="dll\AxInterop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Interop.ShockwaveFlashObjects.dll" />
     <Content Include="dll\Web_Request.dll" />
+    <Content Include="Resources\app_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\net7.0-windows\models\captcha\captcha_model.onnx" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Emgu.CV" Version="4.4.0.4099" />
